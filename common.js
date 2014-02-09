@@ -9,34 +9,28 @@
 function createTitleLandscape() {
     var titleLandscape = new Landscape("#007700", "#009900", "#00AA00", 600);
     titleLandscape.defineGenerateTerrain(function (path) {
-        var color;
-        switch (path) {
-            case FAR:
-                color = this.terrainColorFar;
-                break;
-            case MID:
-                color = this.terrainColorMid;
-                break;
-            case NEAR:
-                color = this.terrainColorNear;
-                break;
-            default:
-                color = "black";
-        }
+        var color = this.pathToColor(path);
         var terrain = generateSurface(path, color);
         registerObject(pathToLandscapeLayer(path), terrain);
 
-        var decorationCount = Math.floor(random() * 2);
-        for (var i = 0; i < decorationCount; i++) {
-            var image = getImageResource("imgDecTree1");
-            var scale =  getPathScale(path) + (random() * 0.6);
-            var position = Math.floor(random() * reaches[path].radius * 2)
-                + reaches[path].position - reaches[path].radius;
-            var decorationOffset = Math.floor(random()*10) + 60;
-
-            var newDecoration = new Decoration(image, scale, path, decorationOffset, position);
-            registerObject(pathToDecorationLayer(path), newDecoration);
+        var patchSet = [];
+        for (var i = 1; i < 3; i++) {
+            patchSet.push(getImageResource("imgDecGrassPatch" + i));
         }
+        patchSet.push(getImageResource("imgDecGrassFlower1"));
+        decorateReaches(path, -3, 3, 0.6, 50, patchSet);
+
+        var shrubSet = [];
+        for (i = 1; i < 3; i++) {
+            shrubSet.push(getImageResource("imgDecGrassShrub" + i));
+        }
+        decorateReaches(path, 0, 2.5, 0.5, 90, shrubSet);
+
+        var treeSet = [];
+        for (i = 1; i < 5; i++) {
+            treeSet.push(getImageResource("imgDecGrassTree" + i));
+        }
+        decorateReaches(path, 0, 2, 1, 10, treeSet);
     });
     return titleLandscape;
 }

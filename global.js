@@ -362,6 +362,20 @@ function generateSurface(path, color) {
     return terrain;
 }
 
+function decorateReaches(path, layerOffset, density, scaleModifier, offset, imageSet) {
+    var decorationCount = Math.floor(random() * density);
+    for (var i = 0; i < decorationCount; i++) {
+        var image = imageSet[Math.floor(Math.random() * imageSet.length)];
+        var scale =  (getPathScale(path) + (random() * 0.6)) * scaleModifier;
+        var position = Math.floor(random() * reaches[path].radius * 2)
+            + reaches[path].position - reaches[path].radius;
+        var decorationOffset = (Math.floor(Math.random() * (offset / 5)) + image.height + offset);
+
+        var newDecoration = new Decoration(image, scale, path, decorationOffset, position);
+        registerObject(pathToDecorationLayer(path) + layerOffset, newDecoration);
+    }
+}
+
 function drawTextbox(xPos, yPos, width, height) {
     fc.beginPath();
     fc.fillStyle = "#FFFFFF";
@@ -806,7 +820,7 @@ function deliverImpacts() {
 }
 
 function tick() {
-    //window.setTimeout(tick, 20);
+    window.setTimeout(tick, 20);
 
     fc.clearRect(0, 0, W, H);
     for (var i = 0; i < layers.length; i++) {
@@ -905,5 +919,5 @@ function tick() {
 
     keyPressed = KEY_NONE;
 
-    window.setTimeout(tick, 20);
+    //window.setTimeout(tick, 20);
 }

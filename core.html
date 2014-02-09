@@ -28,7 +28,15 @@ Rat Rider Dominique v.0.65 ALPHA
 
             <img id="imgPortraitDominique" src="resources/portraits/dominique.png">
 
-            <img id="imgDecTree1" src="resources/decorations/decoration1.png">
+            <img id="imgDecGrassTree1" src="resources/decorations/grasslands/tree1.png">
+            <img id="imgDecGrassTree2" src="resources/decorations/grasslands/tree2.png">
+            <img id="imgDecGrassTree3" src="resources/decorations/grasslands/tree3.png">
+            <img id="imgDecGrassTree4" src="resources/decorations/grasslands/tree4.png">
+            <img id="imgDecGrassShrub1" src="resources/decorations/grasslands/shrub1.png">
+            <img id="imgDecGrassShrub2" src="resources/decorations/grasslands/shrub2.png">
+            <img id="imgDecGrassPatch1" src="resources/decorations/grasslands/patch1.png">
+            <img id="imgDecGrassPatch2" src="resources/decorations/grasslands/patch2.png">
+            <img id="imgDecGrassFlower1" src="resources/decorations/grasslands/flower1.png">
 
             <img id="imgHeroStand" src="resources/hero/stand.png">
             <img id="imgHeroMove1" src="resources/hero/move-1.png">
@@ -43,8 +51,10 @@ Rat Rider Dominique v.0.65 ALPHA
 
             <img id="imgObjHouse1" src="resources/objects/house1.png">
 
-            <img id="imgEnemy1Stand" src="resources/enemies/enm1-1.png">
-            <img id="imgEnemy1Attack" src="resources/enemies/enm1-2.png">
+            <img id="imgEnemyBandit1Stand" src="resources/enemies/bandit1.png">
+            <img id="imgEnemyBandit1Attack" src="resources/enemies/bandit1attack.png">
+            <img id="imgEnemyWolf1Stand" src="resources/enemies/wolf1.png">
+            <img id="imgEnemyWolf1Attack" src="resources/enemies/wolf1attack.png">
         </td>
         <td style="display: none;">
             <span id="txtIntro1">
@@ -92,7 +102,9 @@ Rat Rider Dominique v.0.65 ALPHA
 
     setControlMode(CM_NONE);
     initializeGui();
-    createTitleLandscape().resetTerrain();
+    landscape = createTitleLandscape();
+    landscape.resetTerrain();
+    registerObject(GUI_EVENT, landscape);
     var logoDisplay = new Sequence();
     var logoAppearAction = new Action();
     var logoDisplayAction = new Action();
@@ -145,41 +157,11 @@ Rat Rider Dominique v.0.65 ALPHA
         displayGui = true;
         moving = true;
         for (i = 0; i < 3; i++) { objectsOnLayer[i] = 0; }
-        landscape = new Landscape("#007700", "#009900", "#00AA00", 600);
-        landscape.defineGenerateTerrain(function (path) {
-            var color;
-            switch (path) {
-                case FAR:
-                    color = this.terrainColorFar;
-                    break;
-                case MID:
-                    color = this.terrainColorMid;
-                    break;
-                case NEAR:
-                    color = this.terrainColorNear;
-                    break;
-                default:
-                    color = "black";
-            }
-            var terrain = generateSurface(path, color);
-            registerObject(pathToLandscapeLayer(path), terrain);
-
-            var decorationCount = Math.floor(random() * 2);
-            for (var i = 0; i < decorationCount; i++) {
-                var image = getImageResource("imgDecTree1");
-                var scale =  getPathScale(path) + (random() * 0.6);
-                var position = Math.floor(random() * reaches[path].radius * 2)
-                        + reaches[path].position - reaches[path].radius;
-                var decorationOffset = Math.floor(random()*10) + 60;
-
-                var newDecoration = new Decoration(image, scale, path, decorationOffset, position);
-                registerObject(pathToDecorationLayer(path), newDecoration);
-            }
-        });
+        landscape = createTitleLandscape();
         landscape.resetTerrain();
         var houseType = new ObjectType(0.5);
         houseType.defineGenerateObject(function (path, position) {
-            var house = new FieldObject(path, position, 80, getImageResource("imgObjHouse1"));
+            var house = new FieldObject(path, position, 50, getImageResource("imgObjHouse1"));
             house.defineTrigger(function () {
                 var houseSequence = new Sequence();
                 houseSequence.addAction(procureStopAction());
@@ -215,8 +197,8 @@ Rat Rider Dominique v.0.65 ALPHA
         });
         var banditType = new ObjectType(0.5);
         banditType.defineGenerateObject(function (path, position) {
-            var bandit = new FieldObject(path, position, 80, getImageResource("imgEnemy1Stand"));
-            bandit.setAttackImage(getImageResource("imgEnemy1Attack"));
+            var bandit = new FieldObject(path, position, 50, getImageResource("imgEnemyBandit1Stand"));
+            bandit.setAttackImage(getImageResource("imgEnemyBandit1Attack"));
             bandit.defineTrigger(function () {
                 var banditSequence = new Sequence();
                 banditSequence.addAction(procureStopAction());

@@ -43,6 +43,24 @@ function Landscape(terrainColorFar, terrainColorMid, terrainColorNear, objectFre
         }
     };
 
+    this.pathToColor = function (path) {
+        var color;
+        switch (path) {
+            case FAR:
+                color = this.terrainColorFar;
+                break;
+            case MID:
+                color = this.terrainColorMid;
+                break;
+            case NEAR:
+                color = this.terrainColorNear;
+                break;
+            default:
+                color = "black";
+        }
+        return color;
+    };
+
     this.defineGenerateTerrain = function (generateTerrain) {
         this.generateTerrain = generateTerrain;
     };
@@ -50,20 +68,22 @@ function Landscape(terrainColorFar, terrainColorMid, terrainColorNear, objectFre
     this.generateTerrain = function (path) {};
 
     this.manifest = function () {
-        for (var path = 0; path < 3; path++) {
-            while (objectsOnLayer[path] < this.objectsMin) {
-                var newObjectPosition = farthestObjects[path].position + this.objectFrequency * (0.5 + Math.random());
-                var chanceHit = Math.random();
-                var currentObjectTypeId = 0;
-                var chanceArea = this.objectTypes[currentObjectTypeId].chanceToAppear;
-                while ((currentObjectTypeId + 1 < this.objectTypes.length) && (chanceArea < chanceHit)) {
-                    currentObjectTypeId++;
-                    chanceArea += this.objectTypes[currentObjectTypeId].chanceToAppear;
+        if (this.objectTypes.length > 0) {
+            for (var path = 0; path < 3; path++) {
+                while (objectsOnLayer[path] < this.objectsMin) {
+                    var newObjectPosition = farthestObjects[path].position + this.objectFrequency * (0.5 + Math.random());
+                    var chanceHit = Math.random();
+                    var currentObjectTypeId = 0;
+                    var chanceArea = this.objectTypes[currentObjectTypeId].chanceToAppear;
+                    while ((currentObjectTypeId + 1 < this.objectTypes.length) && (chanceArea < chanceHit)) {
+                        currentObjectTypeId++;
+                        chanceArea += this.objectTypes[currentObjectTypeId].chanceToAppear;
+                    }
+                    var newObject = this.objectTypes[currentObjectTypeId].generateObject(path, newObjectPosition);
+                    registerObject(pathToObjectFrontLayer(path), newObject);
+                    objectsOnLayer[path]++;
+                    farthestObjects[path] = newObject;
                 }
-                var newObject = this.objectTypes[currentObjectTypeId].generateObject(path, newObjectPosition);
-                registerObject(pathToObjectFrontLayer(path), newObject);
-                objectsOnLayer[path]++;
-                farthestObjects[path] = newObject;
             }
         }
     };
