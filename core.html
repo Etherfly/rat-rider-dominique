@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rat Rider Dominique v.0.53 ALPHA</title>
+    <meta charset="windows-1251">
+</head>
+<body>
+
+Rat Rider Dominique v.0.65 ALPHA
+
+<table>
+    <tr>
+        <td style="background-color: #80C0FF; empty-cells: show;">
+            <canvas id="field" style="border: 1px solid black"></canvas>
+        </td>
+    </tr>
+    <tr>
+        <td style="display: none;">
+            <img id="imgResLogo" src="resources/other/logo.png">
+            <img id="imgCursorNext" src="resources/other/cursorNext.png">
+            <img id="imgCursorChoice" src="resources/other/cursorChoice.png">
+            <img id="imgGuiHpSpGauge" src="resources/other/hp-sp-gauge.png">
+            <img id="imgGuiEnemyHpGauge" src="resources/other/hp-gauge-enemy.png">
+            <img id="imgGuiAttributeBox" src="resources/other/attributeBox.png">
+            <img id="imgKarma" src="resources/other/karma.png">
+            <img id="imgBattleGauges" src="resources/other/battleGauges.png">
+            <img id="imgBattleImpactIcon" src="resources/other/iconImpact.png">
+
+            <img id="imgPortraitDominique" src="resources/portraits/dominique.png">
+
+            <img id="imgDecTree1" src="resources/decorations/decoration1.png">
+
+            <img id="imgHeroStand" src="resources/hero/stand.png">
+            <img id="imgHeroMove1" src="resources/hero/move-1.png">
+            <img id="imgHeroMove2" src="resources/hero/move-2.png">
+            <img id="imgHeroPrepare" src="resources/hero/prepare.png">
+            <img id="imgHeroAttack" src="resources/hero/attack.png">
+            <img id="imgHeroDefend" src="resources/hero/defend.png">
+
+            <img id="imgEffectHit1-1" src="resources/effects/hit1-1.png">
+            <img id="imgEffectHit1-2" src="resources/effects/hit1-2.png">
+            <img id="imgEffectHit1-3" src="resources/effects/hit1-3.png">
+
+            <img id="imgObjHouse1" src="resources/objects/house1.png">
+
+            <img id="imgEnemy1Stand" src="resources/enemies/enm1-1.png">
+            <img id="imgEnemy1Attack" src="resources/enemies/enm1-2.png">
+        </td>
+        <td style="display: none;">
+            <span id="txtIntro1">
+                For as long as he can remember, Dominique was a rebellious knight serving none but justice itself,
+                protecting the weak, punishing evil and giving all he had to the poor. <br> <br>
+                But most importantly, he appears to be a small boar.
+                And his trusty friend and steed is a phlegmatic rat by the name of Sallinger. <br>
+            </span>
+            <span id="txtIntro2">
+                Dominique protected a peaceful hamlet called Hogville where his younger brother, Vink, lived.
+                <br> <br> Vink was a scholar who sought to delve deep into the mysteries of this strange world.
+                <br> <br> All was fine until one day, when Dominique was away, a man of aristocratic taste and manners
+                came to Hogville and brought the light of progress along. The light of progress burned the village down and
+                his not so aristocratic henchmen took the villagers away. <br>
+            </span>
+            <span id="txtIntro3">
+                Upon their return, Dominique and Sallinger see only ruins.
+                Amidst the smoldering ashes of Vink's home they found an eerily untouched note saying: <br> <br>
+                "Windmills are waiting."
+            </span>
+            <span id="txtIntro4">
+                Guide Dominique on his quest for answers and justice! <br>
+                Navigate the landscape, fight enemies for experience
+                and visit different places for special effects. <br> <br>
+                W, S or arrows up and down - move farther/nearer; choose a menu item. <br>
+                A, D or arrows left and right - choose attack timing. <br>
+                Space or Enter - confirm/action. <br> <br>
+                Press ACTION to start.
+            </span>
+        </td>
+    </tr>
+</table>
+
+<script src="global.js"></script>
+<script src="object.js"></script>
+<script src="common.js"></script>
+<script type="text/javascript">
+
+    /* ================================== */
+    /* ========= INITIALIZATION ========= */
+    /* ================================== */
+
+    CURSOR_NEXT = getImageResource("imgCursorNext");
+    CURSOR_CHOICE = getImageResource("imgCursorChoice");
+
+    setControlMode(CM_NONE);
+    initializeGui();
+    createTitleLandscape().resetTerrain();
+    var logoDisplay = new Sequence();
+    var logoAppearAction = new Action();
+    var logoDisplayAction = new Action();
+    var imgResLogo = getImageResource("imgResLogo");
+    logoAppearAction.definePlayFrame(function (frame) {
+        fc.beginPath();
+        fc.drawImage(imgResLogo, (W - imgResLogo.width / 2) / 2, -imgResLogo.height / 2 + frame * 4, 700, 471);
+        return frame * 4 > imgResLogo.height / 2 + 10;
+    });
+    logoDisplayAction.definePlayFrame(function (frame) {
+        fc.beginPath();
+        fc.drawImage(imgResLogo, (W - imgResLogo.width / 2) / 2, 10, 700, 471);
+        if (frame % 50 < 25) {
+            fc.beginPath();
+            fc.fillStyle = "white";
+            fc.font = "bold 24pt Courier New";
+            fc.fillText("PRESS SPACE OR ENTER", (W - 375) / 2, 110 + imgResLogo.height / 2);
+        }
+        if (keyPressed == KEY_ACTION) {
+            var gameStart = new Sequence();
+            gameStart.addAction(procureMaskAction());
+            gameStart.addAction(procureDisplayFreeTextAction(200, 200, W - 400, getTextResource("txtIntro1"), true));
+            gameStart.addAction(procureDisplayFreeTextAction(200, 200, W - 400, getTextResource("txtIntro2"), true));
+            gameStart.addAction(procureDisplayFreeTextAction(200, 200, W - 400, getTextResource("txtIntro3"), true));
+            gameStart.addAction(procureDisplayMessageAction((W - 1100) / 2, 200, 1100, 300,
+                    getTextResource("txtIntro4"), false));
+            gameStart.addAction(procureCodeFragmentAction(resetGame));
+            gameStart.addAction(procureUnmaskAction());
+            registerObject(GUI_EVENT, gameStart);
+            return true;
+        } else {
+            return false;
+        }
+    });
+    logoDisplay.addAction(logoAppearAction);
+    logoDisplay.addAction(logoDisplayAction);
+    registerObject(GUI_EVENT, logoDisplay);
+
+    window.setTimeout(tick, 20);
+
+    /* ================================== */
+    /* =========== MAIN BLOCK =========== */
+    /* ================================== */
+
+    function resetGame() {
+        clearObjectType("Hero");
+        hero = new Hero();
+        hero.setAnimationState(AN_MOVE_1);
+        registerObject(OBJECTS_MID, hero);
+        displayGui = true;
+        moving = true;
+        for (i = 0; i < 3; i++) { objectsOnLayer[i] = 0; }
+        landscape = new Landscape("#007700", "#009900", "#00AA00", 600);
+        landscape.defineGenerateTerrain(function (path) {
+            var color;
+            switch (path) {
+                case FAR:
+                    color = this.terrainColorFar;
+                    break;
+                case MID:
+                    color = this.terrainColorMid;
+                    break;
+                case NEAR:
+                    color = this.terrainColorNear;
+                    break;
+                default:
+                    color = "black";
+            }
+            var terrain = generateSurface(path, color);
+            registerObject(pathToLandscapeLayer(path), terrain);
+
+            var decorationCount = Math.floor(random() * 2);
+            for (var i = 0; i < decorationCount; i++) {
+                var image = getImageResource("imgDecTree1");
+                var scale =  getPathScale(path) + (random() * 0.6);
+                var position = Math.floor(random() * reaches[path].radius * 2)
+                        + reaches[path].position - reaches[path].radius;
+                var decorationOffset = Math.floor(random()*10) + 60;
+
+                var newDecoration = new Decoration(image, scale, path, decorationOffset, position);
+                registerObject(pathToDecorationLayer(path), newDecoration);
+            }
+        });
+        landscape.resetTerrain();
+        var houseType = new ObjectType(0.5);
+        houseType.defineGenerateObject(function (path, position) {
+            var house = new FieldObject(path, position, 80, getImageResource("imgObjHouse1"));
+            house.defineTrigger(function () {
+                var houseSequence = new Sequence();
+                houseSequence.addAction(procureStopAction());
+                houseSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, "Hello, world!", false)
+                        .addChoice("Yeah, hi.")
+                        .addChoice("All is dust."));
+                houseSequence.addAction(procureCodeFragmentAction(function () {
+                    var houseSequenceAnswered = new Sequence();
+                    if (currentChoice == 0) {
+                        houseSequenceAnswered.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL, "Wow! A talking boar!", true));
+                        houseSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                            hero.restoreHp(18);
+                        }));
+                    } else {
+                        houseSequenceAnswered.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL,  "Ooohhhkay...", true));
+                        houseSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                            hero.expendHp(28);
+                            hero.expendSp(37);
+                            hero.attrAttack += 0.23;
+                            hero.attrDefense += 0.31;
+                            hero.attrAgility += 0.11;
+                            hero.attrReflexes += 0.05;
+                        }));
+                    }
+                    houseSequenceAnswered.addAction(procureResumeAction());
+                    registerObject(GUI_EVENT, houseSequenceAnswered);
+                }));
+                registerObject(GUI_EVENT, houseSequence);
+            });
+            return house;
+        });
+        var banditType = new ObjectType(0.5);
+        banditType.defineGenerateObject(function (path, position) {
+            var bandit = new FieldObject(path, position, 80, getImageResource("imgEnemy1Stand"));
+            bandit.setAttackImage(getImageResource("imgEnemy1Attack"));
+            bandit.defineTrigger(function () {
+                var banditSequence = new Sequence();
+                banditSequence.addAction(procureStopAction());
+                banditSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, "\"Hey, there! Wanna fight?\"", false)
+                        .addChoice("Anytime!")
+                        .addChoice("Sorry, dude, not now."));
+                banditSequence.addAction(procureCodeFragmentAction(function () {
+                    var banditSequenceAnswered = new Sequence();
+                    if (currentChoice == 0) {
+                        banditSequenceAnswered.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL, "\"Heh! Let's rock!\"", true));
+                        banditSequenceAnswered.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL, "A bandit approaches!", true));
+                        var banditSequenceFinished = new Sequence();
+                        banditSequenceFinished.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL,
+                                        "\"That was a fine display of skill...\"", true));
+                        banditSequenceFinished.addAction(procureResumeAction());
+                        banditSequenceAnswered.addAction(procureInitiateBattleAction(enlistBandit(bandit),
+                                banditSequenceFinished));
+                    } else {
+                        banditSequenceAnswered.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL,  "\"Aw, what a shame...\"", true));
+                        banditSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                            hero.restoreHp(25);
+                            hero.restoreSp(25);
+                        }));
+                        banditSequenceAnswered.addAction(procureResumeAction());
+                    }
+                    registerObject(GUI_EVENT, banditSequenceAnswered);
+                }));
+                registerObject(GUI_EVENT, banditSequence);
+            });
+            return bandit;
+        });
+        landscape.addObjectType(houseType);
+        landscape.addObjectType(banditType);
+        registerObject(GUI_EVENT, landscape);
+        setControlMode(CM_FIELD);
+    }
+
+</script>
+
+</body>
+</html>
