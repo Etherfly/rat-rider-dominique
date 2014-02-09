@@ -30,23 +30,23 @@ var controlMode = CM_NONE;
 
 var layers = [];    // global object storage
 
-var LANDSCAPE_FAR = 1;          layers[LANDSCAPE_FAR] = [];
-var OBJECTS_FAR_BG = 2;         layers[OBJECTS_FAR_BG] = [];
-var OBJECTS_FAR = 3;            layers[OBJECTS_FAR] = [];
-var OBJECTS_FAR_FRONT = 4;      layers[OBJECTS_FAR_FRONT] = [];
-var DECORATIONS_FAR = 5;        layers[DECORATIONS_FAR] = [];
-var LANDSCAPE_MID = 7;          layers[LANDSCAPE_MID] = [];
-var OBJECTS_MID_BG = 8;         layers[OBJECTS_MID_BG] = [];
-var OBJECTS_MID = 9;            layers[OBJECTS_MID] = [];
-var OBJECTS_MID_FRONT = 10;     layers[OBJECTS_MID_FRONT] = [];
-var DECORATIONS_MID = 11;       layers[DECORATIONS_MID] = [];
-var LANDSCAPE_NEAR = 13;        layers[LANDSCAPE_NEAR] = [];
-var OBJECTS_NEAR_BG = 14;       layers[OBJECTS_NEAR_BG] = [];
-var OBJECTS_NEAR = 15;          layers[OBJECTS_NEAR] = [];
-var OBJECTS_NEAR_FRONT = 16;    layers[OBJECTS_NEAR_FRONT] = [];
-var DECORATIONS_NEAR = 17;      layers[DECORATIONS_NEAR] = [];
-var GUI_COMMON = 19;            layers[GUI_COMMON] = [];
-var GUI_EVENT = 22;             layers[GUI_EVENT] = [];
+var LANDSCAPE_FAR = 1;
+var OBJECTS_FAR_BG = 2;
+var OBJECTS_FAR = 3;
+var OBJECTS_FAR_FRONT = 4;
+var DECORATIONS_FAR = 5;
+var LANDSCAPE_MID = 7;
+var OBJECTS_MID_BG = 8;
+var OBJECTS_MID = 9;
+var OBJECTS_MID_FRONT = 10;
+var DECORATIONS_MID = 11;
+var LANDSCAPE_NEAR = 13;
+var OBJECTS_NEAR_BG = 14;
+var OBJECTS_NEAR = 15;
+var OBJECTS_NEAR_FRONT = 16;
+var DECORATIONS_NEAR = 17;
+var GUI_COMMON = 19;
+var GUI_EVENT = 22;
 
 // path layers
 var FAR = 0; var MID = 1; var NEAR = 2;
@@ -190,6 +190,34 @@ function getImageResource(id) {
 function getTextResource(id) {
     var string = document.getElementById(id).innerHTML;
     return string.replace(/\n/g, "").replace(/ +/g, " ").replace(/^ /, "");
+}
+
+
+function resetGame() {
+    layers.length = 23;
+    for (var i = 0; i < 23; i++) {
+        // Yeah, javascript, you're the best.
+        layers[i] = [];
+    }
+    setControlMode(CM_NONE);
+    initializeGui();
+    landscape = createTitleLandscape();
+    landscape.resetTerrain();
+    moving = true;
+    registerObject(GUI_EVENT, landscape);
+    registerObject(GUI_EVENT, procureTitleSequence());
+}
+
+function saveGame() {
+    // TODO: localStorage game saving
+}
+
+function loadGame() {
+    var loadGameSequence = new Sequence();
+    loadGameSequence.addAction(procureDisplayCenteredMessageAction(400,
+        "Sincerest apologies, but this feature is not implemented yet.", true));
+    loadGameSequence.addAction(procureTitleSequence());
+    registerObject(GUI_EVENT, loadGameSequence);
 }
 
 function setControlMode(newControlMode) {
@@ -667,6 +695,7 @@ function initializeGui() {
         }
     });
     registerObject(GUI_COMMON, skillSet);
+    displayGui = false;
 }
 
 function registerImpact(attacker, target, attackPower) {

@@ -97,17 +97,7 @@ function Landscape(terrainColorFar, terrainColorMid, terrainColorNear, objectFre
     };
 
     this.destroy = function() {
-        for (var i = 0; i < layers.length; i++) {
-            if (!(typeof layers[i] === "undefined")) {
-                for (var j = 0; j < layers[i].length; j++) {
-                    var object = layers[i][j];
-                    if (!(typeof object === "undefined")
-                        && (object.type == "FieldObject")) {
-                        object.deletable = true;
-                    }
-                }
-            }
-        }
+        clearObjectType("FieldObject");
         this.deletable = true;
     };
 }

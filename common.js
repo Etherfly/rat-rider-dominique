@@ -18,7 +18,7 @@ function createTitleLandscape() {
             patchSet.push(getImageResource("imgDecGrassPatch" + i));
         }
         patchSet.push(getImageResource("imgDecGrassFlower1"));
-        decorateReaches(path, -3, 3, 0.6, 50, patchSet);
+        decorateReaches(path, -3, 4, 0.6, 50, patchSet);
 
         var shrubSet = [];
         for (i = 1; i < 3; i++) {
@@ -33,6 +33,51 @@ function createTitleLandscape() {
         decorateReaches(path, 0, 2, 1, 10, treeSet);
     });
     return titleLandscape;
+}
+
+/* SEQUENCES */
+
+function procureTitleSequence() {
+    var titleDisplay = new Sequence();
+    var logoAppearAction = new Action();
+    var titleDisplayAction = new Action();
+    var imgResLogo = getImageResource("imgResLogo");
+    logoAppearAction.definePlayFrame(function (frame) {
+        fc.beginPath();
+        fc.drawImage(imgResLogo, (W - imgResLogo.width / 2) / 2, -imgResLogo.height / 2 + frame * 4, 700, 471);
+        return frame * 4 > imgResLogo.height / 2 + 10;
+    });
+    titleDisplayAction.definePlayFrame(function (frame) {
+        fc.beginPath();
+        fc.drawImage(imgResLogo, (W - imgResLogo.width / 2) / 2, 10, 700, 471);
+        if (frame % 50 < 25) {
+            fc.beginPath();
+            fc.fillStyle = "white";
+            fc.font = "bold 24pt Courier New";
+            fc.fillText("PRESS SPACE OR ENTER", (W - 375) / 2, 110 + imgResLogo.height / 2);
+        }
+        if (keyPressed == KEY_ACTION) {
+            var mainMenuSequence = new Sequence();
+            mainMenuSequence.addAction(procureDisplayCenteredMessageAction(300, "", true)
+                .addChoice("New game").addChoice("Load game"));
+            mainMenuSequence.addAction(procureCodeFragmentAction(function () {
+                switch (currentChoice) {
+                    case 0:
+                        registerObject(GUI_EVENT, procureStartPrologueSequence());
+                        break;
+                    default:
+                        loadGame();
+                }
+            }));
+            registerObject(GUI_EVENT, mainMenuSequence);
+            return true;
+        } else {
+            return false;
+        }
+    });
+    titleDisplay.addAction(logoAppearAction);
+    titleDisplay.addAction(titleDisplayAction);
+    return titleDisplay;
 }
 
 /* ACTIONS */
