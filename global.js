@@ -97,6 +97,9 @@ var ATTR_DEFENSE = 1;
 var ATTR_AGILITY = 2;
 var ATTR_REFLEXES = 3;
 
+var SP_RECOVERY_BASIS = 0.05;
+var PATH_CHANGE_SP_COST_RATIO = 0.25;
+
 var attrIncrease = [];
 attrIncrease[ATTR_ATTACK] = 0;      // attack is increased by... attacking and dealing damage
 attrIncrease[ATTR_DEFENSE] = 0;     // defense is increased by defending
@@ -708,6 +711,9 @@ function handleBattleEnd() {
                 + " <br> Reflexes experience +" + Math.floor(attrIncrease[ATTR_REFLEXES] * 100) + "%"
                 + " <br> <br> Karma +" + karmaGained, true));
         battleEndSequence.addAction(procureCodeFragmentAction(function () {
+            heroHpShake = 0;
+            enemyHpShake = 0;
+
             hero.attrAttack += attrIncrease[ATTR_ATTACK];
             hero.attrDefense += attrIncrease[ATTR_DEFENSE];
             hero.attrAgility += attrIncrease[ATTR_AGILITY];
@@ -865,7 +871,7 @@ function tick() {
     }
 
     if (controlMode == CM_FIELD) {
-        hero.restoreSp(0.05);
+        hero.restoreSp(SP_RECOVERY_BASIS);
 
         switch (keyPressed) {
             case KEY_UP:

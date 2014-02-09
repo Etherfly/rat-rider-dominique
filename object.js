@@ -269,13 +269,23 @@ function Hero() {
 
     this.moveFarther = function() {
         if (this.path != FAR) {
-            this.path--;
+            if (this.sp > this.attrMaxSp * PATH_CHANGE_SP_COST_RATIO) {
+                this.sp -= this.attrMaxSp * PATH_CHANGE_SP_COST_RATIO;
+                this.path--;
+            } else {
+                registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_SPGAUGE_FLASH, "#FF6060", null));
+            }
         }
     };
 
-    this.moveNearer = function() {
+    this.moveNearer = function () {
         if (this.path != NEAR) {
-            this.path++
+            if (this.sp > this.attrMaxSp * PATH_CHANGE_SP_COST_RATIO) {
+                this.sp -= this.attrMaxSp * PATH_CHANGE_SP_COST_RATIO;
+                this.path++;
+            } else {
+                registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_SPGAUGE_FLASH, "#FF6060", null));
+            }
         }
     };
 
