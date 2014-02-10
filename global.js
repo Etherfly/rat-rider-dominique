@@ -747,11 +747,11 @@ function handleBattleEnd() {
     }
     if (hero.hp > 0) {
         var karmaGained = enemy.getKarma();
-        battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM,
-            "BATTLE RESULTS <br> <br> Attack experience +" + Math.floor(attrIncrease[ATTR_ATTACK] * 100) + "%"
-                + " <br> Defense experience +" + Math.floor(attrIncrease[ATTR_DEFENSE] * 100) + "%"
-                + " <br> Agility experience +" + Math.floor(attrIncrease[ATTR_AGILITY] * 100) + "%"
-                + " <br> Reflexes experience +" + Math.floor(attrIncrease[ATTR_REFLEXES] * 100) + "%"
+        battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL,
+            "BATTLE RESULTS <br> <br> Attack growth +" + Math.floor(attrIncrease[ATTR_ATTACK] * 100) + "%"
+                + " <br> Defense growth +" + Math.floor(attrIncrease[ATTR_DEFENSE] * 100) + "%"
+                + " <br> Agility growth +" + Math.floor(attrIncrease[ATTR_AGILITY] * 100) + "%"
+                + " <br> Reflexes growth +" + Math.floor(attrIncrease[ATTR_REFLEXES] * 100) + "%"
                 + " <br> <br> Karma +" + karmaGained, true));
         battleEndSequence.addAction(procureCodeFragmentAction(function () {
             heroHpShake = 0;

@@ -4,11 +4,16 @@
  * This file contains objects specific to or introduced in the prologue.
  */
 
+/* LANDSCAPE */
+
+
+
 /* SEQUENCES */
 
 function procureStartPrologueSequence() {
     var startPrologue = new Sequence();
     startPrologue.addAction(procureMaskAction());
+    startPrologue.addAction(procureDisplayFreeTextAction(500, 200, W - 1000, "Prologue: Hero's Karma", true));
     startPrologue.addAction(procureDisplayFreeTextAction(200, 200, W - 400, getTextResource("txtIntro1"), true));
     startPrologue.addAction(procureDisplayFreeTextAction(200, 200, W - 400, getTextResource("txtIntro2"), true));
     startPrologue.addAction(procureDisplayFreeTextAction(200, 200, W - 400, getTextResource("txtIntro3"), true));
@@ -107,3 +112,8 @@ function procureStartPrologueSequence() {
     startPrologue.addAction(procureUnmaskAction());
     return startPrologue;
 }
+
+/* FIELD OBJECTS */
+
+/* ENEMIES */
+
