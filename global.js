@@ -63,6 +63,7 @@ var KEY_UP = 3;
 var KEY_DOWN = 4;
 var KEY_ACTION = 5;
 var KEY_ESC = 6;
+var KEY_LANG = 7;
 
 var keyPressed = KEY_NONE;
 var keyCtrl = false;
@@ -137,10 +138,21 @@ var BATTLEGAUGE_FLASH_LENGTH = 1;
 var displayGui = false;
 var blackMask = false;
 
-var currentChoice = 0;
+var eventChoice = 0;
 
 var CURSOR_NEXT;
 var CURSOR_CHOICE;
+
+var LANG_ENG = 0;       // English language
+var LANG_RUS = 1;       // Русский язык
+
+var lang = LANG_ENG;    // current language
+
+// global game state storage
+
+var gst = [];
+
+var CH00 = 0;   // prologue
 
 /* RESOURCES */
 
@@ -193,11 +205,31 @@ function getTextResource(id) {
 }
 
 
+function initializeChapterData(chapterId) {
+    switch (chapterId) {
+        case CH00:
+            for (var i = 0; i < 7; i++) {
+                gst[chapterId][i] = 0;
+            }
+            break;
+        default:
+            for (i = 0; i < gst[chapterId].length; i++) {
+                gst[chapterId][i] = 0;
+            }
+    }
+}
+
 function resetGame() {
     layers.length = 23;
-    for (var i = 0; i < 23; i++) {
+    for (var i = 0; i < layers.length; i++) {
         // Yeah, javascript, you're the best.
         layers[i] = [];
+    }
+    gst.length = 8;
+    for (i = 0; i < gst.length; i++) {
+        // ...
+        gst[i] = [];
+        initializeChapterData(i);
     }
     setControlMode(CM_NONE);
     initializeGui();
@@ -205,7 +237,6 @@ function resetGame() {
     landscape.resetTerrain();
     moving = true;
     registerObject(GUI_EVENT, landscape);
-    registerObject(GUI_EVENT, procureTitleSequence());
 }
 
 function saveGame() {
@@ -213,6 +244,7 @@ function saveGame() {
 }
 
 function loadGame() {
+    resetGame();
     var loadGameSequence = new Sequence();
     loadGameSequence.addAction(procureDisplayCenteredMessageAction(400,
         "Sincerest apologies, but this feature is not implemented yet.", true));
@@ -248,6 +280,9 @@ document.onkeydown = function (event) {
             break;
         case 27:
             keyPressed = KEY_ESC;
+            break;
+        case 192:
+            keyPressed = KEY_LANG;
             break;
         default:
             keyPressed = KEY_NONE;
@@ -367,6 +402,17 @@ function getBattleGaugeOffset(character) {
         return 56;
     } else {
         return 179;
+    }
+}
+
+function getHeroStrengthScale(startingHeroStrength, maxHeroStrength) {
+    var heroStrength = hero.attrAttack * hero.attrDefense * hero.attrAgility * hero.attrReflexes;
+    if (heroStrength < startingHeroStrength) {
+        return 1;
+    } else if (heroStrength > maxHeroStrength) {
+        return Math.sqrt(Math.sqrt((maxHeroStrength / startingHeroStrength - 1) * 0.2 + 1));
+    } else {
+        return Math.sqrt(Math.sqrt((heroStrength / startingHeroStrength - 1) * 0.2 + 1));
     }
 }
 
@@ -513,11 +559,12 @@ function initializeGui() {
     var imgGuiAttributeBox = getImageResource("imgGuiAttributeBox");
     var attributeBox = new GuiElement(imgGuiAttributeBox, 10, H - imgGuiAttributeBox.height - 60);
     attributeBox.defineReflect(function() {
-        function displayAttribute(attribute, offset) {
+        function displayAttribute(attrName, attribute, offset) {
             fc.beginPath();
             fc.fillStyle = "white";
             fc.font = "bold 18pt Courier New";
             var yPos = H - imgGuiAttributeBox.height + offset;
+            fc.fillText(attrName[lang], 72, yPos);
             fc.fillText(Math.floor(attribute).toString(), 216, yPos);
             fc.beginPath();
             fc.fillStyle = "#FFD010";
@@ -548,16 +595,16 @@ function initializeGui() {
             fc.fillStyle = "white";
             fc.font = "bold 18pt Courier New";
             var offset = -24;
-            displayAttribute(hero.attrAttack, offset);
+            displayAttribute(TXT_ATTR_ATTACK, hero.attrAttack, offset);
             displayEffectiveAttribute(hero.effAttack, offset);
             offset += 49;
-            displayAttribute(hero.attrDefense, offset);
+            displayAttribute(TXT_ATTR_DEFENSE,hero.attrDefense, offset);
             displayEffectiveAttribute(hero.effDefense, offset);
             offset += 49;
-            displayAttribute(hero.attrAgility, offset);
+            displayAttribute(TXT_ATTR_AGILITY,hero.attrAgility, offset);
             displayEffectiveAttribute(hero.effAgility, offset);
             offset += 49;
-            displayAttribute(hero.attrReflexes, offset);
+            displayAttribute(TXT_ATTR_REFLEXES,hero.attrReflexes, offset);
             displayEffectiveAttribute(hero.effReflexes, offset);
         }
     });
@@ -568,13 +615,13 @@ function initializeGui() {
         if (hero != null) {
             drawTextbox(this.xPos, this.yPos, 350, 45);
             fc.beginPath();
-            fc.drawImage(imgKarma, this.xPos + 8, this.yPos + 8, 30, 30);
             fc.fillStyle = "white";
             fc.font = "bold 18pt Courier New";
-            fc.fillText("Karma", this.xPos + 45, this.yPos + 29);
+            fc.fillText(TXT_KARMA[lang], this.xPos + 15, this.yPos + 29);
             var displayValue = hero.karma.toString();
-            var valueOffset = (8 - displayValue.length) * 14;
-            fc.fillText(displayValue, this.xPos + 220 + valueOffset, this.yPos + 29);
+            var valueOffset = (8 - displayValue.length) * 14.2;
+            fc.fillText(displayValue, this.xPos + 190 + valueOffset, this.yPos + 29);
+            fc.drawImage(imgKarma, this.xPos + 308, this.yPos + 8, 30, 30);
         }
     });
     registerObject(GUI_COMMON, karmaDisplay);
@@ -664,21 +711,21 @@ function initializeGui() {
             }
             drawTextbox(W - 350, 54, 330, 50 + 30 * lineCount);
             if (keyPressed == KEY_UP) {
-                if (currentChoice > 0) {
-                    currentChoice--;
+                if (eventChoice > 0) {
+                    eventChoice--;
                 } else {
-                    currentChoice = hero.skillSet.length - 1;
+                    eventChoice = hero.skillSet.length - 1;
                 }
             } else if (keyPressed == KEY_DOWN) {
-                if (currentChoice < hero.skillSet.length - 1) {
-                    currentChoice++;
+                if (eventChoice < hero.skillSet.length - 1) {
+                    eventChoice++;
                 } else {
-                    currentChoice = 0;
+                    eventChoice = 0;
                 }
             }
             for (var i = 0; i < hero.skillSet.length; i++) {
-                writeLine(hero.skillSet[i].name, i, 50);
-                if (i == currentChoice) {
+                writeLine(hero.skillSet[i].name[lang], i, 50);
+                if (i == eventChoice) {
                     var artifactData = hero.skillSet[i].getArtifacts(0);
                     for (var j = 0; j < artifactData.length; j++) {
                         artifactData[j].sketch(getAbsoluteArtifactPosition(0), hero);
@@ -707,7 +754,7 @@ function registerImpact(attacker, target, attackPower) {
 }
 
 function handleBattleEnd() {
-    battleFrame = 0;
+    battleFrame = null;
     behaviorFluctuation = 0;
     controlMode = CM_NONE;
     hero.battleGaugeArtifacts.length = 0;
@@ -747,12 +794,19 @@ function handleBattleEnd() {
     }
     if (hero.hp > 0) {
         var karmaGained = enemy.getKarma();
-        battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL,
-            "BATTLE RESULTS <br> <br> Attack growth +" + Math.floor(attrIncrease[ATTR_ATTACK] * 100) + "%"
-                + " <br> Defense growth +" + Math.floor(attrIncrease[ATTR_DEFENSE] * 100) + "%"
-                + " <br> Agility growth +" + Math.floor(attrIncrease[ATTR_AGILITY] * 100) + "%"
-                + " <br> Reflexes growth +" + Math.floor(attrIncrease[ATTR_REFLEXES] * 100) + "%"
-                + " <br> <br> Karma +" + karmaGained, true));
+        var battleResultsMessage = [
+            TXT_BATTLE_RESULTS_1[LANG_ENG] + Math.floor(attrIncrease[ATTR_ATTACK] * 100) + "%"
+                + TXT_BATTLE_RESULTS_2[LANG_ENG] + Math.floor(attrIncrease[ATTR_DEFENSE] * 100) + "%"
+                + TXT_BATTLE_RESULTS_3[LANG_ENG] + Math.floor(attrIncrease[ATTR_AGILITY] * 100) + "%"
+                + TXT_BATTLE_RESULTS_4[LANG_ENG] + Math.floor(attrIncrease[ATTR_REFLEXES] * 100) + "%"
+                + " <br> <br> " + TXT_KARMA[LANG_ENG] + " +" + karmaGained,
+            TXT_BATTLE_RESULTS_1[LANG_RUS] + Math.floor(attrIncrease[ATTR_ATTACK] * 100) + "%"
+                + TXT_BATTLE_RESULTS_2[LANG_RUS] + Math.floor(attrIncrease[ATTR_DEFENSE] * 100) + "%"
+                + TXT_BATTLE_RESULTS_3[LANG_RUS] + Math.floor(attrIncrease[ATTR_AGILITY] * 100) + "%"
+                + TXT_BATTLE_RESULTS_4[LANG_RUS] + Math.floor(attrIncrease[ATTR_REFLEXES] * 100) + "%"
+                + " <br> <br> " + TXT_KARMA[LANG_RUS] + " +" + karmaGained
+        ];
+        battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, battleResultsMessage, true));
         battleEndSequence.addAction(procureCodeFragmentAction(function () {
             heroHpShake = 0;
             enemyHpShake = 0;
@@ -762,7 +816,7 @@ function handleBattleEnd() {
             hero.attrAgility += attrIncrease[ATTR_AGILITY];
             hero.attrReflexes += attrIncrease[ATTR_REFLEXES];
             for (var i = 0; i < attrIncrease.length; i++) { attrIncrease[i] = 0; }
-            hero.karma += karmaGained;
+            hero.addKarma(karmaGained);
         }));
         if (eventBattleEndSequence != null) {
             battleEndSequence.addAction(procureCodeFragmentAction(function () {
@@ -772,11 +826,16 @@ function handleBattleEnd() {
             battleEndSequence.addAction(procureResumeAction());
         }
     } else {
-        battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL,
-            "Dominique has fallen... <br> <br> Press ACTION to start all over again."));
+        battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, TXT_DOMINIQUE_HAS_FALLEN)
+            .addChoice(TXT_LOAD_GAME).addChoice(TXT_RETURN_TO_TITLE));
         battleEndSequence.addAction(procureCodeFragmentAction(function () {
             landscape.destroy();
-            resetGame();
+            if (eventChoice == 0) {
+                loadGame();
+            } else {
+                resetGame();
+                registerObject(GUI_EVENT, procureTitleSequence());
+            }
         }));
     }
     registerObject(GUI_EVENT, battleEndSequence);
@@ -852,6 +911,14 @@ function tick() {
     window.setTimeout(tick, 20);
 
     fc.clearRect(0, 0, W, H);
+
+    if (keyPressed == KEY_LANG) {
+        lang++;
+        if (lang > 1) {
+            lang = 0;
+        }
+    }
+
     for (var i = 0; i < layers.length; i++) {
 
         // masking screen when needed
@@ -933,7 +1000,7 @@ function tick() {
             deliverImpacts();
             enemy.behave(enemy, battleFrame);
             if (keyPressed == KEY_ACTION) {
-                hero.useSkill(hero.skillSet[currentChoice], 0);
+                hero.useSkill(hero.skillSet[eventChoice], 0);
             }
             battleFrame++;
         } else {

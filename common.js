@@ -54,14 +54,14 @@ function procureTitleSequence() {
             fc.beginPath();
             fc.fillStyle = "white";
             fc.font = "bold 24pt Courier New";
-            fc.fillText("PRESS SPACE OR ENTER", (W - 375) / 2, 110 + imgResLogo.height / 2);
+            fc.fillText(TXT_PRESS_START[lang], (W - 375) / 2, 110 + imgResLogo.height / 2);
         }
         if (keyPressed == KEY_ACTION) {
             var mainMenuSequence = new Sequence();
             mainMenuSequence.addAction(procureDisplayCenteredMessageAction(300, "", true)
-                .addChoice("New game").addChoice("Load game"));
+                .addChoice(TXT_NEW_GAME).addChoice(TXT_LOAD_GAME));
             mainMenuSequence.addAction(procureCodeFragmentAction(function () {
-                switch (currentChoice) {
+                switch (eventChoice) {
                     case 0:
                         registerObject(GUI_EVENT, procureStartPrologueSequence());
                         break;
@@ -136,7 +136,9 @@ function procureDisplayFreeTextAction(xPos, yPos, width, text, displayCursor) {
             fc.fillText(line, xPos + 30, yPos + 30 + 30 * lineCount);
         }
 
-        var printedText = frame * 3 >= text.length ? text : text.substr(0, frame * 3);
+        var translatedText = (typeof text === "string") ? text : text[lang];
+
+        var printedText = frame * 3 >= translatedText.length ? translatedText : translatedText.substr(0, frame * 3);
 
         var charLimitPerLine = Math.floor((width - 60) / 14 - 1);
         var lineCount = 0;
@@ -185,7 +187,7 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
         }
 
         if ((frame == 0) && (displayMessageAction.choices.length > 0)) {
-            currentChoice = 0;
+            eventChoice = 0;
         }
 
         if (frame < 10) {
@@ -194,7 +196,7 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
             drawTextbox(xPos, yPos, width, height);
             var charLimitPerLine = Math.floor((width - 60) / 14 - 1);
             var lineCount = 0;
-            var words = text.split(" ");
+            var words = (typeof text === "string") ? text.split(" ") : text[lang].split(" ");
             words.push("");
             var line = "";
             for (var i = 0; i < words.length; i++) {
@@ -210,22 +212,23 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
 
             if (displayMessageAction.choices.length > 0) {
                 if (keyPressed == KEY_UP) {
-                    if (currentChoice > 0) {
-                        currentChoice--;
+                    if (eventChoice > 0) {
+                        eventChoice--;
                     } else {
-                        currentChoice = displayMessageAction.choices.length - 1;
+                        eventChoice = displayMessageAction.choices.length - 1;
                     }
                 } else if (keyPressed == KEY_DOWN) {
-                    if (currentChoice < displayMessageAction.choices.length - 1) {
-                        currentChoice++;
+                    if (eventChoice < displayMessageAction.choices.length - 1) {
+                        eventChoice++;
                     } else {
-                        currentChoice = 0;
+                        eventChoice = 0;
                     }
                 }
                 for (i = 0; i < displayMessageAction.choices.length; i++) {
-                    writeLine(displayMessageAction.choices[i], lineCount, 60);
+                    writeLine(((typeof displayMessageAction.choices[i] === "string"))
+                        ? displayMessageAction.choices[i] : displayMessageAction.choices[i][lang], lineCount, 60);
                     lineCount++;
-                    if (i == currentChoice) {
+                    if (i == eventChoice) {
                         fc.beginPath();
                         if (frame % 20 < 10) {
                             fc.drawImage(CURSOR_CHOICE, xPos + 35, yPos + 15 + 30 * (lineCount - 1));
@@ -253,7 +256,13 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
 function procureDisplayCenteredMessageAction(width, text, displayCursor) {
     var charLimitPerLine = Math.floor((width - 60) / 14 - 1);
     var lineCount = 0;
-    var words = text.split(" ");
+    var largestText;
+    if (typeof text === "string") {
+        largestText = text;
+    } else {
+        largestText = text[LANG_ENG].length > text[1].length ? text[LANG_ENG] : text[1];
+    }
+    var words = largestText.split(" ");
     words.push("");
     var line = "";
     for (var i = 0; i < words.length; i++) {
@@ -456,6 +465,51 @@ function procureDeathAnimationAction(character) {
     return deathAnimationAction;
 }
 
+/* OBJECT TYPES */
+
+function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, enemyImageAttack, enlistEnemyFunction,
+                                 startingHeroStrength, maxHeroStrength) {
+    var encounterType = new ObjectType(chanceToAppear);
+    encounterType.defineGenerateObject(function (path, position) {
+        var enemyObject = new FieldObject(path, position, 50, enemyImageStand);
+        enemyObject.setAttackImage(enemyImageAttack);
+        var enemy = enlistEnemyFunction(startingHeroStrength, maxHeroStrength, enemyObject);
+        enemyObject.defineTrigger(function () {
+            var encounterSequence = new Sequence();
+            encounterSequence.addAction(procureStopAction());
+            var karmaCost = enemy.getKarma();
+            var encounterMessage = [
+                enemyName[LANG_ENG] + TXT_COMMON_ENCOUNTER_1[LANG_ENG] + karmaCost + TXT_COMMON_ENCOUNTER_2[LANG_ENG],
+                enemyName[LANG_RUS] + TXT_COMMON_ENCOUNTER_1[LANG_RUS] + karmaCost + TXT_COMMON_ENCOUNTER_2[LANG_RUS]
+            ];
+            encounterSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, encounterMessage, false)
+                .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_FIGHT)
+                .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_AVOID));
+            encounterSequence.addAction(procureCodeFragmentAction(function () {
+                var encounterSequenceAnswered = new Sequence();
+                if (eventChoice == 0) {
+                    encounterSequenceAnswered.addAction(procureInitiateBattleAction(enemy));
+                } else {
+                    var avoidMessage = [
+                        TXT_COMMON_ENCOUNTER_3[LANG_ENG] + karmaCost + TXT_KARMA_COST[LANG_ENG],
+                        TXT_COMMON_ENCOUNTER_3[LANG_RUS] + karmaCost + TXT_KARMA_COST[LANG_RUS]
+                    ];
+                    encounterSequenceAnswered.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL,  avoidMessage, true));
+                    encounterSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                        hero.expendKarma(karmaCost);
+                    }));
+                    encounterSequenceAnswered.addAction(procureResumeAction());
+                }
+                registerObject(GUI_EVENT, encounterSequenceAnswered);
+            }));
+            registerObject(GUI_EVENT, encounterSequence);
+        });
+        return enemyObject;
+    });
+    return encounterType;
+}
+
 /* SKILLS */
 
 function acquireAttributeAdjustmentArtifact(position, leftWidth, rightWidth, weakColor, strongColor,
@@ -565,8 +619,9 @@ function getAbsoluteArtifactPosition(position) {
 }
 
 function obtainAttackSkill() {
-    var attackSkill = new CombatSkill("Attack",
-        "A standard strike. 100% attack power impact in the middle of a medium-sized guard down period.", 10);
+    var attackSkill = new CombatSkill(["Attack", "Атаковать"],
+        ["A standard strike. 100% attack power impact in the middle of a medium-sized guard down period.",
+        "Обычный удар. Воздействие 100% силы атаки посреди средних размеров зоны пониженной защиты"], 10);
     attackSkill.defineGetArtifacts(function (position) {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
@@ -578,7 +633,8 @@ function obtainAttackSkill() {
 }
 
 function obtainDefendSkill() {
-    var defendSkill = new CombatSkill("Defend", "A medium-sized guard up period.", 5);
+    var defendSkill = new CombatSkill(["Defend", "Защищаться"],
+        ["A medium-sized guard up period.", "Средних размеров зона повышенной защиты"], 5);
     defendSkill.defineGetArtifacts(function (position) {
         return [acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
             60, 60, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.6)]
@@ -607,31 +663,3 @@ function obtainOpeningSkill(width, vulnerability) {
 }
 
 /* ENEMIES */
-
-function enlistBandit(animationObject) {
-    var bandit = new Enemy(15, 20, 10, 10, 120, animationObject);
-    var attackSkill = obtainAttackSkill();
-    var defendSkill = obtainDefendSkill();
-    var opening = obtainOpeningSkill(40, 0.5);
-    bandit.defineBehave(function (character, battleFrame) {
-        if (battleFrame == 0) {
-            character.useSkill(obtainOpenerSkill(200), 0);
-            behaviorFluctuation = 1;
-        } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
-            if (behaviorFluctuation == 1) {
-                character.useSkill(defendSkill, character.getRightmostCooldown() + defendSkill.getLeftCooldown()
-                    + 30 +  Math.floor(70 * Math.random()) - getAbsoluteArtifactPosition(0));
-                behaviorFluctuation++;
-            } else if (behaviorFluctuation == 2) {
-                character.useSkill(attackSkill, character.getRightmostCooldown() + attackSkill.getLeftCooldown()
-                    + 30 + Math.floor(70 * Math.random()) - getAbsoluteArtifactPosition(0));
-                behaviorFluctuation++;
-            } else if (behaviorFluctuation == 3) {
-                character.useSkill(opening, character.getRightmostCooldown() + opening.getLeftCooldown()
-                    + 30 + Math.floor(70 * Math.random()) - getAbsoluteArtifactPosition(0));
-                behaviorFluctuation = 1;
-            }
-        }
-    });
-    return bandit;
-}

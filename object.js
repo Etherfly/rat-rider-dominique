@@ -16,6 +16,7 @@ function Landscape(terrainColorFar, terrainColorMid, terrainColorNear, objectFre
 
     this.objectsMin = 2 * W / objectFrequency;  // objects to be present on the layer simultaneously
 
+    for (i = 0; i < 3; i++) { objectsOnLayer[i] = 0; }
     farthestObjects[FAR] = (new FieldObject(FAR, 600, 0, null));
     farthestObjects[MID] = (new FieldObject(MID, 600, 0, null));
     farthestObjects[NEAR] = (new FieldObject(NEAR, 600, 0, null));
@@ -72,7 +73,11 @@ function Landscape(terrainColorFar, terrainColorMid, terrainColorNear, objectFre
             for (var path = 0; path < 3; path++) {
                 while (objectsOnLayer[path] < this.objectsMin) {
                     var newObjectPosition = farthestObjects[path].position + this.objectFrequency * (0.5 + Math.random());
-                    var chanceHit = Math.random();
+                    var probabilityScale = 0;
+                    for (var i = 0; i < this.objectTypes.length; i++) {
+                        probabilityScale += this.objectTypes[i].chanceToAppear;
+                    }
+                    var chanceHit = Math.random() * probabilityScale;
                     var currentObjectTypeId = 0;
                     var chanceArea = this.objectTypes[currentObjectTypeId].chanceToAppear;
                     while ((currentObjectTypeId + 1 < this.objectTypes.length) && (chanceArea < chanceHit)) {
@@ -397,6 +402,14 @@ function Hero() {
         }
     };
 
+    this.addKarma = function (karma) {
+        this.karma += karma;
+    };
+
+    this.expendKarma = function (karma) {
+        this.karma -= karma;
+    };
+
     this.setAnimationState = function (animationState) {
         if (this.animationState != AN_ATTACK) {
             this.animationState = animationState;
@@ -600,7 +613,7 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
     this.getKarma = function () {
         var overallStrengthModifier = (this.attrAttack * this.attrDefense * this.attrAgility * this.attrReflexes)
             / (hero.attrAttack * hero.attrDefense * hero.attrAgility * hero.attrReflexes);
-        return Math.floor(overallStrengthModifier * this.attrMaxHp / 10);
+        return Math.floor(Math.sqrt(overallStrengthModifier) * this.attrMaxHp / 10);
     };
 }
 
