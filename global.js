@@ -64,6 +64,7 @@ var KEY_DOWN = 4;
 var KEY_ACTION = 5;
 var KEY_ESC = 6;
 var KEY_LANG = 7;
+var KEY_DIGIT_0 = 10;
 
 var keyPressed = KEY_NONE;
 var keyCtrl = false;
@@ -97,6 +98,8 @@ var ATTR_ATTACK = 0;
 var ATTR_DEFENSE = 1;
 var ATTR_AGILITY = 2;
 var ATTR_REFLEXES = 3;
+var ATTR_EVASION = 4;
+var ATTR_REFLECT = 5;
 
 var SP_RECOVERY_BASIS = 0.05;
 var PATH_CHANGE_SP_COST_RATIO = 0.25;
@@ -109,8 +112,8 @@ attrIncrease[ATTR_REFLEXES] = 0;    // reflexes are increased by precision actio
                                     // in a weakpoint or defending right when the enemy attacks
 // attribute increase bases
 var AIB_ATTACK = 0.1;
-var AIB_DEFENSE = 0.1;
-var AIB_AGILITY = 0.1;
+var AIB_DEFENSE = 0.2;
+var AIB_AGILITY = 0.05;
 var AIB_REFLEXES = 0.03;
 
 // objects
@@ -138,13 +141,15 @@ var BATTLEGAUGE_FLASH_LENGTH = 1;
 var displayGui = false;
 var blackMask = false;
 
+var skillChoice = 0;
+var itemChoice = 0;
 var eventChoice = 0;
 
 var CURSOR_NEXT;
 var CURSOR_CHOICE;
 
 var LANG_ENG = 0;       // English language
-var LANG_RUS = 1;       // –ÛÒÒÍËÈ ˇÁ˚Í
+var LANG_RUS = 1;       // –†—É—Å—Å–∫–∏–π —è–∑—ã–∫
 
 var lang = LANG_ENG;    // current language
 
@@ -204,6 +209,40 @@ function getTextResource(id) {
     return string.replace(/\n/g, "").replace(/ +/g, " ").replace(/^ /, "");
 }
 
+/*
+ * Universal text processor
+ *
+ * Displays text starting at the specified point, limited by the specified line width.
+ * Text can be a multilingual array.
+ * Supported tags: <br>
+ * Returns the line count.
+ */
+function processText(text, x, y, w) {
+    function writeLine(line, lineCount) {
+        fc.beginPath();
+        fc.fillStyle = "white";
+        fc.font = "bold 18pt Courier New";
+        fc.fillText(line, x, y + 30 * (lineCount + 1));
+    }
+
+    var lineCount = 0;
+    var charLimitPerLine = Math.floor((w - 60) / 14 - 1);
+    var words = (typeof text === "string") ? text.split(" ") : text[lang].split(" ");
+    words.push("");
+    var line = "";
+    for (var i = 0; i < words.length; i++) {
+        if ((line.length + words[i].length > charLimitPerLine) || (words[i] == "<br>") || (i == words.length - 1)) {
+            writeLine(line, lineCount);
+            lineCount++;
+            line = "";
+        }
+        if (words[i].indexOf("<") == -1) {
+            line += words[i] + " ";
+        }
+    }
+
+    return lineCount;
+}
 
 function initializeChapterData(chapterId) {
     switch (chapterId) {
@@ -227,7 +266,6 @@ function resetGame() {
     }
     gst.length = 8;
     for (i = 0; i < gst.length; i++) {
-        // ...
         gst[i] = [];
         initializeChapterData(i);
     }
@@ -285,9 +323,19 @@ document.onkeydown = function (event) {
             keyPressed = KEY_LANG;
             break;
         default:
-            keyPressed = KEY_NONE;
+            if (event.keyCode >= 48 && event.keyCode <= 57) {
+                keyPressed = KEY_DIGIT_0 + event.keyCode - 48;
+            } else {
+                keyPressed = KEY_NONE;
+            }
     }
     keyCtrl = event.ctrlKey;
+};
+
+document.onkeyup = function (event) {
+    if (event.keyCode == 17) {
+        keyCtrl = false;
+    }
 };
 
 function pathToLandscapeLayer(path) {
@@ -711,24 +759,28 @@ function initializeGui() {
             }
             drawTextbox(W - 350, 54, 330, 50 + 30 * lineCount);
             if (keyPressed == KEY_UP) {
-                if (eventChoice > 0) {
-                    eventChoice--;
+                if (skillChoice > 0) {
+                    skillChoice--;
                 } else {
-                    eventChoice = hero.skillSet.length - 1;
+                    skillChoice = hero.skillSet.length - 1;
                 }
             } else if (keyPressed == KEY_DOWN) {
-                if (eventChoice < hero.skillSet.length - 1) {
-                    eventChoice++;
+                if (skillChoice < hero.skillSet.length - 1) {
+                    skillChoice++;
                 } else {
-                    eventChoice = 0;
+                    skillChoice = 0;
                 }
+            } else if ((keyPressed >= KEY_DIGIT_0) && (keyPressed <= KEY_DIGIT_0 + 9)
+                && ((keyPressed - KEY_DIGIT_0 + 9) % 10 < hero.skillSet.length)) {
+                skillChoice = (keyPressed - KEY_DIGIT_0 + 9) % 10;
             }
+
             for (var i = 0; i < hero.skillSet.length; i++) {
                 writeLine(hero.skillSet[i].name[lang], i, 50);
-                if (i == eventChoice) {
+                if (i == skillChoice) {
                     var artifactData = hero.skillSet[i].getArtifacts(0);
                     for (var j = 0; j < artifactData.length; j++) {
-                        artifactData[j].sketch(getAbsoluteArtifactPosition(0), hero);
+                        artifactData[j].sketch(artifactData[j].position, hero);
                     }
 
                     fc.beginPath();
@@ -736,6 +788,21 @@ function initializeGui() {
                         fc.drawImage(CURSOR_CHOICE, W - 330, 69 + 30 * i);
                     } else {
                         fc.drawImage(CURSOR_CHOICE, W - 335, 69 + 30 * i);
+                    }
+
+                    if (keyCtrl) {
+                        drawTextbox(20 + imgGuiAttributeBox.width, H - imgGuiAttributeBox.height - 60,
+                            W - 370 - imgGuiAttributeBox.width, 55 + imgGuiAttributeBox.height);
+                        var skillInfo = [
+                            hero.skillSet[i].name[LANG_ENG] + " - " + hero.skillSet[i].spCost + " " + TXT_SP[LANG_ENG]
+                                + TXT_HOTKEY[LANG_ENG] + ((i + 1) % 10) + "') <br> <br> "
+                                + hero.skillSet[i].description[LANG_ENG],
+                            hero.skillSet[i].name[LANG_RUS] + " - " + hero.skillSet[i].spCost + " " + TXT_SP[LANG_RUS]
+                                + TXT_HOTKEY[LANG_RUS] + ((i + 1) % 10) + "') <br> <br> "
+                                + hero.skillSet[i].description[LANG_RUS]
+                        ];
+                        processText(skillInfo, 50 + imgGuiAttributeBox.width, H - imgGuiAttributeBox.height - 60,
+                            W - 370 - imgGuiAttributeBox.width);
                     }
                 }
             }
@@ -991,7 +1058,7 @@ function tick() {
                 hero.moveNearer();
                 break;
         }
-    } else if (controlMode == CM_BATTLE) {
+    } else if ((controlMode == CM_BATTLE) && !keyCtrl) {
         if ((hero.hp > 0) && (enemy.hp > 0)) {
             hero.restoreSp(0.05 * getGlobalBattleGaugeShiftCoefficient());
 
@@ -1000,7 +1067,7 @@ function tick() {
             deliverImpacts();
             enemy.behave(enemy, battleFrame);
             if (keyPressed == KEY_ACTION) {
-                hero.useSkill(hero.skillSet[eventChoice], 0);
+                hero.useSkill(hero.skillSet[skillChoice], 0);
             }
             battleFrame++;
         } else {

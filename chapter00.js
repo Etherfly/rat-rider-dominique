@@ -8,7 +8,7 @@
 
 var chroniclersNames = [
     ["Hilbert", "Benjamin", "Aristarchus", "Arnold"],
-    ["Гильберт", "Бенджамин", "Аристарх", "Арнольд"]
+    ["Р“РёР»СЊР±РµСЂС‚", "Р‘РµРЅРґР¶Р°РјРёРЅ", "РђСЂРёСЃС‚Р°СЂС…", "РђСЂРЅРѕР»СЊРґ"]
 ];
 
 var CH00_PHASE = 0;                     // phase
@@ -21,55 +21,91 @@ var CH00_BANDIT_RINGLEADER_BEATEN = 6;  // bandit ringleader beaten flag
 
 /* TEXT DATA */
 
-var CH00_TITLE = ["Prologue: Hero's Karma", "Пролог: Карма Героя"];
+var CH00_TITLE = ["Prologue: Hero's Karma", "РџСЂРѕР»РѕРі: РљР°СЂРјР° Р“РµСЂРѕСЏ"];
 
 var CH00_CHRONICLER_01 = [
     "Dominique comes upon a tranquil pavilion where chronicler ",
-    "Доминик встречает на своём пути укромную беседку, где летописец "
+    "Р”РѕРјРёРЅРёРє РІСЃС‚СЂРµС‡Р°РµС‚ РЅР° СЃРІРѕС‘Рј РїСѓС‚Рё СѓРєСЂРѕРјРЅСѓСЋ Р±РµСЃРµРґРєСѓ, РіРґРµ Р»РµС‚РѕРїРёСЃРµС† "
 ];
 var CH00_CHRONICLER_02 = [
     " records everything that happens around and anything that he hears of. Such is the way of the Order "
         + "of the Holy Stylus - gather every piece of information this world has to offer. "
         + "He may even write down Dominique's story, so that it is not forgotten in the ages to come. <br> <br> "
         + "Would you like to save?",
-    " записывает всё, что происходит вокруг, и о чём он слышит. Таков путь Ордена Святого Стилуса - "
-        + "собирать песчинки любой информации, которую только может предложить этот мир. "
-        + "Он может записать даже историю Доминика, дабы её не забыли будущие поколения. <br> <br> "
-        + "Желаете сохраниться?"
+    " Р·Р°РїРёСЃС‹РІР°РµС‚ РІСЃС‘, С‡С‚Рѕ РїСЂРѕРёСЃС…РѕРґРёС‚ РІРѕРєСЂСѓРі, Рё Рѕ С‡С‘Рј РѕРЅ СЃР»С‹С€РёС‚. РўР°РєРѕРІ РїСѓС‚СЊ РћСЂРґРµРЅР° РЎРІСЏС‚РѕРіРѕ РЎС‚РёР»СѓСЃР° - "
+        + "СЃРѕР±РёСЂР°С‚СЊ РїРµСЃС‡РёРЅРєРё Р»СЋР±РѕР№ РёРЅС„РѕСЂРјР°С†РёРё, РєРѕС‚РѕСЂСѓСЋ С‚РѕР»СЊРєРѕ РјРѕР¶РµС‚ РїСЂРµРґР»РѕР¶РёС‚СЊ СЌС‚РѕС‚ РјРёСЂ. "
+        + "РћРЅ РјРѕР¶РµС‚ Р·Р°РїРёСЃР°С‚СЊ РґР°Р¶Рµ РёСЃС‚РѕСЂРёСЋ Р”РѕРјРёРЅРёРєР°, РґР°Р±С‹ РµС‘ РЅРµ Р·Р°Р±С‹Р»Рё Р±СѓРґСѓС‰РёРµ РїРѕРєРѕР»РµРЅРёСЏ. <br> <br> "
+        + "Р–РµР»Р°РµС‚Рµ СЃРѕС…СЂР°РЅРёС‚СЊСЃСЏ?"
 ];
 var CH00_CHRONICLER_03 = [
     "Chronicler successfully writes down Dominique's story.",
-    "Летописец успешно записывает историю Доминика."
+    "Р›РµС‚РѕРїРёСЃРµС† СѓСЃРїРµС€РЅРѕ Р·Р°РїРёСЃС‹РІР°РµС‚ РёСЃС‚РѕСЂРёСЋ Р”РѕРјРёРЅРёРєР°."
 ];
 
 var CH00_INN_01 = [
     "A bustling inn appears along the way. Enticing smells and flavors catch Dominique's attention and his mouth "
         + "waters at the thought of having a grand feast. <br> <br> Wild dreams aside, having a meal and resting "
         + "at this inn will restore ",
-    "На пути возник шумный трактир. Манящие запахи привлекают внимание Доминика, и при мысли о грандиозном пире у "
-        + "него текут слюнки. <br> <br> Шутки в сторону, пища и отдых в этом трактире восстановят "
+    "РќР° РїСѓС‚Рё РІРѕР·РЅРёРє С€СѓРјРЅС‹Р№ С‚СЂР°РєС‚РёСЂ. РњР°РЅСЏС‰РёРµ Р·Р°РїР°С…Рё РїСЂРёРІР»РµРєР°СЋС‚ РІРЅРёРјР°РЅРёРµ Р”РѕРјРёРЅРёРєР°, Рё РїСЂРё РјС‹СЃР»Рё Рѕ РіСЂР°РЅРґРёРѕР·РЅРѕРј РїРёСЂРµ Сѓ "
+        + "РЅРµРіРѕ С‚РµРєСѓС‚ СЃР»СЋРЅРєРё. <br> <br> РЁСѓС‚РєРё РІ СЃС‚РѕСЂРѕРЅСѓ, РїРёС‰Р° Рё РѕС‚РґС‹С… РІ СЌС‚РѕРј С‚СЂР°РєС‚РёСЂРµ РІРѕСЃСЃС‚Р°РЅРѕРІСЏС‚ "
 ];
-var CH00_INN_02 = [" However, it will cost Dominique ", " Однако это обойдётся Доминику в "];
-var CH00_INN_03 = ["Would you like to stop here?", "Желаете остановиться?"];
+var CH00_INN_02 = [" However, it will cost Dominique ", " РћРґРЅР°РєРѕ СЌС‚Рѕ РѕР±РѕР№РґС‘С‚СЃСЏ Р”РѕРјРёРЅРёРєСѓ РІ "];
+var CH00_INN_03 = ["Would you like to stop here?", "Р–РµР»Р°РµС‚Рµ РѕСЃС‚Р°РЅРѕРІРёС‚СЊСЃСЏ?"];
 var CH00_INN_04_1 = [
     "After a disgusting meal and a horrible rest Dominique, nonetheless, feels a little better.",
-    "После омерзительной трапезы и ужасного отдыха Доминик, тем не менее, чувствует себя немного лучше."
+    "РџРѕСЃР»Рµ РѕРјРµСЂР·РёС‚РµР»СЊРЅРѕР№ С‚СЂР°РїРµР·С‹ Рё СѓР¶Р°СЃРЅРѕРіРѕ РѕС‚РґС‹С…Р° Р”РѕРјРёРЅРёРє, С‚РµРј РЅРµ РјРµРЅРµРµ, С‡СѓРІСЃС‚РІСѓРµС‚ СЃРµР±СЏ РЅРµРјРЅРѕРіРѕ Р»СѓС‡С€Рµ."
 ];
 var CH00_INN_04_2 = [
     "After a so-so meal and a fairly bad rest Dominique, nonetheless, feels better.",
-    "После так себе трапезы и довольно плохого отдыха Доминик, тем не менее, чувствует себя лучше."
+    "РџРѕСЃР»Рµ С‚Р°Рє СЃРµР±Рµ С‚СЂР°РїРµР·С‹ Рё РґРѕРІРѕР»СЊРЅРѕ РїР»РѕС…РѕРіРѕ РѕС‚РґС‹С…Р° Р”РѕРјРёРЅРёРє, С‚РµРј РЅРµ РјРµРЅРµРµ, С‡СѓРІСЃС‚РІСѓРµС‚ СЃРµР±СЏ Р»СѓС‡С€Рµ."
 ];
 var CH00_INN_04_3 = [
     "After a tasty meal and a good rest Dominique feels better.",
-    "После приятной трапезы и хорошего отдыха Доминик чувствует себя лучше."
+    "РџРѕСЃР»Рµ РїСЂРёСЏС‚РЅРѕР№ С‚СЂР°РїРµР·С‹ Рё С…РѕСЂРѕС€РµРіРѕ РѕС‚РґС‹С…Р° Р”РѕРјРёРЅРёРє С‡СѓРІСЃС‚РІСѓРµС‚ СЃРµР±СЏ Р»СѓС‡С€Рµ."
 ];
 var CH00_INN_04_4 = [
     "After a great meal and a top grade rest Dominique feels much better.",
-    "После чудесной трапезы и отдыха высшего класса Доминик чувствует себя гораздо лучше."
+    "РџРѕСЃР»Рµ С‡СѓРґРµСЃРЅРѕР№ С‚СЂР°РїРµР·С‹ Рё РѕС‚РґС‹С…Р° РІС‹СЃС€РµРіРѕ РєР»Р°СЃСЃР° Р”РѕРјРёРЅРёРє С‡СѓРІСЃС‚РІСѓРµС‚ СЃРµР±СЏ РіРѕСЂР°Р·РґРѕ Р»СѓС‡С€Рµ."
 ];
 var CH00_INN_04_5 = [
     "After a divine meal and an ancient deity quality rest Dominique feels excellent!",
-    "После райской трапезы и отдыха, достойного древнего божества, Доминик чувствует себя превосходно!"
+    "РџРѕСЃР»Рµ СЂР°Р№СЃРєРѕР№ С‚СЂР°РїРµР·С‹ Рё РѕС‚РґС‹С…Р°, РґРѕСЃС‚РѕР№РЅРѕРіРѕ РґСЂРµРІРЅРµРіРѕ Р±РѕР¶РµСЃС‚РІР°, Р”РѕРјРёРЅРёРє С‡СѓРІСЃС‚РІСѓРµС‚ СЃРµР±СЏ РїСЂРµРІРѕСЃС…РѕРґРЅРѕ!"
+];
+
+var CH00_HOTSPRING_01 = [
+    "What luck! A small resort around a hotspring is just what Dominique's weathered body needs. "
+        + "Bathing in the hotspring's nutritious waters will restore ",
+    "РљР°РєР°СЏ СѓРґР°С‡Р°! РњР°Р»РµРЅСЊРєРёР№ РєСѓСЂРѕСЂС‚ РІРѕР·Р»Рµ РіРѕСЂСЏС‡РµРіРѕ РёСЃС‚РѕС‡РЅРёРєР° - С‚Рѕ, С‡С‚Рѕ РЅСѓР¶РЅРѕ РґР»СЏ СѓСЃС‚Р°Р»РѕРіРѕ С‚РµР»Р° Р”РѕРјРёРЅРёРєР°. "
+        + "РСЃРєСѓРїР°РІС€РёСЃСЊ РІ С†РµР»РµР±РЅС‹С… РІРѕРґР°С… РёСЃС‚РѕС‡РЅРёРєР°, РѕРЅ РјРіРЅРѕРІРµРЅРЅРѕ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚ "
+];
+var CH00_HOTSPRING_02 = [" in no time, but for a price of ", ", РѕРґРЅР°РєРѕ РЅРµ Р±РµСЃРїР»Р°С‚РЅРѕ, Р° Р·Р° "];
+var CH00_HOTSPRING_03 = ["Would you like to take a bath?", "Р–РµР»Р°РµС‚Рµ РёСЃРєСѓРїР°С‚СЊСЃСЏ?"];
+var CH00_HOTSPRING_04_1 = [
+    "The water of this hotspring is just common water with barely any healing properties. "
+        + "Still, it's refreshing to take a bath once in a while.",
+    "Р’РѕРґР° СЌС‚РѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° СЃР°РјР°СЏ РѕР±С‹С‡РЅР°СЏ, Рё Сѓ РЅРµС‘ РµРґРІР° Р»Рё РµСЃС‚СЊ РєР°РєРёРµ-Р»РёР±Рѕ С†РµР»РёС‚РµР»СЊРЅС‹Рµ СЃРІРѕР№СЃС‚РІР°. "
+        + "РўРµРј РЅРµ РјРµРЅРµРµ, РїРѕРјС‹С‚СЊСЃСЏ РІСЃС‘ СЂР°РІРЅРѕ РЅРµ РїРѕРјРµС€Р°Р»Рѕ."
+];
+var CH00_HOTSPRING_04_2 = [
+    "The water of this hotspring slightly invigorates Dominique's body. It's not what he expected, but it will do.",
+    "Р’РѕРґР° СЌС‚РѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° РїСЂРёРґР°С‘С‚ Р”РѕРјРёРЅРёРєСѓ РЅРµРјРЅРѕРіРѕ СЃРёР». РќРµ СЃРѕРІСЃРµРј С‚Рѕ, С‡С‚Рѕ РѕРЅ РѕР¶РёРґР°Р», РЅРѕ Рё СЌС‚Рѕ РЅРµРїР»РѕС…Рѕ."
+];
+var CH00_HOTSPRING_04_3 = [
+    "The water of this hotspring definitely has curative properties, "
+        + "as merely pouring it at the wounds makes them heal times faster.",
+    "Р’РѕРґР° СЌС‚РѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° РѕРїСЂРµРґРµР»С‘РЅРЅРѕ РѕР±Р»Р°РґР°РµС‚ С†РµР»РµР±РЅС‹РјРё СЃРІРѕР№СЃС‚РІР°РјРё, "
+        + "РёР±Рѕ РґР°Р¶Рµ РїСЂРѕСЃС‚РѕРµ РѕРјРѕРІРµРЅРёРµ СЂР°РЅ РІ СЂР°Р·С‹ СѓСЃРєРѕСЂСЏРµС‚ РёС… РёСЃС†РµР»РµРЅРёРµ."
+];
+var CH00_HOTSPRING_04_4 = [
+    "The water of this hotspring revitalizes Dominique and fills him with will to live and "
+        + "the desire to make this world a better place.",
+    "Р’РѕРґР° СЌС‚РѕРіРѕ РёСЃС‚РѕС‡РЅРёРєР° Р±СѓРєРІР°Р»СЊРЅРѕ РѕР¶РёРІР»СЏРµС‚ Р”РѕРјРёРЅРёРєР° Рё РЅР°РїРѕР»РЅСЏРµС‚ РµРіРѕ РІРѕР»РµР№ Рє Р¶РёР·РЅРё Рё Р¶РµР»Р°РЅРёРµРј РґРµР»Р°С‚СЊ СЌС‚РѕС‚ РјРёСЂ Р»СѓС‡С€Рµ."
+];
+var CH00_HOTSPRING_04_5 = [
+    "The water of this hotspring must be the legendary reviving waters of Etheria, for when Dominique walkes into it, "
+        + "his wounds immediately close and all worries leave his mind.",
+    "Р’ СЌС‚РѕРј РёСЃС‚РѕС‡РЅРёРєРµ, РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ, Р»РµРіРµРЅРґР°СЂРЅС‹Рµ РІРѕСЃРєСЂРµС€Р°СЋС‰РёРµ РІРѕРґС‹ Р­С‚РµСЂРёРё, РёР±Рѕ Р»РёС€СЊ С‚РѕР»СЊРєРѕ Р”РѕРјРёРЅРёРє Р·Р°С…РѕРґРёС‚ РІ РЅРёС…, "
+        + "РµРіРѕ СЂР°РЅС‹ С‚СѓС‚ Р¶Рµ Р·Р°РєСЂС‹РІР°СЋС‚СЃСЏ, Рё РІСЃРµ С‚СЂРµРІРѕРіРё РїРѕРєРёРґР°СЋС‚ РµРіРѕ СЂР°Р·СѓРј."
 ];
 
 /* LANDSCAPE */
@@ -152,58 +188,58 @@ function describeChroniclersPavilionType() {
 }
 
 function describeHotspringType() {
-    var innType = new ObjectType(0.1);
-    innType.defineGenerateObject(function (path, position) {
-        var inn = new FieldObject(path, position, 50, getImageResource("imgObjHotspring"));
-        inn.defineTrigger(function () {
-            var innSequence = new Sequence();
-            innSequence.addAction(procureStopAction());
+    var hotspringType = new ObjectType(0.1);
+    hotspringType.defineGenerateObject(function (path, position) {
+        var hotspring = new FieldObject(path, position, 60, getImageResource("imgObjHotspring"));
+        hotspring.defineTrigger(function () {
+            var hotspringSequence = new Sequence();
+            hotspringSequence.addAction(procureStopAction());
             var restoreAmount = 15 + Math.floor(Math.random() * (15 + 5 * gst[CH00][CH00_PHASE]));
             var karmaCost = Math.floor(hero.attrMaxHp * (0.5 + Math.random() * 0.4) * (restoreAmount / 100));
-            var innMessage = [
-                CH00_INN_01[LANG_ENG] + restoreAmount + "% " + TXT_HP[LANG_ENG] + TXT_AND[LANG_ENG]
-                    + (restoreAmount * 2) + "% " + TXT_SP[LANG_ENG] + "." + CH00_INN_02[LANG_ENG]
-                    + karmaCost + TXT_KARMA_COST[LANG_ENG] + " " + CH00_INN_03[LANG_ENG],
-                CH00_INN_01[LANG_RUS] + restoreAmount + "% " + TXT_HP[LANG_RUS] + TXT_AND[LANG_RUS]
-                    + (restoreAmount * 2) + "% " + TXT_SP[LANG_RUS] + "." + CH00_INN_02[LANG_RUS]
-                    + karmaCost + TXT_KARMA_COST[LANG_RUS] + " " + CH00_INN_03[LANG_RUS]
+            var hotspringMessage = [
+                CH00_HOTSPRING_01[LANG_ENG] + (restoreAmount * 2) + "% " + TXT_HP[LANG_ENG] + TXT_AND[LANG_ENG]
+                    + restoreAmount + "% " + TXT_SP[LANG_ENG] + CH00_HOTSPRING_02[LANG_ENG]
+                    + karmaCost + TXT_KARMA_COST[LANG_ENG] + " " + CH00_HOTSPRING_03[LANG_ENG],
+                CH00_HOTSPRING_01[LANG_RUS] + (restoreAmount * 2) + "% " + TXT_HP[LANG_RUS] + TXT_AND[LANG_RUS]
+                    + restoreAmount + "% " + TXT_SP[LANG_RUS] + CH00_HOTSPRING_02[LANG_RUS]
+                    + karmaCost + TXT_KARMA_COST[LANG_RUS] + " " + CH00_HOTSPRING_03[LANG_RUS]
             ];
-            innSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM,
-                innMessage, false).addChoice(TXT_YES).addChoice(TXT_NO));
-            innSequence.addAction(procureCodeFragmentAction(function () {
-                var innSequenceAnswered = new Sequence();
+            hotspringSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, hotspringMessage, false)
+                .addChoice(TXT_YES).addChoice(TXT_NO));
+            hotspringSequence.addAction(procureCodeFragmentAction(function () {
+                var hotspringSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
                     var qualityMessage;
                     if (restoreAmount < 20) {
-                        qualityMessage = CH00_INN_04_1;
+                        qualityMessage = CH00_HOTSPRING_04_1;
                     } else if (restoreAmount < 25) {
-                        qualityMessage = CH00_INN_04_2;
+                        qualityMessage = CH00_HOTSPRING_04_2;
                     } else if (restoreAmount < 35) {
-                        qualityMessage = CH00_INN_04_3;
+                        qualityMessage = CH00_HOTSPRING_04_3;
                     } else if (restoreAmount < 45) {
-                        qualityMessage = CH00_INN_04_4;
+                        qualityMessage = CH00_HOTSPRING_04_4;
                     } else {
-                        qualityMessage = CH00_INN_04_5;
+                        qualityMessage = CH00_HOTSPRING_04_5;
                     }
-                    innSequenceAnswered.addAction(
+                    hotspringSequenceAnswered.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL, qualityMessage, true));
-                    innSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                    hotspringSequenceAnswered.addAction(procureCodeFragmentAction(function () {
                         hero.restoreHp(hero.attrMaxHp * (restoreAmount * 2 / 100));
                         hero.restoreSp(hero.attrMaxSp * (restoreAmount / 100));
                         hero.expendKarma(karmaCost);
                     }));
                 } else {
-                    innSequenceAnswered.addAction(
+                    hotspringSequenceAnswered.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
                 }
-                innSequenceAnswered.addAction(procureResumeAction());
-                registerObject(GUI_EVENT, innSequenceAnswered);
+                hotspringSequenceAnswered.addAction(procureResumeAction());
+                registerObject(GUI_EVENT, hotspringSequenceAnswered);
             }));
-            registerObject(GUI_EVENT, innSequence);
+            registerObject(GUI_EVENT, hotspringSequence);
         });
-        return inn;
+        return hotspring;
     });
-    return innType;
+    return hotspringType;
 }
 
 function describeInnType() {
@@ -223,8 +259,8 @@ function describeInnType() {
                     + (restoreAmount * 2) + "% " + TXT_SP[LANG_RUS] + "." + CH00_INN_02[LANG_RUS]
                     + karmaCost + TXT_KARMA_COST[LANG_RUS] + " " + CH00_INN_03[LANG_RUS]
             ];
-            innSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM,
-                innMessage, false).addChoice(TXT_YES).addChoice(TXT_NO));
+            innSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, innMessage, false)
+                .addChoice(TXT_YES).addChoice(TXT_NO));
             innSequence.addAction(procureCodeFragmentAction(function () {
                 var innSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
@@ -262,13 +298,13 @@ function describeInnType() {
 }
 
 function describeBanditType() {
-    return describeCommonEncounter(0.1, ["Bandit", "Разбойник"],
+    return describeCommonEncounter(0.1, ["Bandit", "Р Р°Р·Р±РѕР№РЅРёРє"],
         getImageResource("imgEnemyBandit1Stand"), getImageResource("imgEnemyBandit1Attack"),
         enlistBandit, 22500, 140000);
 }
 
 function describeWolfType() {
-    return describeCommonEncounter(0.1, ["Wolf", "Волк"],
+    return describeCommonEncounter(0.1, ["Wolf", "Р’РѕР»Рє"],
         getImageResource("imgEnemyWolf1Stand"), getImageResource("imgEnemyWolf1Attack"),
         enlistWolf, 22500, 140000);
 }
@@ -277,7 +313,7 @@ function describeWolfType() {
 
 function enlistBandit(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
-    var bandit = new Enemy(15 * strScale, 20 * strScale, 10 * strScale, 10 * strScale, 120 * strScale, animationObject);
+    var bandit = new Enemy(10 * strScale, 20 * strScale, 10 * strScale, 10 * strScale, 120 * strScale, animationObject);
     var attackSkill = obtainAttackSkill();
     var defendSkill = obtainDefendSkill();
     var opening = obtainOpeningSkill(40, 0.5);
@@ -306,29 +342,29 @@ function enlistBandit(startingHeroStrength, maxHeroStrength, animationObject) {
 
 function enlistWolf(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
-    var wolf = new Enemy(10 * strScale, 14 * strScale, 12 * strScale, 10 * strScale, 90 * strScale, animationObject);
+    var wolf = new Enemy(7 * strScale, 14 * strScale, 12 * strScale, 10 * strScale, 90 * strScale, animationObject);
     var attackSkill = obtainAttackSkill();
     var defendSkill = obtainDefendSkill();
-    var opening = obtainOpeningSkill(40, 0.5);
+    var fumbledAttackSkill = obtainFumbledAttackSkill(40, 0.3);
     wolf.defineBehave(function (character, battleFrame) {
         if (battleFrame == 0) {
             character.useSkill(obtainOpenerSkill(100), 0);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
             if (behaviorFluctuation == 1) {
-                character.useSkill(attackSkill, character.getRightmostCooldown() + defendSkill.getLeftCooldown()
+                character.useSkill(attackSkill, character.getRightmostCooldown() + attackSkill.getLeftCooldown()
                     + 30 +  Math.floor(60 * Math.random()) - getAbsoluteArtifactPosition(0));
                 behaviorFluctuation += 1 + Math.floor(Math.random() * 2);
             } else if (behaviorFluctuation == 2) {
-                character.useSkill(defendSkill, character.getRightmostCooldown() + attackSkill.getLeftCooldown()
+                character.useSkill(defendSkill, character.getRightmostCooldown() + defendSkill.getLeftCooldown()
                     + 30 + Math.floor(30 * Math.random()) - getAbsoluteArtifactPosition(0));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 3) {
-                character.useSkill(defendSkill, character.getRightmostCooldown() + opening.getLeftCooldown()
+                character.useSkill(defendSkill, character.getRightmostCooldown() + defendSkill.getLeftCooldown()
                     + 30 + Math.floor(50 * Math.random()) - getAbsoluteArtifactPosition(0));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation >= 4) {
-                character.useSkill(attackSkill, character.getRightmostCooldown() + opening.getLeftCooldown()
+                character.useSkill(fumbledAttackSkill, character.getRightmostCooldown() + fumbledAttackSkill.getLeftCooldown()
                     + 30 + Math.floor(50 * Math.random()) - getAbsoluteArtifactPosition(0));
                 behaviorFluctuation = 1;
             }

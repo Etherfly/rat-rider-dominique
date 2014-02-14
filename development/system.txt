@@ -41,4 +41,4 @@ Jab: 50% attack power impact in the middle of a small guard down period. Small c
 Counterattack: a medium-sized guard up period followed by a 75% attack power impact followed by a small guard down period. 15 SP. Unlocks at level 5.
 Guarded strike: a medium-sized guard down period followed by a 100% attack power impact followed by a large guard up period. 18 SP. Unlocks at level 7.
 Rat Rider's Dance: three 80% attack power impacts surrounded with small guard up, guard down, guard down, guard up periods. 25 SP. Unlocks at level 9.
-Gungnir: 500% attack power impact in the right side of a huge guard down period. 40 SP. Unlocks at level 12.
+Ace of Spades: 500% attack power impact in the right side of a huge guard down period. 40 SP. Unlocks at level 12.

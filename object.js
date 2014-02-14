@@ -264,6 +264,9 @@ function Hero() {
     this.hp = this.attrMaxHp;
     this.sp = this.attrMaxSp;
 
+    this.effEvasion = 1;        // effective evasion of 1 means 100% chance to hit, thus no evasion
+    this.effReflect = 1;        // effective reflection of 1 means 100% reflect damage reduction, thus no reflection
+
     this.karma = 100;
 
     this.position = 500;
@@ -277,6 +280,13 @@ function Hero() {
     // TODO: temporary way to fill skills!
     this.skillSet.push(obtainAttackSkill());
     this.skillSet.push(obtainDefendSkill());
+    this.skillSet.push(obtainChargeSkill());
+    this.skillSet.push(obtainJabSkill());
+    this.skillSet.push(obtainCounterattackSkill());
+    this.skillSet.push(obtainGuardedStrikeSkill());
+    this.skillSet.push(obtainRatRiderDanceSkill());
+    this.skillSet.push(obtainAceOfSpadesSkill());
+    this.skillSet.push(obtainOmnislashSkill());
     this.battleGaugeArtifacts = [];
 
     this.type = "Hero";      // type definition
@@ -513,6 +523,9 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
     this.effReflexes = 1;
     this.hp = this.attrMaxHp;
 
+    this.effEvasion = 1;
+    this.effReflect = 1;
+
     this.animationObject = animationObject;
 
     this.battleGaugeArtifacts = [];
@@ -613,7 +626,7 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
     this.getKarma = function () {
         var overallStrengthModifier = (this.attrAttack * this.attrDefense * this.attrAgility * this.attrReflexes)
             / (hero.attrAttack * hero.attrDefense * hero.attrAgility * hero.attrReflexes);
-        return Math.floor(Math.sqrt(overallStrengthModifier) * this.attrMaxHp / 10);
+        return Math.floor(Math.sqrt(overallStrengthModifier) * this.attrMaxHp / 5);
     };
 }
 

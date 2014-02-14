@@ -6,5 +6,15 @@ convert bandit3.png -transparent white bandit3.png
 convert bandit3attack.png -transparent white bandit3attack.png
 convert wolf1.png -transparent white wolf1.png
 convert wolf1attack.png -transparent white wolf1attack.png
+convert wolf2.png -transparent white wolf2.png
+convert wolf2attack.png -transparent white wolf2attack.png
 convert wasp1.png -transparent white wasp1.png
 convert wasp1attack.png -transparent white wasp1attack.png
+convert wasp2.png -transparent white wasp2.png
+convert wasp2attack.png -transparent white wasp2attack.png
+convert armadillo1.png -transparent white armadillo1.png
+convert armadillo1attack.png -transparent black armadillo1attack.png
+convert armadillo2.png -transparent white armadillo2.png
+convert armadillo2attack.png -transparent white armadillo2attack.png
+convert serpent1.png -transparent white serpent1.png
+convert serpent1attack.png -transparent white serpent1attack.png
