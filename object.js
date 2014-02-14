@@ -6,7 +6,8 @@
 
 /* OBJECT STRUCTURES */
 
-function Landscape(terrainColorFar, terrainColorMid, terrainColorNear, objectFrequency) {
+function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNear, objectFrequency) {
+    this.background = background;
     this.terrainColorFar = terrainColorFar;
     this.terrainColorMid = terrainColorMid;
     this.terrainColorNear = terrainColorNear;
@@ -167,15 +168,15 @@ function Sequence() {
         if (this.currentActionId < 0) {
             this.currentActionId = 0;
             if (this.sequence.length > 0) {
-                registerObject(GUI_EVENT, this.sequence[this.currentActionId]);
+                registerObject(this.sequence[this.currentActionId].layer, this.sequence[this.currentActionId].action);
             } else {
                 this.deletable = true;
             }
         }
-        if (this.sequence[this.currentActionId].deletable) {
+        if (this.sequence[this.currentActionId].action.deletable) {
             this.currentActionId++;
             if (this.currentActionId < this.sequence.length) {
-                registerObject(GUI_EVENT, this.sequence[this.currentActionId]);
+                registerObject(this.sequence[this.currentActionId].layer, this.sequence[this.currentActionId].action);
             } else {
                 this.deletable = true;
             }
@@ -184,16 +185,24 @@ function Sequence() {
 
     this.move = function() {};
 
-    this.addAction = function(action) {
-        this.sequence.push(action);
+    this.addAction = function(action, layer) {
+        this.sequence.push({
+            action: action, layer: (layer === undefined) ? GUI_EVENT : layer
+        });
     };
 }
 
 function Action() {
     this.frame = 0;             // current frame
 
+    this.menuAction = false;
     this.type = "Action";       // type definition
     this.deletable = false;     // universal deletability flag
+
+    this.authorizeMenuPlay = function () {
+        this.menuAction = true;
+        return this;
+    };
 
     /*
      * specify action behavior by defining the playFrame method
@@ -207,7 +216,7 @@ function Action() {
     this.playFrame = function(frame) {};
 
     this.manifest = function () {
-        if (!this.deletable) {
+        if ((!this.deletable) && (this.menuAction || (menuState == MS_NONE))) {
             this.deletable = this.playFrame(this.frame);
             this.frame++;
         }
@@ -435,76 +444,83 @@ function Hero() {
     };
 
     this.manifest = function() {
-        if (moving) {
-            var optimalHeight = getOptimalHeight(this.path, this.position) + 30;
-            var heightOffset = optimalHeight - this.height;
-            if (Math.abs(heightOffset) > 4) {
-                heightOffset = 4 * heightOffset / Math.abs(heightOffset);
+        if (menuState == MS_NONE) {
+            if (moving) {
+                var optimalHeight = getOptimalHeight(this.path, this.position) + 30;
+                var heightOffset = optimalHeight - this.height;
+                if (Math.abs(heightOffset) > 4) {
+                    heightOffset = 4 * heightOffset / Math.abs(heightOffset);
+                }
+                this.height += heightOffset;
             }
-            this.height += heightOffset;
-        }
-        fc.beginPath();
-        switch (this.animationState) {
-            case AN_STAND:
-                fc.drawImage(this.imgHeroStand,
-                    this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
-                    this.imgHeroStand.width * getPathScale(this.path),
-                    this.imgHeroStand.height * getPathScale(this.path));
-                break;
-            case AN_MOVE_1:
-                fc.drawImage(this.imgHeroMove1,
-                    this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
-                    this.imgHeroMove1.width * getPathScale(this.path),
-                    this.imgHeroMove1.height * getPathScale(this.path));
-                if (this.animationFrame > 9) {
-                    this.setAnimationState(AN_MOVE_2);
-                    this.animationFrame = 0;
-                }
-                break;
-            case AN_MOVE_2:
-                fc.drawImage(this.imgHeroMove2,
-                    this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height - 1,
-                    this.imgHeroMove2.width * getPathScale(this.path),
-                    this.imgHeroMove2.height * getPathScale(this.path));
-                if (this.animationFrame > 9) {
-                    this.setAnimationState(AN_MOVE_1);
-                    this.animationFrame = 0;
-                }
-                break;
-            case AN_PREPARE:
-                fc.drawImage(this.imgHeroPrepare,
-                    this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
-                    this.imgHeroPrepare.width * getPathScale(this.path),
-                    this.imgHeroPrepare.height * getPathScale(this.path));
-                break;
-            case AN_ATTACK:
-                fc.drawImage(this.imgHeroAttack,
-                    this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
-                    this.imgHeroAttack.width * getPathScale(this.path),
-                    this.imgHeroAttack.height * getPathScale(this.path));
-                if (this.animationFrame > 8) {
-                    this.animationState = AN_STAND;
-                    this.animationFrame = 0;
-                }
-                break;
-            case AN_DEFEND:
-                fc.drawImage(this.imgHeroDefend,
-                    this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
-                    this.imgHeroDefend.width * getPathScale(this.path),
-                    this.imgHeroDefend.height * getPathScale(this.path));
-                break;
-            case AN_DEATH:
-                if (this.animationFrame % 6 > 2) {
+            fc.beginPath();
+            switch (this.animationState) {
+                case AN_STAND:
                     fc.drawImage(this.imgHeroStand,
                         this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
                         this.imgHeroStand.width * getPathScale(this.path),
                         this.imgHeroStand.height * getPathScale(this.path));
-                }
-                break;
-        }
-        this.animationFrame++;
-        if (this.animationFrame > 10) {
-            this.animationFrame = 0;
+                    break;
+                case AN_MOVE_1:
+                    fc.drawImage(this.imgHeroMove1,
+                        this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
+                        this.imgHeroMove1.width * getPathScale(this.path),
+                        this.imgHeroMove1.height * getPathScale(this.path));
+                    if (this.animationFrame > 9) {
+                        this.setAnimationState(AN_MOVE_2);
+                        this.animationFrame = 0;
+                    }
+                    break;
+                case AN_MOVE_2:
+                    fc.drawImage(this.imgHeroMove2,
+                        this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height - 1,
+                        this.imgHeroMove2.width * getPathScale(this.path),
+                        this.imgHeroMove2.height * getPathScale(this.path));
+                    if (this.animationFrame > 9) {
+                        this.setAnimationState(AN_MOVE_1);
+                        this.animationFrame = 0;
+                    }
+                    break;
+                case AN_PREPARE:
+                    fc.drawImage(this.imgHeroPrepare,
+                        this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
+                        this.imgHeroPrepare.width * getPathScale(this.path),
+                        this.imgHeroPrepare.height * getPathScale(this.path));
+                    break;
+                case AN_ATTACK:
+                    fc.drawImage(this.imgHeroAttack,
+                        this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
+                        this.imgHeroAttack.width * getPathScale(this.path),
+                        this.imgHeroAttack.height * getPathScale(this.path));
+                    if (this.animationFrame > 8) {
+                        this.animationState = AN_STAND;
+                        this.animationFrame = 0;
+                    }
+                    break;
+                case AN_DEFEND:
+                    fc.drawImage(this.imgHeroDefend,
+                        this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
+                        this.imgHeroDefend.width * getPathScale(this.path),
+                        this.imgHeroDefend.height * getPathScale(this.path));
+                    break;
+                case AN_DEATH:
+                    if (this.animationFrame % 6 > 2) {
+                        fc.drawImage(this.imgHeroStand,
+                            this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
+                            this.imgHeroStand.width * getPathScale(this.path),
+                            this.imgHeroStand.height * getPathScale(this.path));
+                    }
+                    break;
+            }
+            this.animationFrame++;
+            if (this.animationFrame > 10) {
+                this.animationFrame = 0;
+            }
+        } else {
+            fc.drawImage(this.imgHeroStand,
+                this.position - this.imgHeroStand.width * getPathScale(this.path) / 2, this.height,
+                this.imgHeroStand.width * getPathScale(this.path),
+                this.imgHeroStand.height * getPathScale(this.path));
         }
     };
 

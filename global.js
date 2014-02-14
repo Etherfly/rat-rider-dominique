@@ -15,18 +15,17 @@ var WW_MEDIUM = 750;
 var WW_LARGE = 1000;
 
 // battle gauge limits
-var BGL_LEFT = W / 2 - 300;
-var BGL_RIGHT = W / 2 + 300;
+var BGL_LEFT = W / 2 - 320;
+var BGL_RIGHT = W / 2 + 280;
 var BGL_HEIGHT = 30;
 
 var BGL_COLOR = "#C8FFFF";
 
-var CM_NONE = 0;    // Control mode: none
+var CM_EVENT = 0;    // Control mode: none
 var CM_FIELD = 1;   // Control mode: field
-var CM_EVENT = 2;   // Control mode: event
-var CM_BATTLE = 3;  // Control mode: battle
+var CM_BATTLE = 2;  // Control mode: battle
 
-var controlMode = CM_NONE;
+var controlMode = CM_EVENT;
 
 var layers = [];    // global object storage
 
@@ -125,25 +124,18 @@ var farthestObjects = [];       // farthest object position on layer
 var collisionDistance = 40;
 
 // GUI
-var GFX_HERO_SPGAUGE_FLASH = 0;             // GUI effect: flashing sp gauge
-var GFX_HERO_HPGAUGE_SHAKE = 1;             // GUI effect: shaking hero hp gauge
-var GFX_ENEMY_HPGAUGE_SHAKE = 2;            // GUI effect: shaking enemy hp gauge
-var GFX_HERO_BATTLEGAUGE_FLASH = 3;         // GUI effect: hero battle gauge border flash
-var GFX_HERO_BATTLEGAUGE_FLASH_FILL = 4;    // GUI effect: hero battle gauge fill flash
-var GFX_ENEMY_BATTLEGAUGE_FLASH = 5;        // GUI effect: enemy battle gauge border flash
-var GFX_ENEMY_BATTLEGAUGE_FLASH_FILL = 6;   // GUI effect: enemy battle gauge fill flash
-
-var heroHpShake = 0;
-var enemyHpShake = 0;
-
-var BATTLEGAUGE_FLASH_LENGTH = 1;
-
-var displayGui = false;
-var blackMask = false;
 
 var skillChoice = 0;
 var itemChoice = 0;
 var eventChoice = 0;
+
+var DEFAULT_FONT = "bold 14pt Courier New";
+var DEFAULT_CHAR_WIDTH = 11.4;
+var DEFAULT_LINE_HEIGHT = 22;
+
+var LARGE_FONT = "bold 18pt Courier New";
+var LARGE_CHAR_WIDTH = 15;
+var LARGE_LINE_HEIGHT = 34;
 
 var CURSOR_NEXT;
 var CURSOR_CHOICE;
@@ -209,41 +201,6 @@ function getTextResource(id) {
     return string.replace(/\n/g, "").replace(/ +/g, " ").replace(/^ /, "");
 }
 
-/*
- * Universal text processor
- *
- * Displays text starting at the specified point, limited by the specified line width.
- * Text can be a multilingual array.
- * Supported tags: <br>
- * Returns the line count.
- */
-function processText(text, x, y, w) {
-    function writeLine(line, lineCount) {
-        fc.beginPath();
-        fc.fillStyle = "white";
-        fc.font = "bold 18pt Courier New";
-        fc.fillText(line, x, y + 30 * (lineCount + 1));
-    }
-
-    var lineCount = 0;
-    var charLimitPerLine = Math.floor((w - 60) / 14 - 1);
-    var words = (typeof text === "string") ? text.split(" ") : text[lang].split(" ");
-    words.push("");
-    var line = "";
-    for (var i = 0; i < words.length; i++) {
-        if ((line.length + words[i].length > charLimitPerLine) || (words[i] == "<br>") || (i == words.length - 1)) {
-            writeLine(line, lineCount);
-            lineCount++;
-            line = "";
-        }
-        if (words[i].indexOf("<") == -1) {
-            line += words[i] + " ";
-        }
-    }
-
-    return lineCount;
-}
-
 function initializeChapterData(chapterId) {
     switch (chapterId) {
         case CH00:
@@ -269,7 +226,7 @@ function resetGame() {
         gst[i] = [];
         initializeChapterData(i);
     }
-    setControlMode(CM_NONE);
+    setControlMode(CM_EVENT);
     initializeGui();
     landscape = createTitleLandscape();
     landscape.resetTerrain();
@@ -498,320 +455,6 @@ function decorateReaches(path, layerOffset, density, scaleModifier, offset, imag
     }
 }
 
-function drawTextbox(xPos, yPos, width, height) {
-    fc.beginPath();
-    fc.fillStyle = "#FFFFFF";
-    fc.fillRect(xPos, yPos, width, height);
-    if ((width > 14) && (height > 14))
-    {
-        fc.beginPath();
-        fc.fillStyle = "#3333AA";
-        fc.fillRect(xPos + 5, yPos + 5, width - 10, height - 10);
-    }
-}
-
-function hexToRgb(hex) {
-    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-        return r + r + g + g + b + b;
-    });
-
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
-
-function componentToHex(c) {
-    var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
-}
-
-function rgbToHex(r, g, b) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
-
-function drawLimitedGradient(xStart, yStart, xEnd, yEnd, startColorHex, endColorHex) {
-    var startColor = hexToRgb(startColorHex);
-    var endColor = hexToRgb(endColorHex);
-    var realXStart;
-    var realXEnd;
-    var realStartColor;
-    var realEndColor;
-    if (xStart < BGL_LEFT) {
-        realXStart = BGL_LEFT;
-        realStartColor = rgbToHex(
-            Math.floor(startColor.r - (startColor.r - endColor.r) * (1 - (xEnd - realXStart) / (xEnd - xStart))),
-            Math.floor(startColor.g - (startColor.g - endColor.g) * (1 - (xEnd - realXStart) / (xEnd - xStart))),
-            Math.floor(startColor.b - (startColor.b - endColor.b) * (1 - (xEnd - realXStart) / (xEnd - xStart)))
-        );
-    } else {
-        realXStart = xStart;
-        realStartColor = rgbToHex(startColor.r, startColor.g, startColor.b);
-    }
-    if (xEnd > BGL_RIGHT) {
-        realXEnd = BGL_RIGHT;
-        realEndColor = rgbToHex(
-            Math.floor(endColor.r - (endColor.r - startColor.r) * (1 - (realXEnd - xStart) / (xEnd - xStart))),
-            Math.floor(endColor.g - (endColor.g - startColor.g) * (1 - (realXEnd - xStart) / (xEnd - xStart))),
-            Math.floor(endColor.b - (endColor.b - startColor.b) * (1 - (realXEnd - xStart) / (xEnd - xStart)))
-        );
-    } else {
-        realXEnd = xEnd;
-        realEndColor = rgbToHex(endColor.r, endColor.g, endColor.b);
-    }
-    if (realXEnd > realXStart) {
-        fc.beginPath();
-        var limitedGradient = fc.createLinearGradient(realXStart, 0, realXEnd, 0);
-        limitedGradient.addColorStop(0, realStartColor);
-        limitedGradient.addColorStop(1, realEndColor);
-        fc.fillStyle = limitedGradient;
-        fc.fillRect(realXStart, yStart, realXEnd - realXStart, yEnd - yStart);
-    }
-}
-
-function initializeGui() {
-    var imgGuiHpSpGauge = getImageResource("imgGuiHpSpGauge");
-    var hpSpGauge = new GuiElement(null, 40, 40);
-    hpSpGauge.defineReflect(function() {
-        var shakeXOffset = 0;
-        var shakeYOffset = 0;
-        if (heroHpShake > 0) {
-            heroHpShake--;
-            if (globalFrame % 4 == 0) {
-                shakeXOffset = -5 + 10 * Math.random();
-                shakeYOffset = -5 + 10 * Math.random();
-            }
-        }
-        fc.beginPath();
-        fc.drawImage(imgGuiHpSpGauge, this.xPos + shakeXOffset, this.yPos + shakeYOffset);
-        if (hero != null) {
-            var width;
-            if (hero.hp > 0) {
-                width = 231 * (hero.hp / hero.attrMaxHp);
-                fc.beginPath();
-                fc.fillStyle = "#FF4444";
-                fc.fillRect(99 + shakeXOffset, 56 + shakeYOffset, width, 14);
-            }
-            if (hero.sp > 0) {
-                width = 231 * (hero.sp / hero.attrMaxSp);
-                fc.beginPath();
-                fc.fillStyle = "#FFFF11";
-                fc.fillRect(99 + shakeXOffset, 72 + shakeYOffset, width, 14);
-            }
-        }
-    });
-    registerObject(GUI_COMMON, hpSpGauge);
-    var imgGuiAttributeBox = getImageResource("imgGuiAttributeBox");
-    var attributeBox = new GuiElement(imgGuiAttributeBox, 10, H - imgGuiAttributeBox.height - 60);
-    attributeBox.defineReflect(function() {
-        function displayAttribute(attrName, attribute, offset) {
-            fc.beginPath();
-            fc.fillStyle = "white";
-            fc.font = "bold 18pt Courier New";
-            var yPos = H - imgGuiAttributeBox.height + offset;
-            fc.fillText(attrName[lang], 72, yPos);
-            fc.fillText(Math.floor(attribute).toString(), 216, yPos);
-            fc.beginPath();
-            fc.fillStyle = "#FFD010";
-            var width = 117 * (attribute % 1);
-            fc.fillRect(74, H - imgGuiAttributeBox.height + offset + 7, width, 3);
-        }
-
-        function displayEffectiveAttribute(attribute, offset) {
-            if (battleFrame > 0) {
-                fc.beginPath();
-                if (attribute > 1) {
-                    fc.fillStyle = "#f0f040";
-                } else if (attribute < 1) {
-                    fc.fillStyle = "#f04040";
-                } else {
-                    fc.fillStyle = "white";
-                }
-                fc.font = "bold 18pt Courier New";
-                var yPos = H - imgGuiAttributeBox.height + offset;
-                var displayValue = Math.floor(attribute * 100).toString();
-                var valueOffset = (3 - displayValue.length) * 14;
-                fc.fillText(Math.floor(attribute * 100).toString() + "%", 286 + valueOffset, yPos);
-            }
-        }
-
-        if (hero != null) {
-            fc.beginPath();
-            fc.fillStyle = "white";
-            fc.font = "bold 18pt Courier New";
-            var offset = -24;
-            displayAttribute(TXT_ATTR_ATTACK, hero.attrAttack, offset);
-            displayEffectiveAttribute(hero.effAttack, offset);
-            offset += 49;
-            displayAttribute(TXT_ATTR_DEFENSE,hero.attrDefense, offset);
-            displayEffectiveAttribute(hero.effDefense, offset);
-            offset += 49;
-            displayAttribute(TXT_ATTR_AGILITY,hero.attrAgility, offset);
-            displayEffectiveAttribute(hero.effAgility, offset);
-            offset += 49;
-            displayAttribute(TXT_ATTR_REFLEXES,hero.attrReflexes, offset);
-            displayEffectiveAttribute(hero.effReflexes, offset);
-        }
-    });
-    registerObject(GUI_COMMON, attributeBox);
-    var imgKarma = getImageResource("imgKarma");
-    var karmaDisplay = new GuiElement(null, 10, H - 55);
-    karmaDisplay.defineReflect(function() {
-        if (hero != null) {
-            drawTextbox(this.xPos, this.yPos, 350, 45);
-            fc.beginPath();
-            fc.fillStyle = "white";
-            fc.font = "bold 18pt Courier New";
-            fc.fillText(TXT_KARMA[lang], this.xPos + 15, this.yPos + 29);
-            var displayValue = hero.karma.toString();
-            var valueOffset = (8 - displayValue.length) * 14.2;
-            fc.fillText(displayValue, this.xPos + 190 + valueOffset, this.yPos + 29);
-            fc.drawImage(imgKarma, this.xPos + 308, this.yPos + 8, 30, 30);
-        }
-    });
-    registerObject(GUI_COMMON, karmaDisplay);
-    var imgEnemyHpGauge = getImageResource("imgGuiEnemyHpGauge");
-    var enemyHpGauge = new GuiElement(null, 40, 185);
-    enemyHpGauge.defineReflect(function() {
-        if ((battleFrame > 0) && (enemy != null)) {
-            var shakeXOffset = 0;
-            var shakeYOffset = 0;
-            if (enemyHpShake > 0) {
-                enemyHpShake--;
-                if (globalFrame % 4 == 0) {
-                    shakeXOffset = -5 + 10 * Math.random();
-                    shakeYOffset = -5 + 10 * Math.random();
-                }
-            }
-
-            var width = 231 * (enemy.hp / enemy.attrMaxHp);
-            fc.beginPath();
-            fc.drawImage(imgEnemyHpGauge, this.xPos + shakeXOffset, this.yPos + shakeYOffset);
-            fc.drawImage(enemy.animationObject.defaultImage,
-                this.xPos - 16 + shakeXOffset, this.yPos - 16 + shakeYOffset);
-            fc.fillStyle = "#FF4444";
-            fc.fillRect(99 + shakeXOffset, 187 + shakeYOffset, width, 14);
-        }
-    });
-    registerObject(GUI_COMMON, enemyHpGauge);
-    var imgGuiBattleGauges = getImageResource("imgBattleGauges");
-    var battleGauges = new GuiElement(null, (W - imgGuiBattleGauges.width) / 2, 22);
-    battleGauges.defineReflect(function() {
-        if ((battleFrame > 0) && (hero != null) && (enemy != null)) {
-            var weightedBattleFrameOffset = (BATTLEGAUGE_SHIFT_BASIS * battleFrame
-                * getGlobalBattleGaugeShiftCoefficient()) % 40;
-            for (var i = 0; i < 57; i++) {
-                fc.beginPath();
-                fc.strokeStyle = "black";
-                fc.lineWidth = 1;
-                fc.moveTo(BGL_LEFT + 30 + i * 10 - weightedBattleFrameOffset,
-                    getBattleGaugeOffset(hero) - 3);
-                fc.lineTo(BGL_LEFT + 30 + i * 10 - weightedBattleFrameOffset,
-                    getBattleGaugeOffset(hero) - (i % 4 == 0 ? 18 : 12));
-                fc.stroke();
-            }
-            weightedBattleFrameOffset = (BATTLEGAUGE_SHIFT_BASIS * battleFrame
-                * getGlobalBattleGaugeShiftCoefficient() * getAgilityDifferenceCoefficient()) % 40;
-            for (i = 0; i < 57; i++) {
-                fc.beginPath();
-                fc.strokeStyle = "black";
-                fc.lineWidth = 1;
-                fc.moveTo(BGL_LEFT + 30 + i * 10 - weightedBattleFrameOffset,
-                    getBattleGaugeOffset(enemy) - 3);
-                fc.lineTo(BGL_LEFT + 30 + i * 10 - weightedBattleFrameOffset,
-                    getBattleGaugeOffset(enemy) - (i % 4 == 0 ? 18 : 12));
-                fc.stroke();
-            }
-
-            fc.beginPath();
-            fc.drawImage(imgGuiBattleGauges, this.xPos, this.yPos);
-            for (i = 0; i < hero.battleGaugeArtifacts.length; i++) {
-                var artifact = hero.battleGaugeArtifacts[i];
-                if (!(typeof artifact === "undefined")) {
-                    artifact.draw(artifact.position, hero);
-                }
-            }
-            for (i = 0; i < enemy.battleGaugeArtifacts.length; i++) {
-                artifact = enemy.battleGaugeArtifacts[i];
-                if (!(typeof artifact === "undefined")) {
-                    artifact.draw(artifact.position, enemy);
-                }
-            }
-        }
-    });
-    registerObject(GUI_COMMON, battleGauges);
-    var skillSet = new GuiElement(null, W - 360, 54);
-    skillSet.defineReflect(function() {
-        function writeLine(line, lineCount, offset) {
-            fc.beginPath();
-            fc.fillStyle = "white";
-            fc.font = "bold 18pt Courier New";
-            fc.fillText(line, W - 360 + offset, 84 + 30 * lineCount);
-        }
-
-        if ((battleFrame > 0) && (hero != null)) {
-            var lineCount = hero.skillSet.length;
-            if (lineCount < 4) {
-                lineCount = 4;
-            }
-            drawTextbox(W - 350, 54, 330, 50 + 30 * lineCount);
-            if (keyPressed == KEY_UP) {
-                if (skillChoice > 0) {
-                    skillChoice--;
-                } else {
-                    skillChoice = hero.skillSet.length - 1;
-                }
-            } else if (keyPressed == KEY_DOWN) {
-                if (skillChoice < hero.skillSet.length - 1) {
-                    skillChoice++;
-                } else {
-                    skillChoice = 0;
-                }
-            } else if ((keyPressed >= KEY_DIGIT_0) && (keyPressed <= KEY_DIGIT_0 + 9)
-                && ((keyPressed - KEY_DIGIT_0 + 9) % 10 < hero.skillSet.length)) {
-                skillChoice = (keyPressed - KEY_DIGIT_0 + 9) % 10;
-            }
-
-            for (var i = 0; i < hero.skillSet.length; i++) {
-                writeLine(hero.skillSet[i].name[lang], i, 50);
-                if (i == skillChoice) {
-                    var artifactData = hero.skillSet[i].getArtifacts(0);
-                    for (var j = 0; j < artifactData.length; j++) {
-                        artifactData[j].sketch(artifactData[j].position, hero);
-                    }
-
-                    fc.beginPath();
-                    if (globalFrame % 20 < 10) {
-                        fc.drawImage(CURSOR_CHOICE, W - 330, 69 + 30 * i);
-                    } else {
-                        fc.drawImage(CURSOR_CHOICE, W - 335, 69 + 30 * i);
-                    }
-
-                    if (keyCtrl) {
-                        drawTextbox(20 + imgGuiAttributeBox.width, H - imgGuiAttributeBox.height - 60,
-                            W - 370 - imgGuiAttributeBox.width, 55 + imgGuiAttributeBox.height);
-                        var skillInfo = [
-                            hero.skillSet[i].name[LANG_ENG] + " - " + hero.skillSet[i].spCost + " " + TXT_SP[LANG_ENG]
-                                + TXT_HOTKEY[LANG_ENG] + ((i + 1) % 10) + "') <br> <br> "
-                                + hero.skillSet[i].description[LANG_ENG],
-                            hero.skillSet[i].name[LANG_RUS] + " - " + hero.skillSet[i].spCost + " " + TXT_SP[LANG_RUS]
-                                + TXT_HOTKEY[LANG_RUS] + ((i + 1) % 10) + "') <br> <br> "
-                                + hero.skillSet[i].description[LANG_RUS]
-                        ];
-                        processText(skillInfo, 50 + imgGuiAttributeBox.width, H - imgGuiAttributeBox.height - 60,
-                            W - 370 - imgGuiAttributeBox.width);
-                    }
-                }
-            }
-        }
-    });
-    registerObject(GUI_COMMON, skillSet);
-    displayGui = false;
-}
-
 function registerImpact(attacker, target, attackPower) {
     impacts.push({
         attacker: attacker,
@@ -823,7 +466,7 @@ function registerImpact(attacker, target, attackPower) {
 function handleBattleEnd() {
     battleFrame = null;
     behaviorFluctuation = 0;
-    controlMode = CM_NONE;
+    controlMode = CM_EVENT;
     hero.battleGaugeArtifacts.length = 0;
     enemy.battleGaugeArtifacts.length = 0;
     var battleGuiDisappearAction = new Action();
@@ -839,7 +482,7 @@ function handleBattleEnd() {
             ? 1 : (reverseFrame * 16) / (22 + imgGuiBattleGauges.height);
 
         var imgEnemyHpGauge = getImageResource("imgGuiEnemyHpGauge");
-        x = -imgEnemyHpGauge.width + scale * (imgEnemyHpGauge.width + 40);
+        x = -imgEnemyHpGauge.width + scale * (imgEnemyHpGauge.width + 18);
         fc.drawImage(imgEnemyHpGauge, x, 185);
 
         var lineCount = hero.skillSet.length;
@@ -893,7 +536,7 @@ function handleBattleEnd() {
             battleEndSequence.addAction(procureResumeAction());
         }
     } else {
-        battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, TXT_DOMINIQUE_HAS_FALLEN)
+        battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, TXT_DOMINIQUE_HAS_FALLEN, true)
             .addChoice(TXT_LOAD_GAME).addChoice(TXT_RETURN_TO_TITLE));
         battleEndSequence.addAction(procureCodeFragmentAction(function () {
             landscape.destroy();
@@ -986,6 +629,11 @@ function tick() {
         }
     }
 
+    if (landscape != null) {
+        fc.beginPath();
+        fc.drawImage(landscape.background, 0, 0);
+    }
+
     for (var i = 0; i < layers.length; i++) {
 
         // masking screen when needed
@@ -1001,7 +649,7 @@ function tick() {
                 // every defined object...
                 var object = layers[i][j];
                 if (!(typeof object === "undefined")) {
-                    if (moving) {               // ...moves...
+                    if (moving && (menuState == MS_NONE)) {   // ...moves...
                         object.move();
                     }
                     object.manifest();          // ...manifests...
@@ -1047,31 +695,38 @@ function tick() {
         }
     }
 
-    if (controlMode == CM_FIELD) {
-        hero.restoreSp(SP_RECOVERY_BASIS);
+    if (displayGui && (menuState == MS_NONE) && (controlMode != CM_BATTLE) && (keyPressed == KEY_ESC)) {
+        menuState = MS_OPENING;
+        registerObject(GUI_EVENT, procureEscapeMenuSequence());
+    }
 
-        switch (keyPressed) {
-            case KEY_UP:
-                hero.moveFarther();
-                break;
-            case KEY_DOWN:
-                hero.moveNearer();
-                break;
-        }
-    } else if ((controlMode == CM_BATTLE) && !keyCtrl) {
-        if ((hero.hp > 0) && (enemy.hp > 0)) {
-            hero.restoreSp(0.05 * getGlobalBattleGaugeShiftCoefficient());
+    if (menuState == MS_NONE) {
+        if (controlMode == CM_FIELD) {
+            hero.restoreSp(SP_RECOVERY_BASIS);
 
-            hero.progressBattleGauge();
-            enemy.progressBattleGauge();
-            deliverImpacts();
-            enemy.behave(enemy, battleFrame);
-            if (keyPressed == KEY_ACTION) {
-                hero.useSkill(hero.skillSet[skillChoice], 0);
+            switch (keyPressed) {
+                case KEY_UP:
+                    hero.moveFarther();
+                    break;
+                case KEY_DOWN:
+                    hero.moveNearer();
+                    break;
             }
-            battleFrame++;
-        } else {
-            handleBattleEnd();
+        } else if (controlMode == CM_BATTLE) {
+            if ((hero.hp > 0) && (enemy.hp > 0)) {
+                hero.restoreSp(0.05 * getGlobalBattleGaugeShiftCoefficient());
+
+                hero.progressBattleGauge();
+                enemy.progressBattleGauge();
+                deliverImpacts();
+                enemy.behave(enemy, battleFrame);
+                if (keyPressed == KEY_ACTION) {
+                    hero.useSkill(hero.skillSet[skillChoice], 0);
+                }
+                battleFrame++;
+            } else {
+                handleBattleEnd();
+            }
         }
     }
 

@@ -7,7 +7,7 @@
 /* LANDSCAPES */
 
 function createTitleLandscape() {
-    var titleLandscape = new Landscape("#007700", "#009900", "#00AA00", 600);
+    var titleLandscape = new Landscape(getImageResource("imgDecGrassBackground"), "#007700", "#009900", "#00AA00", 600);
     titleLandscape.defineGenerateTerrain(function (path) {
         var color = this.pathToColor(path);
         var terrain = generateSurface(path, color);
@@ -58,8 +58,8 @@ function procureTitleSequence() {
         }
         if (keyPressed == KEY_ACTION) {
             var mainMenuSequence = new Sequence();
-            mainMenuSequence.addAction(procureDisplayCenteredMessageAction(300, "", true)
-                .addChoice(TXT_NEW_GAME).addChoice(TXT_LOAD_GAME));
+            mainMenuSequence.addAction(procureDisplayCenteredMessageAction(300, "", false)
+                .addChoice(TXT_NEW_GAME).addChoice(TXT_LOAD_GAME).addChoice(TXT_ENDLESS_MODE, function () {return false;}));
             mainMenuSequence.addAction(procureCodeFragmentAction(function () {
                 switch (eventChoice) {
                     case 0:
@@ -132,8 +132,8 @@ function procureDisplayFreeTextAction(xPos, yPos, width, text, displayCursor) {
         function writeLine(line, lineCount) {
             fc.beginPath();
             fc.fillStyle = "white";
-            fc.font = "bold 18pt Courier New";
-            fc.fillText(line, xPos + 30, yPos + 30 + 30 * lineCount);
+            fc.font = DEFAULT_FONT;
+            fc.fillText(line, xPos + 30, yPos + DEFAULT_LINE_HEIGHT * (lineCount + 1));
         }
 
         var translatedText = (typeof text === "string") ? text : text[lang];
@@ -143,9 +143,9 @@ function procureDisplayFreeTextAction(xPos, yPos, width, text, displayCursor) {
         if (displayCursor && (frame * 3 >= text.length)) {
             fc.beginPath();
             if (frame % 20 < 10) {
-                fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2, yPos + 15 + 30 * lineCount);
+                fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2, yPos + 20 + DEFAULT_LINE_HEIGHT * lineCount);
             } else {
-                fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2, yPos + 20 + 30 * lineCount);
+                fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2, yPos + 25 + DEFAULT_LINE_HEIGHT * lineCount);
             }
         }
 
@@ -157,17 +157,18 @@ function procureDisplayFreeTextAction(xPos, yPos, width, text, displayCursor) {
 function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCursor) {
     var displayMessageAction = new Action();
     displayMessageAction.choices = [];
-    displayMessageAction.addChoice = function (textAnswer) {
-        displayMessageAction.choices.push(textAnswer);
-        height += 30;
+    displayMessageAction.addChoice = function (textAnswer, activityFunction) {
+        var isActive = activityFunction == null ? function () {return true} : activityFunction;
+        displayMessageAction.choices.push({text: textAnswer, active: isActive});
+        height += DEFAULT_LINE_HEIGHT;
         return displayMessageAction;
     };
     displayMessageAction.definePlayFrame(function (frame) {
-        function writeLine(line, lineCount, offset) {
+        function writeLine(line, lineCount, color, offset) {
             fc.beginPath();
-            fc.fillStyle = "white";
-            fc.font = "bold 18pt Courier New";
-            fc.fillText(line, xPos + offset, yPos + 30 + 30 * lineCount);
+            fc.fillStyle = color;
+            fc.font = DEFAULT_FONT;
+            fc.fillText(line, xPos + offset, yPos + DEFAULT_LINE_HEIGHT * (lineCount + 1));
         }
 
         if ((frame == 0) && (displayMessageAction.choices.length > 0)) {
@@ -181,6 +182,7 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
             var lineCount = processText(text, xPos + 30, yPos, width);
 
             if (displayMessageAction.choices.length > 0) {
+                lineCount++;
                 if (keyPressed == KEY_UP) {
                     if (eventChoice > 0) {
                         eventChoice--;
@@ -195,28 +197,26 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
                     }
                 }
                 for (i = 0; i < displayMessageAction.choices.length; i++) {
-                    writeLine(((typeof displayMessageAction.choices[i] === "string"))
-                        ? displayMessageAction.choices[i] : displayMessageAction.choices[i][lang], lineCount, 60);
+                    writeLine(((typeof displayMessageAction.choices[i].text === "string"))
+                        ? displayMessageAction.choices[i].text : displayMessageAction.choices[i].text[lang],
+                        lineCount, displayMessageAction.choices[i].active() ? "white" : "gray", 60);
                     lineCount++;
                     if (i == eventChoice) {
                         fc.beginPath();
-                        if (frame % 20 < 10) {
-                            fc.drawImage(CURSOR_CHOICE, xPos + 35, yPos + 15 + 30 * (lineCount - 1));
-                        } else {
-                            fc.drawImage(CURSOR_CHOICE, xPos + 40, yPos + 15 + 30 * (lineCount - 1));
-                        }
+                        var cursorOffset = (frame % 20 < 10) ? 35 : 40;
+                        fc.drawImage(CURSOR_CHOICE, xPos + cursorOffset,
+                            yPos + 7 + DEFAULT_LINE_HEIGHT * (lineCount - 1));
                     }
                 }
             } else if (displayCursor) {
                 fc.beginPath();
-                if (frame % 20 < 10) {
-                    fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2, yPos + 15 + 30 * lineCount);
-                } else {
-                    fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2, yPos + 20 + 30 * lineCount);
-                }
+                cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2,
+                    yPos + cursorOffset + DEFAULT_LINE_HEIGHT * lineCount);
             }
 
-            return keyPressed == KEY_ACTION;
+            return (keyPressed == KEY_ACTION)
+                && (displayMessageAction.choices.length == 0 || displayMessageAction.choices[eventChoice].active());
         }
         return false;
     });
@@ -224,7 +224,7 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
 }
 
 function procureDisplayCenteredMessageAction(width, text, displayCursor) {
-    var charLimitPerLine = Math.floor((width - 60) / 14 - 1);
+    var charLimitPerLine = Math.floor((width - 30) / DEFAULT_CHAR_WIDTH - 1);
     var lineCount = 0;
     var largestText;
     if (typeof text === "string") {
@@ -248,7 +248,7 @@ function procureDisplayCenteredMessageAction(width, text, displayCursor) {
         lineCount++;
     }
     return procureDisplayMessageAction(
-        (W - width) / 2, H / 2 - 100, width, 50 + 30 * lineCount, text, displayCursor);
+        (W - width) / 2, H / 2 - 100, width, 50 + DEFAULT_LINE_HEIGHT * lineCount, text, displayCursor);
 }
 
 function procureGuiEffectAction(guiEffect, color, value) {
@@ -271,7 +271,7 @@ function procureGuiEffectAction(guiEffect, color, value) {
                 if ((frame < 50) && (value != null)) {
                     fc.beginPath();
                     fc.fillStyle = color;
-                    fc.font = "bold 14pt Courier New";
+                    fc.font = DEFAULT_FONT;
                     fc.fillText(value, 60, 70 - frame);
                 }
                 return frame > 50;
@@ -283,7 +283,7 @@ function procureGuiEffectAction(guiEffect, color, value) {
                 if ((frame < 50) && (value != null)) {
                     fc.beginPath();
                     fc.fillStyle = color;
-                    fc.font = "bold 14pt Courier New";
+                    fc.font = DEFAULT_FONT;
                     fc.fillText(value, 60, 175 - frame);
                 }
                 return frame > 50;
@@ -335,7 +335,7 @@ function procureGuiEffectAction(guiEffect, color, value) {
 
 function procureStopAction() {
     return procureCodeFragmentAction(function() {
-        controlMode = CM_NONE;
+        controlMode = CM_EVENT;
         if ((battleFrame == null) || (battleFrame == 0)) {
             hero.setAnimationState(AN_STAND);
             moving = false;
@@ -358,12 +358,12 @@ function procureResumeAction() {
 function procureInitiateBattleAction(newEnemy, finishedSequence) {
     return procureCodeFragmentAction(function () {
         hero.setAnimationState(AN_STAND);
-        controlMode = CM_NONE;
+        controlMode = CM_EVENT;
         moving = false;
         var battleGuiAppearAction = new Action();
         battleGuiAppearAction.definePlayFrame(function (frame) {
             var imgGuiBattleGauges = getImageResource("imgBattleGauges");
-            var x = (W - imgGuiBattleGauges.width) / 2;
+            var x = (W - imgGuiBattleGauges.width) / 2 - 20;
             var y = frame * 8 - imgGuiBattleGauges.height;
             fc.beginPath();
             fc.drawImage(imgGuiBattleGauges, x, y);
@@ -372,7 +372,7 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
                 ? 1 : (frame * 16) / (22 + imgGuiBattleGauges.height);
 
             var imgEnemyHpGauge = getImageResource("imgGuiEnemyHpGauge");
-            x = -imgEnemyHpGauge.width + scale * (imgEnemyHpGauge.width + 40);
+            x = -imgEnemyHpGauge.width + scale * (imgEnemyHpGauge.width + 18);
             fc.drawImage(imgEnemyHpGauge, x, 185);
 
             var lineCount = hero.skillSet.length;
@@ -385,7 +385,7 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
             if (scale == 1) {
                 scale = (frame * 16) / (22 + imgGuiBattleGauges.height) - 1;
                 fc.fillStyle = "#FF4444";
-                fc.fillRect(99, 187, 231 * scale, 14);
+                fc.fillRect(77, 187, 231 * scale, 14);
             }
 
             if (y >= 22) {
@@ -453,7 +453,7 @@ function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, ene
                 enemyName[LANG_ENG] + TXT_COMMON_ENCOUNTER_1[LANG_ENG] + karmaCost + TXT_COMMON_ENCOUNTER_2[LANG_ENG],
                 enemyName[LANG_RUS] + TXT_COMMON_ENCOUNTER_1[LANG_RUS] + karmaCost + TXT_COMMON_ENCOUNTER_2[LANG_RUS]
             ];
-            encounterSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, encounterMessage, false)
+            encounterSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, encounterMessage, true)
                 .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_FIGHT)
                 .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_AVOID));
             encounterSequence.addAction(procureCodeFragmentAction(function () {
@@ -596,7 +596,7 @@ function acquireEmptyArtifact(position, cooldown) {
 }
 
 function getAbsoluteArtifactPosition(position) {
-    return (W / 2) + position;
+    return (W / 2) - 10 + position;
 }
 
 function obtainAttackSkill() {
@@ -732,7 +732,7 @@ function obtainAceOfSpadesSkill() {
 
 function obtainOmnislashSkill() {
     var omnislashSkill = new CombatSkill(["Omnislash", "Омнислэш"], [
-        "Девять crushing blows from all possible and impossible angles.",
+        "Nine crushing blows from all possible and impossible angles.",
         "Девять сокрушительных ударов со всех мыслимых и немыслимых углов."], 50);
     omnislashSkill.defineGetArtifacts(function (position) {
         return [

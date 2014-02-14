@@ -7,8 +7,8 @@
 /* DATA STORAGE */
 
 var chroniclersNames = [
-    ["Hilbert", "Benjamin", "Aristarchus", "Arnold"],
-    ["Гильберт", "Бенджамин", "Аристарх", "Арнольд"]
+    ["Hilbert", "Benjamin", "Aristarchus", "Arnold", "Sebastian", "Anselm"],
+    ["Гильберт", "Бенджамин", "Аристарх", "Арнольд", "Себастьян", "Ансельм"]
 ];
 
 var CH00_PHASE = 0;                     // phase
@@ -21,7 +21,7 @@ var CH00_BANDIT_RINGLEADER_BEATEN = 6;  // bandit ringleader beaten flag
 
 /* TEXT DATA */
 
-var CH00_TITLE = ["Prologue: Hero's Karma", "Пролог: Карма Героя"];
+var CH00_TITLE = ["Prologue: Hero's Karma <br> ", "Пролог: Карма Героя <br> "];
 
 var CH00_CHRONICLER_01 = [
     "Dominique comes upon a tranquil pavilion where chronicler ",
@@ -125,7 +125,7 @@ function createPrologueLandscape() {
 function procureStartPrologueSequence() {
     var startPrologue = new Sequence();
     startPrologue.addAction(procureMaskAction());
-    startPrologue.addAction(procureDisplayFreeTextAction(500, 200, W - 1000, CH00_TITLE, true));
+    startPrologue.addAction(procureDisplayFreeTextAction(500, 200, W - 1100, CH00_TITLE, true));
     startPrologue.addAction(procureDisplayFreeTextAction(200, 200, W - 400, TXT_INTRO_1, true));
     startPrologue.addAction(procureDisplayFreeTextAction(200, 200, W - 400, TXT_INTRO_2, true));
     startPrologue.addAction(procureDisplayFreeTextAction(200, 200, W - 400, TXT_INTRO_3, true));
@@ -166,7 +166,7 @@ function describeChroniclersPavilionType() {
                 CH00_CHRONICLER_01[LANG_RUS] + chroniclersNames[LANG_RUS][nameId] + CH00_CHRONICLER_02[LANG_RUS]
             ];
             pavilionSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM,
-                chroniclersMessage, false).addChoice(TXT_YES).addChoice(TXT_NO));
+                chroniclersMessage, true).addChoice(TXT_YES).addChoice(TXT_NO));
             pavilionSequence.addAction(procureCodeFragmentAction(function () {
                 var pavillionSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
@@ -204,7 +204,7 @@ function describeHotspringType() {
                     + restoreAmount + "% " + TXT_SP[LANG_RUS] + CH00_HOTSPRING_02[LANG_RUS]
                     + karmaCost + TXT_KARMA_COST[LANG_RUS] + " " + CH00_HOTSPRING_03[LANG_RUS]
             ];
-            hotspringSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, hotspringMessage, false)
+            hotspringSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, hotspringMessage, true)
                 .addChoice(TXT_YES).addChoice(TXT_NO));
             hotspringSequence.addAction(procureCodeFragmentAction(function () {
                 var hotspringSequenceAnswered = new Sequence();
@@ -259,7 +259,7 @@ function describeInnType() {
                     + (restoreAmount * 2) + "% " + TXT_SP[LANG_RUS] + "." + CH00_INN_02[LANG_RUS]
                     + karmaCost + TXT_KARMA_COST[LANG_RUS] + " " + CH00_INN_03[LANG_RUS]
             ];
-            innSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, innMessage, false)
+            innSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, innMessage, true)
                 .addChoice(TXT_YES).addChoice(TXT_NO));
             innSequence.addAction(procureCodeFragmentAction(function () {
                 var innSequenceAnswered = new Sequence();

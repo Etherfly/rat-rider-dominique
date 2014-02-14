@@ -4,13 +4,14 @@
     <title>Rat Rider Dominique v.0.65 ALPHA</title>
     <meta charset="utf-8">
 </head>
-<body>
-
-Rat Rider Dominique v.0.65 ALPHA
+<body style="background-color: black; empty-cells: show; width: 100%; height: 100%; margin: 0;">
 
 <table>
     <tr>
-        <td style="background-color: #80C0FF; empty-cells: show;">
+        <td style="color: white;">Rat Rider Dominique v.0.65 ALPHA</td>
+    </tr>
+    <tr>
+        <td>
             <canvas id="field" style="border: 1px solid black"></canvas>
         </td>
     </tr>
@@ -21,13 +22,18 @@ Rat Rider Dominique v.0.65 ALPHA
             <img id="imgCursorChoice" src="resources/other/cursorChoice.png">
             <img id="imgGuiHpSpGauge" src="resources/other/hp-sp-gauge.png">
             <img id="imgGuiEnemyHpGauge" src="resources/other/hp-gauge-enemy.png">
-            <img id="imgGuiAttributeBox" src="resources/other/attributeBox.png">
+            <img id="imgGuiAttributeGrowthGauge" src="resources/other/attrGrowth.png">
+            <img id="imgIconAttrAttack" src="resources/other/icons/attrAttack.png">
+            <img id="imgIconAttrDefense" src="resources/other/icons/attrDefense.png">
+            <img id="imgIconAttrAgility" src="resources/other/icons/attrAgility.png">
+            <img id="imgIconAttrReflexes" src="resources/other/icons/attrReflexes.png">
             <img id="imgKarma" src="resources/other/karma.png">
             <img id="imgBattleGauges" src="resources/other/battleGauges.png">
             <img id="imgBattleImpactIcon" src="resources/other/iconImpact.png">
 
             <img id="imgPortraitDominique" src="resources/portraits/dominique.png">
 
+            <img id="imgDecGrassBackground" src="resources/decorations/grasslands/bg.png">
             <img id="imgDecGrassTree1" src="resources/decorations/grasslands/tree1.png">
             <img id="imgDecGrassTree2" src="resources/decorations/grasslands/tree2.png">
             <img id="imgDecGrassTree3" src="resources/decorations/grasslands/tree3.png">
@@ -136,6 +142,7 @@ Rat Rider Dominique v.0.65 ALPHA
 
 <script src="global.js"></script>
 <script src="object.js"></script>
+<script src="gui.js"></script>
 <script src="common.js"></script>
 <script src="chapter00.js"></script>
 <script type="text/javascript">
@@ -169,6 +176,11 @@ Rat Rider Dominique v.0.65 ALPHA
     var TXT_SP = ["SP", "ОВ"];
     var TXT_KARMA = ["Karma", "Карма"];
     var TXT_KARMA_COST = [" karma.", " ед. кармы."];
+
+    var TXT_MENU_STATS = ["Statistics", "Статистика"];
+    var TXT_MENU_SKILLS = ["Skills", "Навыки"];
+    var TXT_MENU_ITEMS = ["Items", "Предметы"];
+    var TXT_MENU_QUIT = ["Quit", "Выйти"];
 
     var TXT_COMMON_ENCOUNTER_1 = [" bars Dominique's way! Would you like to fight or avoid encounter by sacrificing ",
         " преграждает Доминику путь! Вы можете сразиться или избежать столкновения, пожертвовав "];
