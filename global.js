@@ -139,6 +139,7 @@ var LARGE_LINE_HEIGHT = 34;
 
 var CURSOR_NEXT;
 var CURSOR_CHOICE;
+var CURSOR_UP;
 
 var LANG_ENG = 0;       // English language
 var LANG_RUS = 1;       // Русский язык
@@ -467,6 +468,7 @@ function handleBattleEnd() {
     battleFrame = null;
     behaviorFluctuation = 0;
     controlMode = CM_EVENT;
+    hero.skillSet.length = 0;
     hero.battleGaugeArtifacts.length = 0;
     enemy.battleGaugeArtifacts.length = 0;
     var battleGuiDisappearAction = new Action();

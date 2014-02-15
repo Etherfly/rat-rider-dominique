@@ -285,17 +285,15 @@ function Hero() {
     this.animationState = AN_STAND;
     this.animationFrame = 0;
 
+    // TODO: temporary filled skills!
+    this.availableSkills = [SKL_JAB, SKL_CHARGE, SKL_COUNTERATTACK, SKL_GUARDEDSTRIKE, SKL_COUNTERATTACK,
+        SKL_DEFEND, SKL_ATTACK, SKL_ATTACK, SKL_RATRIDERDANCE, SKL_GUARDEDSTRIKE, SKL_DEFEND, SKL_CHARGE,
+        SKL_COUNTERATTACK, SKL_JAB, SKL_COUNTERATTACK, SKL_RATRIDERDANCE];
+    this.availableAuraSkills = [SKL_ACEOFSPADES, SKL_OMNISLASH];
+    this.activeSkills = [SKL_ATTACK, SKL_DEFEND];
+    this.activeAuraSkills = [];
+
     this.skillSet = [];
-    // TODO: temporary way to fill skills!
-    this.skillSet.push(obtainAttackSkill());
-    this.skillSet.push(obtainDefendSkill());
-    this.skillSet.push(obtainChargeSkill());
-    this.skillSet.push(obtainJabSkill());
-    this.skillSet.push(obtainCounterattackSkill());
-    this.skillSet.push(obtainGuardedStrikeSkill());
-    this.skillSet.push(obtainRatRiderDanceSkill());
-    this.skillSet.push(obtainAceOfSpadesSkill());
-    this.skillSet.push(obtainOmnislashSkill());
     this.battleGaugeArtifacts = [];
 
     this.type = "Hero";      // type definition
@@ -669,6 +667,52 @@ function CombatSkill(name, description, spCost) {
             return getAbsoluteArtifactPosition(position) - leftCooldown;
         } else {
             return leftCooldown;
+        }
+    }
+}
+
+function UsableItem(name, description, image, defaultCharges) {
+    this.name = name;
+    this.description = description;
+    this.image = image;
+    this.defaultCharges = defaultCharges;
+
+    this.defineGetFieldEffect = function (getFieldEffect) {
+        this.getFieldEffect = getFieldEffect;
+    };
+
+    /*
+     * GetFieldEffect returns true if the item was actually used and false if it wasn't.
+     * The default "returns false" field effect means that this item cannot be used in the field.
+     */
+    this.getFieldEffect = function () { return false; };
+
+    this.defineGetArtifacts = function (getArtifacts) {
+        this.getArtifacts = getArtifacts;
+    };
+
+    /*
+     * GetArtifacts returns artifact data if the item can actually be used and null if it wasn't.
+     * The default "returns null" artifact effect means that this item cannot be used in battle.
+     */
+    this.getArtifacts = function (position) { return null; };
+
+    this.getLeftCooldown = function (position) {
+        var leftCooldown = 0;
+        var artifactData = this.getArtifacts(0);
+        if (artifactData != null) {
+            for (var i = 0; i < artifactData.length; i++) {
+                if (artifactData[i].leftCooldown > leftCooldown) {
+                    leftCooldown = artifactData[i].leftCooldown;
+                }
+            }
+            if (position != null) {
+                return getAbsoluteArtifactPosition(position) - leftCooldown;
+            } else {
+                return leftCooldown;
+            }
+        } else {
+            return null;
         }
     }
 }

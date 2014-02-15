@@ -260,7 +260,7 @@ function procureGuiEffectAction(guiEffect, color, value) {
                     fc.beginPath();
                     fc.lineWidth = 3;
                     fc.strokeStyle = color;
-                    fc.strokeRect(97, 72, 235, 16);
+                    fc.strokeRect(HP_GAUGE_X + 58, HP_GAUGE_Y + 31, 235, 16);
                 }
                 return frame > 50;
                 break;
@@ -390,6 +390,12 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
 
             if (y >= 22) {
                 eventBattleEndSequence = finishedSequence;
+                for (var i = 0; i < hero.activeSkills.length; i++) {
+                    hero.skillSet[i] = obtainSkill(hero.activeSkills[i]);
+                }
+                for (i = 0; i < hero.activeAuraSkills.length; i++) {
+                    hero.skillSet[i + 7] = obtainSkill(hero.activeAuraSkills[i]);
+                }
                 skillChoice = 0;
                 battleFrame = 0;
                 behaviorFluctuation = 0;
@@ -599,6 +605,7 @@ function getAbsoluteArtifactPosition(position) {
     return (W / 2) - 10 + position;
 }
 
+var SKL_ATTACK = 1;
 function obtainAttackSkill() {
     var attackSkill = new CombatSkill(["Attack", "Атаковать"],
         ["A standard strike. 100% attack power impact in the middle of a medium-sized guard down period.",
@@ -613,6 +620,7 @@ function obtainAttackSkill() {
     return attackSkill;
 }
 
+var SKL_DEFEND = 2;
 function obtainDefendSkill() {
     var defendSkill = new CombatSkill(["Defend", "Защищаться"],
         ["A medium-sized guard up period.", "Средних размеров зона повышенной защиты."], 5);
@@ -623,6 +631,7 @@ function obtainDefendSkill() {
     return defendSkill;
 }
 
+var SKL_CHARGE = 3;
 function obtainChargeSkill() {
     var chargeSkill = new CombatSkill(["Charge", "Напор"],
         ["A charging attack. 150% attack power impact in the right side of a large guard down period.",
@@ -638,6 +647,7 @@ function obtainChargeSkill() {
     return chargeSkill;
 }
 
+var SKL_JAB = 4;
 function obtainJabSkill() {
     var jabSkill = new CombatSkill(["Jab", "Короткий удар"],
         ["A fast strike. 50% attack power impact in the middle of a small guard down period.",
@@ -652,6 +662,7 @@ function obtainJabSkill() {
     return jabSkill;
 }
 
+var SKL_COUNTERATTACK = 5;
 function obtainCounterattackSkill() {
     var counterattackSkill = new CombatSkill(["Counterattack", "Контратака"], [
         "A defensive action followed by an attack. A medium-sized guard up period followed by a 75% attack power "
@@ -670,6 +681,7 @@ function obtainCounterattackSkill() {
     return counterattackSkill;
 }
 
+var SKL_GUARDEDSTRIKE = 6;
 function obtainGuardedStrikeSkill() {
     var guardedStrikeSkill = new CombatSkill(["Guarded strike", "Осторожный удар"], [
         "An attack followed by a defensive action. A medium-sized guard down period followed by a 100% attack power "
@@ -688,6 +700,7 @@ function obtainGuardedStrikeSkill() {
     return guardedStrikeSkill;
 }
 
+var SKL_RATRIDERDANCE = 7;
 function obtainRatRiderDanceSkill() {
     var ratRiderDanceSkill = new CombatSkill(["Rat Rider Dance", "Танец Крыс. Всадника"], [
         "A mighty combo of three strikes. Three 80% attack power impacts surrounded with small guard up, guard down, "
@@ -713,6 +726,7 @@ function obtainRatRiderDanceSkill() {
     return ratRiderDanceSkill;
 }
 
+var SKL_ACEOFSPADES = 8;
 function obtainAceOfSpadesSkill() {
     var aceOfSpadesSkill = new CombatSkill(["Ace of Spades", "Пиковый Туз"], [
         "An ultimate technique for the Queen of Spades. 500% attack power impact in the right side "
@@ -730,6 +744,7 @@ function obtainAceOfSpadesSkill() {
     return aceOfSpadesSkill;
 }
 
+var SKL_OMNISLASH = 100;
 function obtainOmnislashSkill() {
     var omnislashSkill = new CombatSkill(["Omnislash", "Омнислэш"], [
         "Nine crushing blows from all possible and impossible angles.",
@@ -808,6 +823,32 @@ function obtainFullguardAttackSkill(width, armor) {
         ];
     });
     return fullguardAttackSkill;
+}
+
+/* OBTAINABLE SKILLS ID MAPPING */
+function obtainSkill(id) {
+    switch (id) {
+        case SKL_ATTACK:
+            return obtainAttackSkill();
+        case SKL_DEFEND:
+            return obtainDefendSkill();
+        case SKL_CHARGE:
+            return obtainChargeSkill();
+        case SKL_JAB:
+            return obtainJabSkill();
+        case SKL_COUNTERATTACK:
+            return obtainCounterattackSkill();
+        case SKL_GUARDEDSTRIKE:
+            return obtainGuardedStrikeSkill();
+        case SKL_RATRIDERDANCE:
+            return obtainRatRiderDanceSkill();
+        case SKL_ACEOFSPADES:
+            return obtainAceOfSpadesSkill();
+        case SKL_OMNISLASH:
+            return obtainOmnislashSkill();
+        default:
+            return null;
+    }
 }
 
 /* ENEMIES */

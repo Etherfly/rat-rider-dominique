@@ -1,0 +1,1 @@
+convert ointment1.png -transparent white ointment1.png

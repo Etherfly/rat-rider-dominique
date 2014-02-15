@@ -20,6 +20,7 @@
             <img id="imgResLogo" src="resources/other/logo.png">
             <img id="imgCursorNext" src="resources/other/cursorNext.png">
             <img id="imgCursorChoice" src="resources/other/cursorChoice.png">
+            <img id="imgCursorUp" src="resources/other/cursorUp.png">
             <img id="imgGuiHpSpGauge" src="resources/other/hp-sp-gauge.png">
             <img id="imgGuiEnemyHpGauge" src="resources/other/hp-gauge-enemy.png">
             <img id="imgGuiAttributeGrowthGauge" src="resources/other/attrGrowth.png">
@@ -182,6 +183,11 @@
     var TXT_MENU_ITEMS = ["Items", "Предметы"];
     var TXT_MENU_QUIT = ["Quit", "Выйти"];
 
+    var TXT_MENU_AVAILABLE_SKILLS = ["Available skills", "Доступные навыки"];
+    var TXT_MENU_AVAILABLE_AURA_SKILLS = ["Available aura skills", "Доступные аура-навыки"];
+    var TXT_MENU_ACTIVE_SKILLS = ["Active skills", "Активные навыки"];
+    var TXT_MENU_ACTIVE_AURA_SKILLS = ["Active aura skills", "Активные аура-навыки"];
+
     var TXT_COMMON_ENCOUNTER_1 = [" bars Dominique's way! Would you like to fight or avoid encounter by sacrificing ",
         " преграждает Доминику путь! Вы можете сразиться или избежать столкновения, пожертвовав "];
     var TXT_COMMON_ENCOUNTER_2 = [" karma?", " ед. кармы."];
@@ -190,6 +196,7 @@
     var TXT_COMMON_ENCOUNTER_3 = ["Dominique got by without fighting, but lost ", "Доминик избежал боя, но потерял "];
 
     var TXT_HOTKEY = [" (Hotkey: '", " (Клавиша: '"];
+    var TXT_FULL_AP_GAUGE_REQ = [" (Full aura gauge required!)", " (Шкала ауры должна быть заполнена!)"];
 
     var TXT_BATTLE_RESULTS_1 = ["BATTLE RESULTS <br> <br> Attack growth +", "РЕЗУЛЬТАТ БОЯ <br> <br> Прирост атаки +"];
     var TXT_BATTLE_RESULTS_2 = [" <br> Defense growth +", " <br> Прирост защиты +"];
@@ -206,6 +213,7 @@
 
     CURSOR_NEXT = getImageResource("imgCursorNext");
     CURSOR_CHOICE = getImageResource("imgCursorChoice");
+    CURSOR_UP = getImageResource("imgCursorUp");
 
     resetGame();
     registerObject(GUI_EVENT, procureTitleSequence());
