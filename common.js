@@ -143,9 +143,9 @@ function procureDisplayFreeTextAction(xPos, yPos, width, text, displayCursor) {
         if (displayCursor && (frame * 3 >= text.length)) {
             fc.beginPath();
             if (frame % 20 < 10) {
-                fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2, yPos + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                fc.drawImage(CURSOR_DOWN, xPos + width / 2 - CURSOR_DOWN.width / 2, yPos + 20 + DEFAULT_LINE_HEIGHT * lineCount);
             } else {
-                fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2, yPos + 25 + DEFAULT_LINE_HEIGHT * lineCount);
+                fc.drawImage(CURSOR_DOWN, xPos + width / 2 - CURSOR_DOWN.width / 2, yPos + 25 + DEFAULT_LINE_HEIGHT * lineCount);
             }
         }
 
@@ -204,14 +204,14 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
                     if (i == eventChoice) {
                         fc.beginPath();
                         var cursorOffset = (frame % 20 < 10) ? 35 : 40;
-                        fc.drawImage(CURSOR_CHOICE, xPos + cursorOffset,
+                        fc.drawImage(CURSOR_RIGHT, xPos + cursorOffset,
                             yPos + 7 + DEFAULT_LINE_HEIGHT * (lineCount - 1));
                     }
                 }
             } else if (displayCursor) {
                 fc.beginPath();
                 cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                fc.drawImage(CURSOR_NEXT, xPos + width / 2 - CURSOR_NEXT.width / 2,
+                fc.drawImage(CURSOR_DOWN, xPos + width / 2 - CURSOR_DOWN.width / 2,
                     yPos + cursorOffset + DEFAULT_LINE_HEIGHT * lineCount);
             }
 
@@ -391,12 +391,18 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
             if (y >= 22) {
                 eventBattleEndSequence = finishedSequence;
                 for (var i = 0; i < hero.activeSkills.length; i++) {
-                    hero.skillSet[i] = obtainSkill(hero.activeSkills[i]);
+                    hero.skillSet[i] = gainSkill(hero.activeSkills[i]);
                 }
                 for (i = 0; i < hero.activeAuraSkills.length; i++) {
-                    hero.skillSet[i + 7] = obtainSkill(hero.activeAuraSkills[i]);
+                    hero.skillSet[i + 7] = gainSkill(hero.activeAuraSkills[i]);
                 }
                 skillChoice = 0;
+                itemChoice = 0;
+                for (i = 4; i >= 0; i--) {
+                    if (hero.activeItems[i] != null) {
+                        itemChoice = i;
+                    }
+                }
                 battleFrame = 0;
                 behaviorFluctuation = 0;
                 enemy = newEnemy;
@@ -561,6 +567,82 @@ function acquireAttributeAdjustmentArtifact(position, leftWidth, rightWidth, wea
     return attributeAdjustmentArtifact;
 }
 
+function acquireGradualChangeArtifact(position, leftWidth, rightWidth, weakColor, strongColor,
+                                            attribute, minPower, maxPower, hidden) {
+    var gradualChangeArtifact = new BattleGaugeArtifact(position, leftWidth, rightWidth);
+    if (hidden) {
+        gradualChangeArtifact.leftCooldown = 0;
+        gradualChangeArtifact.rightCooldown = 0;
+    }
+    gradualChangeArtifact.defineGetEffect(function (position, character) {
+        var power;
+        if (position >= BGL_LEFT) {
+            if (position - BGL_LEFT <= leftWidth) {
+                power = minPower + (maxPower - minPower) * (1 - (position - BGL_LEFT) / leftWidth);
+            } else {
+                power = 0;
+            }
+        } else {
+            if (BGL_LEFT - position <= rightWidth) {
+                power = minPower + (maxPower - minPower) * (1 - (BGL_LEFT - position) / rightWidth);
+            } else {
+                power = 0;
+            }
+        }
+        power = power * BATTLEGAUGE_SHIFT_BASIS * getGlobalBattleGaugeShiftCoefficient() / (leftWidth + rightWidth);
+        switch (attribute) {
+            case ATTR_HP:
+                if (power >= 0) {
+                    hero.restoreHp(power);
+                } else {
+                    hero.expendHp(-power);
+                }
+                break;
+            case ATTR_SP:
+                if (power >= 0) {
+                    hero.restoreSp(power);
+                } else {
+                    hero.expendSp(-power);
+                }
+                break;
+            case ATTR_AP:
+                if (power >= 0) {
+                    hero.restoreAp(power);
+                } else {
+                    hero.expendAp(-power);
+                }
+                break;
+        }
+        return position + rightWidth < BGL_LEFT;
+    });
+    if (!hidden) {
+        gradualChangeArtifact.defineDraw(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            drawLimitedGradient(position - leftWidth, topOffset, position, topOffset + BGL_HEIGHT,
+                weakColor, strongColor
+            );
+            drawLimitedGradient(position, topOffset, position + rightWidth, topOffset + BGL_HEIGHT,
+                strongColor, weakColor
+            );
+        });
+        gradualChangeArtifact.defineSketch(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            fc.beginPath();
+            fc.rect(position - leftWidth, topOffset - 5, rightWidth + leftWidth, BGL_HEIGHT + 10);
+            fc.lineWidth = 3;
+            fc.strokeStyle = "black";
+            fc.stroke();
+            fc.lineWidth = 1;
+            fc.moveTo(position - leftWidth, topOffset - 5);
+            fc.lineTo(position - leftWidth, topOffset + 164);
+            fc.moveTo(position + rightWidth, topOffset - 5);
+            fc.lineTo(position + rightWidth, topOffset + 164);
+            fc.stroke();
+        });
+    }
+    return gradualChangeArtifact;
+}
+
 function acquireImpactArtifact(position, image, power) {
     var impactArtifact = new BattleGaugeArtifact(position, 10, 10);
     impactArtifact.defineGetEffect(function (position, character) {
@@ -593,8 +675,29 @@ function acquireImpactArtifact(position, image, power) {
     return impactArtifact;
 }
 
-function acquireEmptyArtifact(position, cooldown) {
+function acquireEmptyArtifact(position, cooldown, image) {
     var emptyArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
+    if (image !== undefined) {
+        emptyArtifact.defineDraw(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
+                fc.beginPath();
+                fc.drawImage(image, position - image.width / 2, topOffset - image.height / 2 + 20);
+            }
+        });
+        emptyArtifact.defineSketch(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            fc.beginPath();
+            fc.rect(position - image.width / 2, topOffset - 8, image.width, BGL_HEIGHT + 16);
+            fc.lineWidth = 3;
+            fc.strokeStyle = "black";
+            fc.stroke();
+            fc.lineWidth = 1;
+            fc.moveTo(position, topOffset + BGL_HEIGHT + 5);
+            fc.lineTo(position, topOffset + 164);
+            fc.stroke();
+        });
+    }
     emptyArtifact.defineGetEffect(function (position) {
         return position < BGL_LEFT;
     });
@@ -606,7 +709,7 @@ function getAbsoluteArtifactPosition(position) {
 }
 
 var SKL_ATTACK = 1;
-function obtainAttackSkill() {
+function gainAttackSkill() {
     var attackSkill = new CombatSkill(["Attack", "Атаковать"],
         ["A standard strike. 100% attack power impact in the middle of a medium-sized guard down period.",
         "Обычный удар. Воздействие 100% силы атаки посреди средних размеров зоны пониженной защиты."], 10);
@@ -621,9 +724,10 @@ function obtainAttackSkill() {
 }
 
 var SKL_DEFEND = 2;
-function obtainDefendSkill() {
+function gainDefendSkill() {
     var defendSkill = new CombatSkill(["Defend", "Защищаться"],
-        ["A medium-sized guard up period.", "Средних размеров зона повышенной защиты."], 5);
+        ["A basic defensive action. A medium-sized guard up period.",
+            "Базовый защитный манёвр. Средних размеров зона повышенной защиты."], 5);
     defendSkill.defineGetArtifacts(function (position) {
         return [acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
             60, 60, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.6, false)]
@@ -632,7 +736,7 @@ function obtainDefendSkill() {
 }
 
 var SKL_CHARGE = 3;
-function obtainChargeSkill() {
+function gainChargeSkill() {
     var chargeSkill = new CombatSkill(["Charge", "Напор"],
         ["A charging attack. 150% attack power impact in the right side of a large guard down period.",
             "Стремительная атака. Воздействие 150% силы атаки в правой части большой зоны пониженной защиты."], 15);
@@ -648,7 +752,7 @@ function obtainChargeSkill() {
 }
 
 var SKL_JAB = 4;
-function obtainJabSkill() {
+function gainJabSkill() {
     var jabSkill = new CombatSkill(["Jab", "Короткий удар"],
         ["A fast strike. 50% attack power impact in the middle of a small guard down period.",
             "Быстрый удар. Воздействие 50% силы атаки посредине небольшой зоны пониженной защиты."], 8);
@@ -663,10 +767,10 @@ function obtainJabSkill() {
 }
 
 var SKL_COUNTERATTACK = 5;
-function obtainCounterattackSkill() {
+function gainCounterattackSkill() {
     var counterattackSkill = new CombatSkill(["Counterattack", "Контратака"], [
         "A defensive action followed by an attack. A medium-sized guard up period followed by a 75% attack power "
-            + "impact followed by a small guard down period",
+            + "impact followed by a small guard down period.",
         "Защитный манёвр, за которым следует атака. Средних размеров зона повышенной защиты, за которой следует "
             + "воздействие 75% силы атаки, за которыи следует небольшая зона пониженной защиты."], 15);
     counterattackSkill.defineGetArtifacts(function (position) {
@@ -682,7 +786,7 @@ function obtainCounterattackSkill() {
 }
 
 var SKL_GUARDEDSTRIKE = 6;
-function obtainGuardedStrikeSkill() {
+function gainGuardedStrikeSkill() {
     var guardedStrikeSkill = new CombatSkill(["Guarded strike", "Осторожный удар"], [
         "An attack followed by a defensive action. A medium-sized guard down period followed by a 100% attack power "
             + "impact followed by a large guard up period.",
@@ -701,7 +805,7 @@ function obtainGuardedStrikeSkill() {
 }
 
 var SKL_RATRIDERDANCE = 7;
-function obtainRatRiderDanceSkill() {
+function gainRatRiderDanceSkill() {
     var ratRiderDanceSkill = new CombatSkill(["Rat Rider Dance", "Танец Крыс. Всадника"], [
         "A mighty combo of three strikes. Three 80% attack power impacts surrounded with small guard up, guard down, "
             + "guard down, guard up periods.",
@@ -712,7 +816,7 @@ function obtainRatRiderDanceSkill() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position) - 30,
                 40, 0, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.7, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
-                30, 30, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 0.6, 0.6, false),
+                30, 30, "#FF5C5C", "#FF5C5C", ATTR_DEFENSE, 0.6, 0.6, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position) + 30,
                 0, 40, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.7, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 30,
@@ -727,7 +831,7 @@ function obtainRatRiderDanceSkill() {
 }
 
 var SKL_ACEOFSPADES = 8;
-function obtainAceOfSpadesSkill() {
+function gainAceOfSpadesSkill() {
     var aceOfSpadesSkill = new CombatSkill(["Ace of Spades", "Пиковый Туз"], [
         "An ultimate technique for the Queen of Spades. 500% attack power impact in the right side "
             + "of a huge guard down period.",
@@ -745,7 +849,7 @@ function obtainAceOfSpadesSkill() {
 }
 
 var SKL_OMNISLASH = 100;
-function obtainOmnislashSkill() {
+function gainOmnislashSkill() {
     var omnislashSkill = new CombatSkill(["Omnislash", "Омнислэш"], [
         "Nine crushing blows from all possible and impossible angles.",
         "Девять сокрушительных ударов со всех мыслимых и немыслимых углов."], 50);
@@ -754,7 +858,7 @@ function obtainOmnislashSkill() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position) - 120,
                 40, 0, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.7, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
-                120, 120, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 0.6, 0.6, false),
+                120, 120, "#FF5C5C", "#FF5C5C", ATTR_DEFENSE, 0.6, 0.6, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position) + 120,
                 0, 40, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.7, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 120,
@@ -782,7 +886,7 @@ function obtainOmnislashSkill() {
 
 /* ENEMY SKILLS */
 
-function obtainOpenerSkill(cooldown) {
+function gainOpenerSkill(cooldown) {
     // A dummy skill that sets the initial cooldown for the enemy, so that it doesn't spam attacks right away
     var openerSkill = new CombatSkill("Opener", "A great way to start a battle! Unless you are Dominique.", 0);
     openerSkill.defineGetArtifacts(function (position) {
@@ -791,7 +895,7 @@ function obtainOpenerSkill(cooldown) {
     return openerSkill;
 }
 
-function obtainOpeningSkill(width, vulnerability) {
+function gainOpeningSkill(width, vulnerability) {
     var openingSkill = new CombatSkill("Opening", "Not so much of a skill. More like a lack thereof.", 5);
     openingSkill.defineGetArtifacts(function (position) {
         return [acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
@@ -800,7 +904,7 @@ function obtainOpeningSkill(width, vulnerability) {
     return openingSkill;
 }
 
-function obtainFumbledAttackSkill(width, vulnerability) {
+function gainFumbledAttackSkill(width, vulnerability) {
     var fumbledAttackSkill = new CombatSkill("Fumbled attack", "A weaker attack with a weakness area around.", 10);
     fumbledAttackSkill.defineGetArtifacts(function (position) {
         return [
@@ -813,7 +917,7 @@ function obtainFumbledAttackSkill(width, vulnerability) {
     return fumbledAttackSkill;
 }
 
-function obtainFullguardAttackSkill(width, armor) {
+function gainFullguardAttackSkill(width, armor) {
     var fullguardAttackSkill = new CombatSkill("Fullguard attack", "An attack with a guard up area around.", 20);
     fullguardAttackSkill.defineGetArtifacts(function (position) {
         return [
@@ -825,27 +929,61 @@ function obtainFullguardAttackSkill(width, armor) {
     return fullguardAttackSkill;
 }
 
-/* OBTAINABLE SKILLS ID MAPPING */
-function obtainSkill(id) {
+/* GAINABLE SKILLS ID MAPPING */
+function gainSkill(id) {
     switch (id) {
         case SKL_ATTACK:
-            return obtainAttackSkill();
+            return gainAttackSkill();
         case SKL_DEFEND:
-            return obtainDefendSkill();
+            return gainDefendSkill();
         case SKL_CHARGE:
-            return obtainChargeSkill();
+            return gainChargeSkill();
         case SKL_JAB:
-            return obtainJabSkill();
+            return gainJabSkill();
         case SKL_COUNTERATTACK:
-            return obtainCounterattackSkill();
+            return gainCounterattackSkill();
         case SKL_GUARDEDSTRIKE:
-            return obtainGuardedStrikeSkill();
+            return gainGuardedStrikeSkill();
         case SKL_RATRIDERDANCE:
-            return obtainRatRiderDanceSkill();
+            return gainRatRiderDanceSkill();
         case SKL_ACEOFSPADES:
-            return obtainAceOfSpadesSkill();
+            return gainAceOfSpadesSkill();
         case SKL_OMNISLASH:
-            return obtainOmnislashSkill();
+            return gainOmnislashSkill();
+        default:
+            return null;
+    }
+}
+
+/* ITEMS */
+
+var ITM_OINTMENT1 = 1;
+function obtainOintmentItem() {
+    var ointmentItem = new UsableItem(["Ointment", "Мазь"],
+        ["A common curative ointment that is useful when working on flesh wounds. "
+            + "Restores 25% HP over a long period of time.", "Обычная целебная мазь, полезна при обработке "
+            + "поверхностных ран. Восстанавливает 25% ОЖ за длительный период времени."],
+        getImageResource("imgItemOintment1"), 2);
+    ointmentItem.defineGetFieldEffect(function () {
+        hero.restoreHp(hero.attrMaxHp * 0.25);
+        return true;
+    });
+    ointmentItem.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, false),
+            acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
+                0, 100, BGL_COLOR, "#3CFF3C", ATTR_HP, hero.attrMaxHp * 0.25, hero.attrMaxHp * 0.25, false)
+        ];
+    });
+    return ointmentItem;
+}
+
+/* OBTAINABLE ITEMS ID MAPPING */
+function obtainItem(id) {
+    switch (id) {
+        case ITM_OINTMENT1:
+            return obtainOintmentItem();
         default:
             return null;
     }

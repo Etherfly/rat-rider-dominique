@@ -18,9 +18,10 @@
     <tr>
         <td style="display: none;">
             <img id="imgResLogo" src="resources/other/logo.png">
-            <img id="imgCursorNext" src="resources/other/cursorNext.png">
-            <img id="imgCursorChoice" src="resources/other/cursorChoice.png">
+            <img id="imgCursorDown" src="resources/other/cursorDown.png">
+            <img id="imgCursorRight" src="resources/other/cursorRight.png">
             <img id="imgCursorUp" src="resources/other/cursorUp.png">
+            <img id="imgCursorLeft" src="resources/other/cursorLeft.png">
             <img id="imgGuiHpSpGauge" src="resources/other/hp-sp-gauge.png">
             <img id="imgGuiEnemyHpGauge" src="resources/other/hp-gauge-enemy.png">
             <img id="imgGuiAttributeGrowthGauge" src="resources/other/attrGrowth.png">
@@ -51,6 +52,8 @@
             <img id="imgHeroPrepare" src="resources/hero/prepare.png">
             <img id="imgHeroAttack" src="resources/hero/attack.png">
             <img id="imgHeroDefend" src="resources/hero/defend.png">
+
+            <img id="imgItemOintment1" src="resources/items/ointment1.png">
 
             <img id="imgEffectHit1-1" src="resources/effects/hit1-1.png">
             <img id="imgEffectHit1-2" src="resources/effects/hit1-2.png">
@@ -188,14 +191,56 @@
     var TXT_MENU_ACTIVE_SKILLS = ["Active skills", "Активные навыки"];
     var TXT_MENU_ACTIVE_AURA_SKILLS = ["Active aura skills", "Активные аура-навыки"];
 
-    var TXT_COMMON_ENCOUNTER_1 = [" bars Dominique's way! Would you like to fight or avoid encounter by sacrificing ",
-        " преграждает Доминику путь! Вы можете сразиться или избежать столкновения, пожертвовав "];
+    var TXT_MENU_AVAILABLE_ITEMS = ["Available items", "Доступные предметы"];
+    var TXT_MENU_ACTIVE_ITEMS = ["Active items", "Активные предметы"];
+    var TXT_MENU_EQUIPMENT = ["Equipment", "Экипировка"];
+    var TXT_MENU_QUEEN_OF_SPADES = ["Queen of Spades", "Пиковая Дама"];
+    var TXT_MENU_QUEEN_OF_SPADES_DESC = [
+        "Dominique's weapon of choice, this halberd is a work of art. The axe and pike are forged from an unknown "
+                + "alloy with a bluish hue and form a likeness of a certain card suit. This weapon symbolizes the "
+                + "eventual ruin for those driven by greed. <br> <br> You cannot change Dominique's basic equipment.",
+        "Излюбленное оружие Доминика, эта алебарда - произведение искусства. Секира и наконечник выкованы из "
+                + "неизвестного синеватого сплава и в сочетании являют собой некое подобие карточной масти. Это оружие "
+                + "символизирует неизбежную расплату, ожидающую тех, кто поддаётся жадности."
+                + " <br> <br> Вы не можете изменять базовое снаряжение Доминика."
+    ];
+    var TXT_MENU_WHITE_STEEL_ARMOR = ["White steel armor", "Доспехи из белой стали"];
+    var TXT_MENU_WHITE_STEEL_ARMOR_DESC = [
+        "A set of white steel shining armor. Custom crafted for Dominique to keep him from harm during his "
+                + "perilous journeys. Dominique omitted wearing a helmet because he wanted to reveal his face "
+                + "to the world and be able to see it clearly in return. But also because he could not afford it."
+                + " <br> <br> You cannot change Dominique's basic equipment.",
+        "Комплект сияющих доспехов из белой стали. Исполнено на заказ специально для Доминика, чтобы уберечь его "
+                + "от ран во время его опасных путешествий. Доминик отказался от ношения шлема, потому как хотел "
+                + "открыть миру своё лицо и самому ясно смотреть на мир. Но также потому, что он не мог его себе "
+                + "позволить. <br> <br> Вы не можете изменять базовое снаряжение Доминика."
+    ];
+    var TXT_MENU_RAT_RIDER_PELERINE = ["Rat Rider pelerine", "Пелерина Крысиного Всадника"];
+    var TXT_MENU_RAT_RIDER_PELERINE_DESC = [
+        "A fabric golden cape adorned with the Rat Rider coat of arms. It was brought to Dominique by Sallinger "
+                + "as a token of acceptance into the fabled lineage of Rat Riders. Wearing this cape means bearing "
+                + "the responsibility of protecting the weak and putting your karma on the line in every battle. Who "
+                + "would ever agree to that? <br> <br> You cannot change Dominique's basic equipment.",
+        "Тканевая накидка золотого цвета, украшенная гербом Крысиного Всадника. Её принёс Доминику Сэллинджер "
+                + "в качестве знака того, что он принят в легендарный род Крысиных Всадников. "
+                + "Носить эту накидку значит быть ответственным за защиту слабых и рисковать кармой в каждом бою. "
+                + "Кто вообще на такое согласится? <br> <br> Вы не можете изменять базовое снаряжение Доминика."
+    ];
+
+    var TXT_COMMON_ENCOUNTER_1 = [
+        " stands in Dominique's way! Would you like to fight or avoid encounter by sacrificing ",
+        " преграждает Доминику путь! Вы можете сразиться или избежать столкновения, пожертвовав "
+    ];
     var TXT_COMMON_ENCOUNTER_2 = [" karma?", " ед. кармы."];
     var TXT_COMMON_ENCOUNTER_CHOICE_FIGHT = ["Fight", "Сражаться"];
     var TXT_COMMON_ENCOUNTER_CHOICE_AVOID = ["Avoid fighting", "Избежать боя"];
     var TXT_COMMON_ENCOUNTER_3 = ["Dominique got by without fighting, but lost ", "Доминик избежал боя, но потерял "];
 
     var TXT_HOTKEY = [" (Hotkey: '", " (Клавиша: '"];
+    var TXT_NOCHOSENITEM = ["No item selected", "Предмет не выбран"];
+    var TXT_CTRLENTER = ["Ctrl + ACTION", "Ctrl + ДЕЙСТВИЕ"];
+    var TXT_NOACTIVEITEMS = ["No items ready", "Нет готовых предметов"];
+    var TXT_USES_REMAINING = ["Uses remaining: ", "Осталось использований: "];
     var TXT_FULL_AP_GAUGE_REQ = [" (Full aura gauge required!)", " (Шкала ауры должна быть заполнена!)"];
 
     var TXT_BATTLE_RESULTS_1 = ["BATTLE RESULTS <br> <br> Attack growth +", "РЕЗУЛЬТАТ БОЯ <br> <br> Прирост атаки +"];
@@ -211,9 +256,10 @@
     /* ========= INITIALIZATION ========= */
     /* ================================== */
 
-    CURSOR_NEXT = getImageResource("imgCursorNext");
-    CURSOR_CHOICE = getImageResource("imgCursorChoice");
+    CURSOR_DOWN = getImageResource("imgCursorDown");
+    CURSOR_RIGHT = getImageResource("imgCursorRight");
     CURSOR_UP = getImageResource("imgCursorUp");
+    CURSOR_LEFT = getImageResource("imgCursorLeft");
 
     resetGame();
     registerObject(GUI_EVENT, procureTitleSequence());

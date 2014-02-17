@@ -100,6 +100,10 @@ var ATTR_REFLEXES = 3;
 var ATTR_EVASION = 4;
 var ATTR_REFLECT = 5;
 
+var ATTR_HP = 0;
+var ATTR_SP = 1;
+var ATTR_AP = 2;
+
 var SP_RECOVERY_BASIS = 0.05;
 var PATH_CHANGE_SP_COST_RATIO = 0.25;
 
@@ -125,8 +129,6 @@ var collisionDistance = 40;
 
 // GUI
 
-var skillChoice = 0;
-var itemChoice = 0;
 var eventChoice = 0;
 
 var DEFAULT_FONT = "bold 14pt Courier New";
@@ -137,9 +139,10 @@ var LARGE_FONT = "bold 18pt Courier New";
 var LARGE_CHAR_WIDTH = 15;
 var LARGE_LINE_HEIGHT = 34;
 
-var CURSOR_NEXT;
-var CURSOR_CHOICE;
+var CURSOR_DOWN;
+var CURSOR_RIGHT;
 var CURSOR_UP;
+var CURSOR_LEFT;
 
 var LANG_ENG = 0;       // English language
 var LANG_RUS = 1;       // Русский язык
@@ -723,7 +726,11 @@ function tick() {
                 deliverImpacts();
                 enemy.behave(enemy, battleFrame);
                 if (keyPressed == KEY_ACTION) {
-                    hero.useSkill(hero.skillSet[skillChoice], 0);
+                    if (keyCtrl) {
+                        hero.useItem(itemChoice, 0);
+                    } else {
+                        hero.useSkill(hero.skillSet[skillChoice], 0);
+                    }
                 }
                 battleFrame++;
             } else {

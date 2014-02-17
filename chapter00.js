@@ -314,12 +314,12 @@ function describeWolfType() {
 function enlistBandit(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
     var bandit = new Enemy(10 * strScale, 20 * strScale, 10 * strScale, 10 * strScale, 120 * strScale, animationObject);
-    var attackSkill = obtainAttackSkill();
-    var defendSkill = obtainDefendSkill();
-    var opening = obtainOpeningSkill(40, 0.5);
+    var attackSkill = gainAttackSkill();
+    var defendSkill = gainDefendSkill();
+    var opening = gainOpeningSkill(40, 0.5);
     bandit.defineBehave(function (character, battleFrame) {
         if (battleFrame == 0) {
-            character.useSkill(obtainOpenerSkill(200), 0);
+            character.useSkill(gainOpenerSkill(200), 0);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
             if (behaviorFluctuation == 1) {
@@ -343,12 +343,12 @@ function enlistBandit(startingHeroStrength, maxHeroStrength, animationObject) {
 function enlistWolf(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
     var wolf = new Enemy(7 * strScale, 14 * strScale, 12 * strScale, 10 * strScale, 90 * strScale, animationObject);
-    var attackSkill = obtainAttackSkill();
-    var defendSkill = obtainDefendSkill();
-    var fumbledAttackSkill = obtainFumbledAttackSkill(40, 0.3);
+    var attackSkill = gainAttackSkill();
+    var defendSkill = gainDefendSkill();
+    var fumbledAttackSkill = gainFumbledAttackSkill(40, 0.3);
     wolf.defineBehave(function (character, battleFrame) {
         if (battleFrame == 0) {
-            character.useSkill(obtainOpenerSkill(100), 0);
+            character.useSkill(gainOpenerSkill(100), 0);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
             if (behaviorFluctuation == 1) {

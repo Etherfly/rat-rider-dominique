@@ -12,6 +12,8 @@ var INFO_WINDOW_X = 320;
 var INFO_WINDOW_Y = H - 230;
 var INFO_WINDOW_W = W - 600;
 var INFO_WINDOW_H = 220;
+var ITEM_WINDOW_X = W - 270;
+var ITEM_WINDOW_W = 260;
 
 var MENU_ROOT_Y_OFFSET = 90;
 var MENU_ROOT_HEIGHT = INFO_WINDOW_Y - HP_GAUGE_Y - MENU_ROOT_Y_OFFSET - 10;
@@ -38,8 +40,11 @@ var displayGui = false;
 var blackMask = false;
 
 var menuChoice = 0;     // selected menu item
+var skillChoice = 0;    // selected skill
+var itemChoice = 0;     // selected item
+
 var scrollOffset = 0;   // skill or item list scrolling offset
-var itemChoice = [];    // menu item choice in the multi-column layouts
+var objectChoice = [];    // menu item choice in the multi-column layouts
 
 var menuState = 0;  // global menu state
 
@@ -54,7 +59,11 @@ var MS_SKILLS_BROWSE_3 = 6;
 var MS_SKILLS_EXCHANGE_1 = 7;
 var MS_SKILLS_EXCHANGE_2 = 8;
 var MS_SKILLS_EXCHANGE_3 = 9;
-var MS_ITEMS = 10;
+var MS_ITEMS_BROWSE_1 = 10;
+var MS_ITEMS_BROWSE_2 = 11;
+var MS_ITEMS_BROWSE_3 = 12;
+var MS_ITEMS_EXCHANGE_1 = 13;
+var MS_ITEMS_EXCHANGE_2 = 14;
 
 /*
  * Universal text processor
@@ -400,32 +409,128 @@ function initializeGui() {
                     writeLine(hero.skillSet[i].name[lang], i < 7 ? "white" : "#f0f040", i, 50);
                 }
                 if (i == skillChoice) {
-                    var artifactData = hero.skillSet[i].getArtifacts(0);
-                    for (var j = 0; j < artifactData.length; j++) {
-                        artifactData[j].sketch(artifactData[j].position, hero);
+                    if (!keyCtrl) {
+                        var artifactData = hero.skillSet[i].getArtifacts(0);
+                        for (var j = 0; j < artifactData.length; j++) {
+                            artifactData[j].sketch(artifactData[j].position, hero);
+                        }
                     }
 
                     fc.beginPath();
                     var cursorOffset = (globalFrame % 20 < 10) ? 330 : 335;
-                    fc.drawImage(CURSOR_CHOICE, W - cursorOffset, 69 + 30 * i);
-
-                    if (keyCtrl) {
-                        drawInfoWindow();
-                        var skillInfo = [
-                            hero.skillSet[i].name[LANG_ENG] + " - " + hero.skillSet[i].spCost + " " + TXT_SP[LANG_ENG]
-                                + TXT_HOTKEY[LANG_ENG] + ((i + 1) % 10) + "') <br> <br> "
-                                + hero.skillSet[i].description[LANG_ENG],
-                            hero.skillSet[i].name[LANG_RUS] + " - " + hero.skillSet[i].spCost + " " + TXT_SP[LANG_RUS]
-                                + TXT_HOTKEY[LANG_RUS] + ((i + 1) % 10) + "') <br> <br> "
-                                + hero.skillSet[i].description[LANG_RUS]
-                        ];
-                        processInfoText(skillInfo);
-                    }
+                    fc.drawImage(CURSOR_RIGHT, W - cursorOffset, 69 + 30 * i);
                 }
             }
         }
     });
     registerObject(GUI_COMMON, skillSet);
+    var itemSet = new GuiElement(null, W - 360, 54);
+    itemSet.defineReflect(function() {
+        function writeLine(line, align, color, offsetX, offsetY) {
+            fc.beginPath();
+            fc.textAlign = align;
+            fc.fillStyle = color;
+            fc.font = DEFAULT_FONT;
+            fc.fillText(line, ITEM_WINDOW_X + ITEM_WINDOW_W / 2 + offsetX, INFO_WINDOW_Y + offsetY);
+            fc.textAlign = "left";
+        }
+
+        if ((battleFrame > 0) && (hero != null)) {
+            drawTextbox(ITEM_WINDOW_X, INFO_WINDOW_Y, ITEM_WINDOW_W, INFO_WINDOW_H);
+            var activeItemsNumber = 0;
+            for (var i = 0; i < 5; i++) {
+                if (hero.activeItems[i] != null) {
+                    activeItemsNumber++;
+                }
+            }
+            if (activeItemsNumber > 0) {
+                if (keyPressed == KEY_LEFT) {
+                    itemChoice--;
+                    while (hero.activeItems[itemChoice] == null) {
+                        if (itemChoice > 0) {
+                            itemChoice--;
+                        } else {
+                            itemChoice = hero.activeItems.length - 1;
+                        }
+                    }
+                } else if (keyPressed == KEY_RIGHT) {
+                    itemChoice++;
+                    while (hero.activeItems[itemChoice] == null) {
+                        if (itemChoice < hero.activeItems.length - 1) {
+                            itemChoice++;
+                        } else {
+                            itemChoice = 0;
+                        }
+                    }
+                } else if (keyCtrl && (keyPressed >= KEY_DIGIT_0) && (keyPressed <= KEY_DIGIT_0 + 4)) {
+                    var itemChoiceToBe = (keyPressed - KEY_DIGIT_0 + 4) % 5;
+                    if (hero.activeItems[itemChoiceToBe] != null) {
+                        itemChoice = itemChoiceToBe;
+                    }
+                }
+            }
+
+            var chosenItem;
+            if (hero.activeItems[itemChoice] != null) {
+                chosenItem = obtainItem(hero.activeItems[itemChoice].id);
+                writeLine(chosenItem.name[lang], "center", "white", 0, 30);
+                writeLine(TXT_CTRLENTER[lang], "center", "white", 0, 150);
+                fc.beginPath();
+                fc.drawImage(chosenItem.image, ITEM_WINDOW_X + ITEM_WINDOW_W / 2 - 32, INFO_WINDOW_Y + 50, 64, 64);
+                if (hero.activeItems[itemChoice].charges > 1) {
+                    writeLine("x" + hero.activeItems[itemChoice].charges, "left", "white", 34, 110);
+                }
+                if (activeItemsNumber > 1) {
+                    var cursorOffset = globalFrame % 20 < 10 ? 40 : 45;
+                    fc.drawImage(CURSOR_LEFT, ITEM_WINDOW_X + ITEM_WINDOW_W / 2 - cursorOffset - CURSOR_LEFT.width,
+                        INFO_WINDOW_Y + 82 - CURSOR_LEFT.height / 2);
+                    fc.drawImage(CURSOR_RIGHT, ITEM_WINDOW_X + ITEM_WINDOW_W / 2 + cursorOffset,
+                        INFO_WINDOW_Y + 82 - CURSOR_RIGHT.height / 2);
+                }
+                if (keyCtrl) {
+                    fc.strokeStyle = "white";
+                    fc.lineWidth = 2;
+                    fc.strokeRect(ITEM_WINDOW_X + ITEM_WINDOW_W / 2 - 32, INFO_WINDOW_Y + 50, 64, 64);
+                    drawInfoWindow();
+                    processInfoText([
+                        chosenItem.name[LANG_ENG] + " <br> <br> " + chosenItem.description[LANG_ENG]
+                            + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.activeItems[itemChoice].charges,
+                        chosenItem.name[LANG_RUS] + " <br> <br> " + chosenItem.description[LANG_RUS]
+                            + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.activeItems[itemChoice].charges
+                    ]);
+                }
+            } else {
+                writeLine(TXT_NOCHOSENITEM[lang], "center", "white", 0, 30);
+            }
+
+            if (activeItemsNumber > 0) {
+                for (i = 0; i < hero.activeItems.length; i++) {
+                    if (hero.activeItems[i] != null) {
+                        fc.beginPath();
+                        fc.drawImage(obtainItem(hero.activeItems[i].id).image,
+                            ITEM_WINDOW_X + 10 * (i + 1) + ((ITEM_WINDOW_W - 60) / 5) * i, INFO_WINDOW_Y + 160,
+                            (ITEM_WINDOW_W - 60) / 5, (ITEM_WINDOW_W - 60) / 5);
+                    }
+                    if (i == itemChoice) {
+                        fc.strokeStyle = "white";
+                        fc.lineWidth = 1;
+                        fc.strokeRect(ITEM_WINDOW_X + 10 * (i + 1) + ((ITEM_WINDOW_W - 60) / 5) * i,
+                            INFO_WINDOW_Y + 160, (ITEM_WINDOW_W - 60) / 5, (ITEM_WINDOW_W - 60) / 5);
+
+                        if ((keyCtrl) && (chosenItem != null)) {
+                            var artifactData = chosenItem.getArtifacts(0);
+                            for (var j = 0; j < artifactData.length; j++) {
+                                artifactData[j].sketch(artifactData[j].position, hero);
+                            }
+                        }
+                    }
+                }
+            } else {
+                writeLine(TXT_NOACTIVEITEMS[lang], "center", "white", 0, 190);
+            }
+        }
+    });
+    registerObject(GUI_COMMON, itemSet);
     displayGui = false;
     blackMask = false;
     menuState = MS_NONE;
@@ -529,7 +634,7 @@ function procureDisplayMenuRootAction() {
                     if (i == menuChoice) {
                         fc.beginPath();
                         var cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                        fc.drawImage(CURSOR_CHOICE, HP_GAUGE_X + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, HP_GAUGE_X + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + LARGE_LINE_HEIGHT * lineCount);
                     }
                 }
@@ -539,10 +644,10 @@ function procureDisplayMenuRootAction() {
                     lineCount++;
                     if ((((i == 0) && (menuState == MS_STATS))
                         || ((i == 1) && (menuState >= MS_SKILLS_BROWSE_1) && (menuState <= MS_SKILLS_EXCHANGE_3))
-                        || ((i == 2) && (menuState == MS_ITEMS)))
+                        || ((i == 2) && (menuState >= MS_ITEMS_BROWSE_1) && (menuState <= MS_ITEMS_EXCHANGE_2)))
                         && (frame % 14 > 6)) {
                         fc.beginPath();
-                        fc.drawImage(CURSOR_CHOICE, HP_GAUGE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, HP_GAUGE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + LARGE_LINE_HEIGHT * lineCount);
                     }
                 }
@@ -587,7 +692,7 @@ function procureDisplayMenuStatsAction() {
                 if (i == menuChoice) {
                     fc.beginPath();
                     var cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                    fc.drawImage(CURSOR_CHOICE, HP_GAUGE_X + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                    fc.drawImage(CURSOR_RIGHT, HP_GAUGE_X + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                         + LARGE_LINE_HEIGHT * lineCount);
                 }
             }
@@ -613,9 +718,9 @@ function procureDisplayMenuSkillsAction() {
             menuState = MS_SKILLS_BROWSE_1;
             menuChoice = 0;
             scrollOffset = 0;
-            itemChoice[0] = 0;
-            itemChoice[1] = 0;
-            itemChoice[2] = 0;
+            objectChoice[0] = 0;
+            objectChoice[1] = 0;
+            objectChoice[2] = 0;
         }
 
         if (frame < 10) {
@@ -638,7 +743,7 @@ function procureDisplayMenuSkillsAction() {
                     return menuState - MS_SKILLS_BROWSE_1;
                 } else if ((menuState == MS_SKILLS_EXCHANGE_1) || (menuState == MS_SKILLS_EXCHANGE_2)) {
                     return 2;
-                } else if (itemChoice[2] > 6) {
+                } else if (objectChoice[2] > 6) {
                     return 1;
                 } else {
                     return 0;
@@ -663,50 +768,50 @@ function procureDisplayMenuSkillsAction() {
             var i = getItemSetByMenuState(menuState);
             if (keyPressed == KEY_UP) {
                 if ((menuState < MS_SKILLS_EXCHANGE_1) || (menuState == MS_SKILLS_EXCHANGE_3)) {
-                    itemChoice[i]--;
-                    if (itemChoice[i] < 0) {
-                        itemChoice[i] = getLengthByColumn(i);
+                    objectChoice[i]--;
+                    if (objectChoice[i] < 0) {
+                        objectChoice[i] = getLengthByColumn(i);
                     }
                     if (i == 0) {
-                        if (itemChoice[i] < scrollOffset) {
+                        if (objectChoice[i] < scrollOffset) {
                             scrollOffset--;
-                        } else if ((scrollOffset == 0) && (itemChoice[i] > 12)) {
-                            scrollOffset = itemChoice[i] - 12;
+                        } else if ((scrollOffset == 0) && (objectChoice[i] > 12)) {
+                            scrollOffset = objectChoice[i] - 12;
                         }
                     }
                 } else if (menuState == MS_SKILLS_EXCHANGE_1) {
-                    itemChoice[i]--;
-                    if (itemChoice[i] < 0) {
-                        itemChoice[i] = 6;
+                    objectChoice[i]--;
+                    if (objectChoice[i] < 0) {
+                        objectChoice[i] = 6;
                     }
                 } else {
-                    itemChoice[i]--;
-                    if (itemChoice[i] < 7) {
-                        itemChoice[i] = 9;
+                    objectChoice[i]--;
+                    if (objectChoice[i] < 7) {
+                        objectChoice[i] = 9;
                     }
                 }
             } else if (keyPressed == KEY_DOWN) {
                 if ((menuState < MS_SKILLS_EXCHANGE_1) || (menuState == MS_SKILLS_EXCHANGE_3)) {
-                    itemChoice[i]++;
-                    if (itemChoice[i] > getLengthByColumn(i)) {
-                        itemChoice[i] = 0;
+                    objectChoice[i]++;
+                    if (objectChoice[i] > getLengthByColumn(i)) {
+                        objectChoice[i] = 0;
                     }
                     if (i == 0) {
-                        if (itemChoice[i] > 12) {
-                            scrollOffset = itemChoice[i] - 12;
+                        if (objectChoice[i] > 12) {
+                            scrollOffset = objectChoice[i] - 12;
                         } else {
                             scrollOffset = 0;
                         }
                     }
                 } else if (menuState == MS_SKILLS_EXCHANGE_1) {
-                    itemChoice[i]++;
-                    if (itemChoice[i] > 6) {
-                        itemChoice[i] = 0;
+                    objectChoice[i]++;
+                    if (objectChoice[i] > 6) {
+                        objectChoice[i] = 0;
                     }
                 } else {
-                    itemChoice[i]++;
-                    if (itemChoice[i] > 9) {
-                        itemChoice[i] = 7;
+                    objectChoice[i]++;
+                    if (objectChoice[i] > 9) {
+                        objectChoice[i] = 7;
                     }
                 }
             } else if (keyPressed == KEY_RIGHT) {
@@ -727,43 +832,43 @@ function procureDisplayMenuSkillsAction() {
                 switch (menuState) {
                     case MS_SKILLS_BROWSE_1:
                         menuState = MS_SKILLS_EXCHANGE_1;
-                        itemChoice[2] = 2;
+                        objectChoice[2] = 2;
                         break;
                     case MS_SKILLS_BROWSE_2:
                         menuState = MS_SKILLS_EXCHANGE_2;
-                        itemChoice[2] = 7;
+                        objectChoice[2] = 7;
                         break;
                     case MS_SKILLS_BROWSE_3:
-                        if (itemChoice[2] >= 2) {   // cannot unequip attack and defend
+                        if (objectChoice[2] >= 2) {   // cannot unequip attack and defend
                             menuState = MS_SKILLS_EXCHANGE_3;
                         }
                         break;
                     case MS_SKILLS_EXCHANGE_1:
-                        if (itemChoice[2] >= 2) {   // cannot unequip attack and defend
-                            x = hero.availableSkills[itemChoice[0]];
-                            hero.availableSkills[itemChoice[0]] = hero.activeSkills[itemChoice[2]];
-                            hero.activeSkills[itemChoice[2]] = x;
+                        if (objectChoice[2] >= 2) {   // cannot unequip attack and defend
+                            x = hero.availableSkills[objectChoice[0]];
+                            hero.availableSkills[objectChoice[0]] = hero.activeSkills[objectChoice[2]];
+                            hero.activeSkills[objectChoice[2]] = x;
                             menuState = MS_SKILLS_BROWSE_1;
                             hero.availableSkills = hero.availableSkills.filter(function (x) {return x;});
                         }
                         break;
                     case MS_SKILLS_EXCHANGE_2:
-                        x = hero.availableAuraSkills[itemChoice[1]];
-                        hero.availableAuraSkills[itemChoice[1]] = hero.activeAuraSkills[itemChoice[2] - 7];
-                        hero.activeAuraSkills[itemChoice[2] - 7] = x;
+                        x = hero.availableAuraSkills[objectChoice[1]];
+                        hero.availableAuraSkills[objectChoice[1]] = hero.activeAuraSkills[objectChoice[2] - 7];
+                        hero.activeAuraSkills[objectChoice[2] - 7] = x;
                         menuState = MS_SKILLS_BROWSE_2;
                         hero.availableAuraSkills = hero.availableAuraSkills.filter(function (x) {return x;});
                         break;
                     case MS_SKILLS_EXCHANGE_3:
-                        if (itemChoice[2] < 7) {
-                            x = hero.availableSkills[itemChoice[0]];
-                            hero.availableSkills[itemChoice[0]] = hero.activeSkills[itemChoice[2]];
-                            hero.activeSkills[itemChoice[2]] = x;
+                        if (objectChoice[2] < 7) {
+                            x = hero.availableSkills[objectChoice[0]];
+                            hero.availableSkills[objectChoice[0]] = hero.activeSkills[objectChoice[2]];
+                            hero.activeSkills[objectChoice[2]] = x;
                             hero.availableSkills = hero.availableSkills.filter(function (x) {return x;});
                         } else {
-                            x = hero.availableAuraSkills[itemChoice[1]];
-                            hero.availableAuraSkills[itemChoice[1]] = hero.activeAuraSkills[itemChoice[2] - 7];
-                            hero.activeAuraSkills[itemChoice[2] - 7] = x;
+                            x = hero.availableAuraSkills[objectChoice[1]];
+                            hero.availableAuraSkills[objectChoice[1]] = hero.activeAuraSkills[objectChoice[2] - 7];
+                            hero.activeAuraSkills[objectChoice[2] - 7] = x;
                             hero.availableAuraSkills = hero.availableAuraSkills.filter(function (x) {return x;});
                         }
                         menuState = MS_SKILLS_BROWSE_3;
@@ -790,31 +895,31 @@ function procureDisplayMenuSkillsAction() {
             for (i = scrollOffset; (i < hero.availableSkills.length + 1) && (i - scrollOffset < 13); i++) {
                 lineCount++;
                 if (hero.availableSkills[i] != null) {
-                    writeLine(obtainSkill(hero.availableSkills[i]).name[lang], "white", DEFAULT_FONT, lineCount,
+                    writeLine(gainSkill(hero.availableSkills[i]).name[lang], "white", DEFAULT_FONT, lineCount,
                         MENU_SKILLS_AVAILABLE_X + 45);
                 }
-                if (i == itemChoice[0]) {
+                if (i == objectChoice[0]) {
                     if ((menuState == MS_SKILLS_BROWSE_1)
-                        || ((menuState == MS_SKILLS_EXCHANGE_3) && (itemChoice[2] < 7))) {
+                        || ((menuState == MS_SKILLS_EXCHANGE_3) && (objectChoice[2] < 7))) {
                         fc.beginPath();
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                        fc.drawImage(CURSOR_CHOICE, MENU_SKILLS_AVAILABLE_X + cursorOffset,
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AVAILABLE_X + cursorOffset,
                             HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                         if (hero.availableSkills[i] != null) {
                             skillInfo = [
-                                obtainSkill(hero.availableSkills[i]).name[LANG_ENG] + " - "
-                                    + obtainSkill(hero.availableSkills[i]).spCost + " " + TXT_SP[LANG_ENG]
-                                    + " <br> <br> " + obtainSkill(hero.availableSkills[i]).description[LANG_ENG],
-                                obtainSkill(hero.availableSkills[i]).name[LANG_RUS] + " - "
-                                    + obtainSkill(hero.availableSkills[i]).spCost + " " + TXT_SP[LANG_RUS]
-                                    + " <br> <br> " + obtainSkill(hero.availableSkills[i]).description[LANG_RUS]
+                                gainSkill(hero.availableSkills[i]).name[LANG_ENG] + " - "
+                                    + gainSkill(hero.availableSkills[i]).spCost + " " + TXT_SP[LANG_ENG]
+                                    + " <br> <br> " + gainSkill(hero.availableSkills[i]).description[LANG_ENG],
+                                gainSkill(hero.availableSkills[i]).name[LANG_RUS] + " - "
+                                    + gainSkill(hero.availableSkills[i]).spCost + " " + TXT_SP[LANG_RUS]
+                                    + " <br> <br> " + gainSkill(hero.availableSkills[i]).description[LANG_RUS]
                             ];
                             processInfoText(skillInfo);
                         }
                     } else if ((menuState == MS_SKILLS_EXCHANGE_1) && (frame % 8 > 3)) {
                         // blinks
                         fc.beginPath();
-                        fc.drawImage(CURSOR_CHOICE, MENU_SKILLS_AVAILABLE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AVAILABLE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                     }
                 }
@@ -822,7 +927,7 @@ function procureDisplayMenuSkillsAction() {
             if ((i < hero.availableSkills.length)) {
                 fc.beginPath();
                 cursorOffset = (frame % 20 < 10) ? 360 : 355;
-                fc.drawImage(CURSOR_NEXT, MENU_SKILLS_AVAILABLE_X + MENU_SKILLS_COLUMN_WIDTH / 2,
+                fc.drawImage(CURSOR_DOWN, MENU_SKILLS_AVAILABLE_X + MENU_SKILLS_COLUMN_WIDTH / 2,
                     HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
             }
 
@@ -834,33 +939,33 @@ function procureDisplayMenuSkillsAction() {
             for (i = 0; i < hero.availableAuraSkills.length + 1; i++) {
                 lineCount++;
                 if (hero.availableAuraSkills[i] != null) {
-                    writeLine(obtainSkill(hero.availableAuraSkills[i]).name[lang], "#f0f040", DEFAULT_FONT, lineCount,
+                    writeLine(gainSkill(hero.availableAuraSkills[i]).name[lang], "#f0f040", DEFAULT_FONT, lineCount,
                         MENU_SKILLS_AURA_X + 45);
                 }
-                if (i == itemChoice[1]) {
+                if (i == objectChoice[1]) {
                     if ((menuState == MS_SKILLS_BROWSE_2)
-                        || ((menuState == MS_SKILLS_EXCHANGE_3) && (itemChoice[2] >= 7))) {
+                        || ((menuState == MS_SKILLS_EXCHANGE_3) && (objectChoice[2] >= 7))) {
                         fc.beginPath();
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                        fc.drawImage(CURSOR_CHOICE, MENU_SKILLS_AURA_X + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                         if (hero.availableAuraSkills[i] != null) {
                             skillInfo = [
-                                obtainSkill(hero.availableAuraSkills[i]).name[LANG_ENG] + " - "
-                                    + obtainSkill(hero.availableAuraSkills[i]).spCost + " " + TXT_SP[LANG_ENG]
+                                gainSkill(hero.availableAuraSkills[i]).name[LANG_ENG] + " - "
+                                    + gainSkill(hero.availableAuraSkills[i]).spCost + " " + TXT_SP[LANG_ENG]
                                     + TXT_FULL_AP_GAUGE_REQ[LANG_ENG] + " <br> <br> "
-                                    + obtainSkill(hero.availableAuraSkills[i]).description[LANG_ENG],
-                                obtainSkill(hero.availableAuraSkills[i]).name[LANG_RUS] + " - "
-                                    + obtainSkill(hero.availableAuraSkills[i]).spCost + " " + TXT_SP[LANG_RUS]
+                                    + gainSkill(hero.availableAuraSkills[i]).description[LANG_ENG],
+                                gainSkill(hero.availableAuraSkills[i]).name[LANG_RUS] + " - "
+                                    + gainSkill(hero.availableAuraSkills[i]).spCost + " " + TXT_SP[LANG_RUS]
                                     + TXT_FULL_AP_GAUGE_REQ[LANG_RUS] + " <br> <br> "
-                                    + obtainSkill(hero.availableAuraSkills[i]).description[LANG_RUS]
+                                    + gainSkill(hero.availableAuraSkills[i]).description[LANG_RUS]
                             ];
                             processInfoText(skillInfo);
                         }
                     } else if ((menuState == MS_SKILLS_EXCHANGE_2) && (frame % 8 > 3)) {
                         // blinks
                         fc.beginPath();
-                        fc.drawImage(CURSOR_CHOICE, MENU_SKILLS_AURA_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                     }
                 }
@@ -877,30 +982,30 @@ function procureDisplayMenuSkillsAction() {
                     writeLine((i + 1).toString() + ": --------", "white", DEFAULT_FONT, lineCount,
                         MENU_SKILLS_ACTIVE_X + 45);
                 } else {
-                    writeLine((i + 1).toString() + ": " + obtainSkill(hero.activeSkills[i]).name[lang],
+                    writeLine((i + 1).toString() + ": " + gainSkill(hero.activeSkills[i]).name[lang],
                         (i < 2) ? "gray" : "white", DEFAULT_FONT, lineCount, MENU_SKILLS_ACTIVE_X + 45);
                 }
-                if (i == itemChoice[2]) {
+                if (i == objectChoice[2]) {
                     if ((menuState == MS_SKILLS_BROWSE_3) || (menuState == MS_SKILLS_EXCHANGE_1)) {
                         fc.beginPath();
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                        fc.drawImage(CURSOR_CHOICE, MENU_SKILLS_ACTIVE_X + cursorOffset,
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_ACTIVE_X + cursorOffset,
                             HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                         if (hero.activeSkills[i] != null) {
                             skillInfo = [
-                                obtainSkill(hero.activeSkills[i]).name[LANG_ENG] + " - "
-                                    + obtainSkill(hero.activeSkills[i]).spCost + " " + TXT_SP[LANG_ENG]
-                                    + " <br> <br> " + obtainSkill(hero.activeSkills[i]).description[LANG_ENG],
-                                obtainSkill(hero.activeSkills[i]).name[LANG_RUS] + " - "
-                                    + obtainSkill(hero.activeSkills[i]).spCost + " " + TXT_SP[LANG_RUS]
-                                    + " <br> <br> " + obtainSkill(hero.activeSkills[i]).description[LANG_RUS]
+                                gainSkill(hero.activeSkills[i]).name[LANG_ENG] + " - "
+                                    + gainSkill(hero.activeSkills[i]).spCost + " " + TXT_SP[LANG_ENG]
+                                    + " <br> <br> " + gainSkill(hero.activeSkills[i]).description[LANG_ENG],
+                                gainSkill(hero.activeSkills[i]).name[LANG_RUS] + " - "
+                                    + gainSkill(hero.activeSkills[i]).spCost + " " + TXT_SP[LANG_RUS]
+                                    + " <br> <br> " + gainSkill(hero.activeSkills[i]).description[LANG_RUS]
                             ];
                             processInfoText(skillInfo);
                         }
                     } else if ((menuState == MS_SKILLS_EXCHANGE_3) && (frame % 8 > 3)) {
                         // blinks
                         fc.beginPath();
-                        fc.drawImage(CURSOR_CHOICE, MENU_SKILLS_ACTIVE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_ACTIVE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                     }
                 }
@@ -916,32 +1021,32 @@ function procureDisplayMenuSkillsAction() {
                     writeLine(((i + 8) % 10).toString() + ": --------", "#f0f040", DEFAULT_FONT, lineCount,
                         MENU_SKILLS_ACTIVE_X + 45);
                 } else {
-                    writeLine(((i + 8) % 10).toString() + ": " + obtainSkill(hero.activeAuraSkills[i]).name[lang],
+                    writeLine(((i + 8) % 10).toString() + ": " + gainSkill(hero.activeAuraSkills[i]).name[lang],
                         "#f0f040", DEFAULT_FONT, lineCount, MENU_SKILLS_ACTIVE_X + 45);
                 }
-                if (i + 7 == itemChoice[2]) {
+                if (i + 7 == objectChoice[2]) {
                     if ((menuState == MS_SKILLS_BROWSE_3) || (menuState == MS_SKILLS_EXCHANGE_2)) {
                         fc.beginPath();
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                        fc.drawImage(CURSOR_CHOICE, MENU_SKILLS_ACTIVE_X + cursorOffset,
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_ACTIVE_X + cursorOffset,
                             HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                         if (hero.activeAuraSkills[i] != null) {
                             skillInfo = [
-                                obtainSkill(hero.activeAuraSkills[i]).name[LANG_ENG] + " - "
-                                    + obtainSkill(hero.activeAuraSkills[i]).spCost + " " + TXT_SP[LANG_ENG]
+                                gainSkill(hero.activeAuraSkills[i]).name[LANG_ENG] + " - "
+                                    + gainSkill(hero.activeAuraSkills[i]).spCost + " " + TXT_SP[LANG_ENG]
                                     + TXT_FULL_AP_GAUGE_REQ[LANG_ENG] + " <br> <br> "
-                                    + obtainSkill(hero.activeAuraSkills[i]).description[LANG_ENG],
-                                obtainSkill(hero.activeAuraSkills[i]).name[LANG_RUS] + " - "
-                                    + obtainSkill(hero.activeAuraSkills[i]).spCost + " " + TXT_SP[LANG_RUS]
+                                    + gainSkill(hero.activeAuraSkills[i]).description[LANG_ENG],
+                                gainSkill(hero.activeAuraSkills[i]).name[LANG_RUS] + " - "
+                                    + gainSkill(hero.activeAuraSkills[i]).spCost + " " + TXT_SP[LANG_RUS]
                                     + TXT_FULL_AP_GAUGE_REQ[LANG_ENG] + " <br> <br> "
-                                    + obtainSkill(hero.activeAuraSkills[i]).description[LANG_RUS]
+                                    + gainSkill(hero.activeAuraSkills[i]).description[LANG_RUS]
                             ];
                             processInfoText(skillInfo);
                         }
                     } else if ((menuState == MS_SKILLS_EXCHANGE_3) && (frame % 8 > 3)) {
                         // blinks
                         fc.beginPath();
-                        fc.drawImage(CURSOR_CHOICE, MENU_SKILLS_ACTIVE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_ACTIVE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                     }
                 }
@@ -957,41 +1062,250 @@ function procureDisplayMenuSkillsAction() {
 function procureDisplayMenuItemsAction() {
     var displayMenuItemsAction = new Action();
     displayMenuItemsAction.definePlayFrame(function (frame) {
-        function writeLine(line, lineCount, offset) {
+        function writeLine(line, color, font, lineCount, offset) {
             fc.beginPath();
-            fc.fillStyle = "white";
-            fc.font = LARGE_FONT;
-            fc.fillText(line, HP_GAUGE_X + offset,
-                HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 16 + LARGE_LINE_HEIGHT * (lineCount + 1));
+            fc.fillStyle = color;
+            fc.font = font;
+            fc.fillText(line, offset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 12 + DEFAULT_LINE_HEIGHT * (lineCount + 1));
         }
 
         if ((frame == 0)) {
-            menuState = MS_ITEMS;
+            menuState = MS_ITEMS_BROWSE_1;
             menuChoice = 0;
+            scrollOffset = 0;
+            objectChoice[0] = 0;
+            objectChoice[1] = 0;
+            objectChoice[2] = 0;
         }
 
         if (frame < 10) {
-            drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, (W - HP_GAUGE_X - 320) * frame / 10,
-                (INFO_WINDOW_Y - HP_GAUGE_Y - MENU_ROOT_Y_OFFSET - 10) * frame / 10);
+            drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                MENU_SKILLS_COLUMN_WIDTH * frame / 10, MENU_ROOT_HEIGHT * frame / 10);
+            drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                (INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10) * frame / 10, MENU_ROOT_HEIGHT * frame / 10);
         } else {
-            drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, W - HP_GAUGE_X - 320,
-                INFO_WINDOW_Y - HP_GAUGE_Y - MENU_ROOT_Y_OFFSET - 10);
+            drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                MENU_SKILLS_COLUMN_WIDTH, MENU_ROOT_HEIGHT);
+            drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10, MENU_ROOT_HEIGHT);
 
-            var i;
-            var lineCount = 0;
-
-            for (i = 0; i < 0; i++) {
-                writeLine(displayMenuItemsAction.choices[i][lang], lineCount, 45);
-                lineCount++;
-                if (i == menuChoice) {
-                    fc.beginPath();
-                    var cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                    fc.drawImage(CURSOR_CHOICE, HP_GAUGE_X + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
-                        + LARGE_LINE_HEIGHT * lineCount);
+            function getItemSetByMenuState(ms) {
+                if (ms < MS_ITEMS_EXCHANGE_1) {
+                    return menuState - MS_ITEMS_BROWSE_1;
+                } else if (ms == MS_ITEMS_EXCHANGE_1) {
+                    return 1;
+                } else {
+                    return 0;
                 }
             }
 
-            return (keyPressed == KEY_ESC) && (menuState == MS_ITEMS);
+            function getLengthByColumn(col) {
+                switch (col) {
+                    case 0:
+                        return hero.availableItems.length;
+                    case 1:
+                        return 4;
+                    case 2:
+                        return 2;
+                    default:
+                        return null;
+                }
+            }
+
+            var itemInfo;
+            var x;
+            var i = getItemSetByMenuState(menuState);
+            if (keyPressed == KEY_UP) {
+                if ((menuState == MS_ITEMS_BROWSE_2) && (objectChoice[i] == 0)) {
+                    menuState = MS_ITEMS_BROWSE_3;
+                    objectChoice[2] = 2;
+                } else if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == 0)) {
+                    menuState = MS_ITEMS_BROWSE_2;
+                    objectChoice[1] = 4;
+                } else {
+                    objectChoice[i]--;
+                    if (objectChoice[i] < 0) {
+                        objectChoice[i] = getLengthByColumn(i);
+                    }
+                    if (i == 0) {
+                        if (objectChoice[i] < scrollOffset) {
+                            scrollOffset--;
+                        } else if ((scrollOffset == 0) && (objectChoice[i] > 12)) {
+                            scrollOffset = objectChoice[i] - 12;
+                        }
+                    }
+                }
+            } else if (keyPressed == KEY_DOWN) {
+                if ((menuState == MS_ITEMS_BROWSE_2) && (objectChoice[i] == 4)) {
+                    menuState = MS_ITEMS_BROWSE_3;
+                    objectChoice[2] = 0;
+                } else if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == 2)) {
+                    menuState = MS_ITEMS_BROWSE_2;
+                    objectChoice[1] = 0;
+                } else {
+                    objectChoice[i]++;
+                    if (objectChoice[i] > getLengthByColumn(i)) {
+                        objectChoice[i] = 0;
+                    }
+                    if (i == 0) {
+                        if (objectChoice[i] > 12) {
+                            scrollOffset = objectChoice[i] - 12;
+                        } else {
+                            scrollOffset = 0;
+                        }
+                    }
+                }
+            } else if ((keyPressed == KEY_RIGHT) || (keyPressed == KEY_LEFT)) {
+                if (menuState == MS_ITEMS_BROWSE_1) {
+                    menuState = MS_ITEMS_BROWSE_2;
+                } else if ((menuState == MS_ITEMS_BROWSE_2) || (menuState == MS_ITEMS_BROWSE_3)) {
+                    menuState = MS_ITEMS_BROWSE_1;
+                }
+            } else if (keyPressed == KEY_ACTION) {
+                switch (menuState) {
+                    case MS_ITEMS_BROWSE_1:
+                        menuState = MS_ITEMS_EXCHANGE_1;
+                        break;
+                    case MS_ITEMS_BROWSE_2:
+                        menuState = MS_ITEMS_EXCHANGE_2;
+                        break;
+                    case MS_ITEMS_BROWSE_3:
+                        // cannot change equipment at this time
+                        break;
+                    case MS_ITEMS_EXCHANGE_1:
+                    case MS_ITEMS_EXCHANGE_2:
+                        x = hero.availableItems[objectChoice[0]];
+                        hero.availableItems[objectChoice[0]] = hero.activeItems[objectChoice[1]];
+                        hero.activeItems[objectChoice[1]] = x;
+                        menuState -= 3;
+                        hero.availableItems = hero.availableItems.filter(function (x) {
+                            return x;
+                        });
+                        break;
+                }
+            } else if (keyPressed == KEY_ESC) {
+                if (menuState >= MS_ITEMS_EXCHANGE_1) {
+                    menuState -= 3;
+                    keyPressed = KEY_NONE;
+                }
+            }
+
+            // AVAILABLE ITEMS COLUMN
+            var lineCount = 0;
+            var xOffset = MENU_SKILLS_AVAILABLE_X + 30;
+            writeLine(TXT_MENU_AVAILABLE_ITEMS[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
+            lineCount++;
+            if (scrollOffset > 0) {
+                fc.beginPath();
+                var cursorOffset = (frame % 20 < 10) ? 40 : 45;
+                fc.drawImage(CURSOR_UP, MENU_SKILLS_AVAILABLE_X + MENU_SKILLS_COLUMN_WIDTH / 2,
+                    HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
+            }
+            for (i = scrollOffset; (i < hero.availableItems.length + 1) && (i - scrollOffset < 13); i++) {
+                lineCount++;
+                if (hero.availableItems[i] != null) {
+                    writeLine(obtainItem(hero.availableItems[i].id).name[lang]
+                        + (hero.availableItems[i].charges > 1 ?" x" + hero.availableItems[i].charges : ""),
+                        "white", DEFAULT_FONT, lineCount, MENU_SKILLS_AVAILABLE_X + 45);
+                }
+                if (i == objectChoice[0]) {
+                    if ((menuState == MS_ITEMS_BROWSE_1) || (menuState == MS_ITEMS_EXCHANGE_2)) {
+                        fc.beginPath();
+                        cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AVAILABLE_X + cursorOffset,
+                            HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                        if (hero.availableItems[i] != null) {
+                            itemInfo = [
+                                obtainItem(hero.availableItems[i].id).name[LANG_ENG]
+                                    + " <br> <br> " + obtainItem(hero.availableItems[i].id).description[LANG_ENG]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.availableItems[i].charges,
+                                obtainItem(hero.availableItems[i].id).name[LANG_RUS]
+                                    + " <br> <br> " + obtainItem(hero.availableItems[i].id).description[LANG_RUS]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.availableItems[i].charges
+                            ];
+                            processInfoText(itemInfo);
+                        }
+                    } else if ((menuState == MS_ITEMS_EXCHANGE_1) && (frame % 8 > 3)) {
+                        // blinks
+                        fc.beginPath();
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AVAILABLE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                            + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                    }
+                }
+            }
+            if ((i < hero.availableItems.length)) {
+                fc.beginPath();
+                cursorOffset = (frame % 20 < 10) ? 360 : 355;
+                fc.drawImage(CURSOR_DOWN, MENU_SKILLS_AVAILABLE_X + MENU_SKILLS_COLUMN_WIDTH / 2,
+                    HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
+            }
+
+            // ACTIVE ITEMS COLUMN
+            lineCount = 0;
+            xOffset = MENU_SKILLS_AURA_X + 30;
+            writeLine(TXT_MENU_ACTIVE_ITEMS[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
+            lineCount++;
+            for (i = 0; i < 5; i++) {
+                lineCount++;
+                if (hero.activeItems[i] == null) {
+                    writeLine((i + 1).toString() + ": --------", "white", DEFAULT_FONT, lineCount,
+                        MENU_SKILLS_AURA_X + 45);
+                } else {
+                    writeLine((i + 1).toString() + ": " + obtainItem(hero.activeItems[i].id).name[lang]
+                        + (hero.activeItems[i].charges > 1 ?" x" + hero.activeItems[i].charges : ""),
+                        "white", DEFAULT_FONT, lineCount, MENU_SKILLS_AURA_X + 45);
+                }
+                if (i == objectChoice[1]) {
+                    if ((menuState == MS_ITEMS_BROWSE_2) || (menuState == MS_ITEMS_EXCHANGE_1)) {
+                        fc.beginPath();
+                        cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + cursorOffset,
+                            HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                        if (hero.activeItems[i] != null) {
+                            itemInfo = [
+                                obtainItem(hero.activeItems[i].id).name[LANG_ENG]
+                                    + " <br> <br> " + obtainItem(hero.activeItems[i].id).description[LANG_ENG]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.activeItems[i].charges,
+                                obtainItem(hero.activeItems[i].id).name[LANG_RUS]
+                                    + " <br> <br> " + obtainItem(hero.activeItems[i].id).description[LANG_RUS]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.activeItems[i].charges
+                            ];
+                            processInfoText(itemInfo);
+                        }
+                    } else if ((menuState == MS_ITEMS_EXCHANGE_2) && (frame % 8 > 3)) {
+                        // blinks
+                        fc.beginPath();
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                            + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                    }
+                }
+            }
+
+            // EQUIPMENT INFO
+            lineCount += 2;
+            writeLine(TXT_MENU_EQUIPMENT[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
+            lineCount++;
+            function displayEquipmentInfo(equipName, equipDesc, choiceId) {
+                lineCount++;
+                writeLine(equipName[lang], "gray", DEFAULT_FONT, lineCount, MENU_SKILLS_AURA_X + 45);
+                if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == choiceId)) {
+                        fc.beginPath();
+                        cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + cursorOffset,
+                            HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                        itemInfo = [
+                            equipName[LANG_ENG] + " <br> <br> " + equipDesc[LANG_ENG],
+                            equipName[LANG_RUS] + " <br> <br> " + equipDesc[LANG_RUS]
+                        ];
+                        processInfoText(itemInfo);
+                }
+            }
+
+            displayEquipmentInfo(TXT_MENU_QUEEN_OF_SPADES, TXT_MENU_QUEEN_OF_SPADES_DESC, 0);
+            displayEquipmentInfo(TXT_MENU_WHITE_STEEL_ARMOR, TXT_MENU_WHITE_STEEL_ARMOR_DESC, 1);
+            displayEquipmentInfo(TXT_MENU_RAT_RIDER_PELERINE, TXT_MENU_RAT_RIDER_PELERINE_DESC, 2);
+
+            return (keyPressed == KEY_ESC) && (menuState >= MS_ITEMS_BROWSE_1) && (menuState <= MS_ITEMS_BROWSE_3);
         }
         return false;
     });

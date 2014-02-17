@@ -272,6 +272,7 @@ function Hero() {
     this.effReflexes = 1;
     this.hp = this.attrMaxHp;
     this.sp = this.attrMaxSp;
+    this.ap = 0;
 
     this.effEvasion = 1;        // effective evasion of 1 means 100% chance to hit, thus no evasion
     this.effReflect = 1;        // effective reflection of 1 means 100% reflect damage reduction, thus no reflection
@@ -285,13 +286,17 @@ function Hero() {
     this.animationState = AN_STAND;
     this.animationFrame = 0;
 
-    // TODO: temporary filled skills!
+    // TODO: temporary filled skills and items!
     this.availableSkills = [SKL_JAB, SKL_CHARGE, SKL_COUNTERATTACK, SKL_GUARDEDSTRIKE, SKL_COUNTERATTACK,
         SKL_DEFEND, SKL_ATTACK, SKL_ATTACK, SKL_RATRIDERDANCE, SKL_GUARDEDSTRIKE, SKL_DEFEND, SKL_CHARGE,
         SKL_COUNTERATTACK, SKL_JAB, SKL_COUNTERATTACK, SKL_RATRIDERDANCE];
     this.availableAuraSkills = [SKL_ACEOFSPADES, SKL_OMNISLASH];
     this.activeSkills = [SKL_ATTACK, SKL_DEFEND];
     this.activeAuraSkills = [];
+
+    this.availableItems = [];
+    this.activeItems = [{id: ITM_OINTMENT1, charges: 3}, {id: ITM_OINTMENT1, charges: 2}, null,
+        {id: ITM_OINTMENT1, charges: 1}];
 
     this.skillSet = [];
     this.battleGaugeArtifacts = [];
@@ -384,6 +389,32 @@ function Hero() {
         }
     };
 
+    this.useItem = function (itemChoice, position) {
+        if (this.activeItems[itemChoice] != null) {
+            var item = obtainItem(this.activeItems[itemChoice].id);
+            if (this.getRightmostCooldown() >= item.getLeftCooldown(position)) {
+                registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH, "#FF6060", null));
+            } else {
+                /* ATTRIBUTE INCREASE FOR AGILITY */
+                var enemyAgilityModifier = enemy.attrAgility / hero.attrAgility;
+                var agilityIncreaseMultiplier = 100 / (item.getLeftCooldown(position) - this.getRightmostCooldown() + 50);
+                attrIncrease[ATTR_AGILITY] += agilityIncreaseMultiplier * enemyAgilityModifier * AIB_AGILITY;
+
+                this.activeItems[itemChoice].charges--;
+                if (this.activeItems[itemChoice].charges <= 0) {
+                    this.activeItems[itemChoice] = null;
+                }
+                var artifactData = item.getArtifacts(position);
+                for (var i = 0; i < artifactData.length; i++) {
+                    // Fuck you, Javascript!
+                    this.battleGaugeArtifacts.push(artifactData[i]);
+                }
+                registerObject(GUI_COMMON,
+                    procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH_FILL, "#FFFFFF", null));
+            }
+        }
+    };
+
     this.strike = function (power) {
         registerImpact(hero, enemy, power);
         registerObject(GUI_COMMON,
@@ -419,12 +450,45 @@ function Hero() {
         }
     };
 
+    this.expendAp = function (ap) {
+        this.ap -= ap;
+        if (this.ap < 0) {
+            this.ap = 0;
+        }
+    };
+
+    this.restoreAp = function (ap) {
+        this.ap += ap;
+        if (this.ap > 1) {
+            this.ap = 1;
+        }
+    };
+
     this.addKarma = function (karma) {
         this.karma += karma;
     };
 
     this.expendKarma = function (karma) {
         this.karma -= karma;
+    };
+
+    this.gainSkill = function (skillId) {
+        if ((this.availableSkills.indexOf(skillId) >= 0) && (this.activeSkills.indexOf(skillId) >= 0)) {
+            this.availableSkills.push(skillId);
+        }
+    };
+
+    this.gainAuraSkill = function (skillId) {
+        if ((this.availableAuraSkills.indexOf(skillId) >= 0) && (this.activeSkills.indexOf(skillId) >= 0)) {
+            this.availableAuraSkills.push(skillId);
+        }
+    };
+
+    this.obtainItem = function (itemId, charges) {
+        if (charges === undefined) {
+            charges = obtainItem(itemId).defaultCharges;
+        }
+        this.availableItems.push({id: itemId, charges: charges});
     };
 
     this.setAnimationState = function (animationState) {

@@ -2,4 +2,4 @@
 # convert karma.png -transparent white karma.png
 # convert hp-sp-gauge.png -transparent white hp-sp-gauge.png
 
-convert cursorUp.png -flip cursorUp.png
+convert cursorChoice.png -flop cursorLeft.png
