@@ -80,6 +80,62 @@ function procureTitleSequence() {
     return titleDisplay;
 }
 
+function procureAuraSkillSequence(character, auraImage, skillName) {
+    var auraSkillSequence = new Sequence();
+    auraSkillSequence.addAction(procureStopAction());
+    var auraAnimationAction = new Action();
+    var seed = Math.random() * 1000;
+    auraAnimationAction.definePlayFrame(function (frame) {
+        if (frame == 1) {
+            registerObject(GUI_COMMON, procureGuiEffectAction(GFX_SCREEN_FLASH, "#FFFFFF", null));
+        }
+        var auraImageScale = (AURA_ANIMATION_H - 40) / auraImage.height;
+        fc.beginPath();
+        fc.fillStyle = "#3060E0";
+        fc.fillRect(0, AURA_ANIMATION_Y, W, AURA_ANIMATION_H);
+        setSeed(seed);
+        var tailsLimit = 130 + Math.floor(random() * 20);
+        for (var i = 0; i < tailsLimit; i++) {
+            var x = random() * W * 5 - frame * 50;
+            var y = AURA_ANIMATION_Y + random() * AURA_ANIMATION_H;
+            var length = 100 + Math.floor(random() * 20);
+            fc.beginPath();
+            fc.strokeStyle = "#FFFFFF";
+            fc.lineWidth = 3;
+            fc.moveTo(x, y);
+            fc.lineTo(x + length, y);
+            fc.stroke();
+        }
+        fc.beginPath();
+        if (frame < 25) {
+            fc.drawImage(auraImage, ((25 - frame) / 25) * (-auraImage.width * auraImageScale), AURA_ANIMATION_Y + 40,
+                auraImage.width * auraImageScale, auraImage.height * auraImageScale);
+        } else {
+            fc.drawImage(auraImage, 0, AURA_ANIMATION_Y + 40,
+                auraImage.width * auraImageScale, auraImage.height * auraImageScale);
+        }
+
+        var lineLength = skillName[lang].length * LARGE_CHAR_WIDTH + 25;
+        drawTextbox((W - lineLength) / 2, AURA_ANIMATION_Y + 20, lineLength, 12 + LARGE_LINE_HEIGHT);
+        fc.beginPath();
+        fc.textAlign = "center";
+        fc.fillStyle = TEXT_COLOR_GOLD;
+        fc.font = LARGE_FONT;
+        fc.fillText(skillName[lang], W / 2, AURA_ANIMATION_Y + 20 + LARGE_LINE_HEIGHT - 5);
+        fc.textAlign = "left";
+
+        if (frame >= 100) {
+            registerObject(GUI_COMMON, procureGuiEffectAction(GFX_SCREEN_FLASH, "#FFFFFF", null));
+            return true;
+        } else {
+            return false;
+        }
+    });
+    auraSkillSequence.addAction(auraAnimationAction);
+    auraSkillSequence.addAction(procureResumeAction());
+    return auraSkillSequence;
+}
+
 /* ACTIONS */
 
 function procureCodeFragmentAction(func) {
@@ -251,6 +307,54 @@ function procureDisplayCenteredMessageAction(width, text, displayCursor) {
         (W - width) / 2, H / 2 - 100, width, 50 + DEFAULT_LINE_HEIGHT * lineCount, text, displayCursor);
 }
 
+function procureFloatingTextAction(originX, originY, font, color, text) {
+    var floatingTextAction = new Action();
+    floatingTextAction.definePlayFrame(function (frame) {
+        if ((frame < 50) && (text != null)) {
+            fc.beginPath();
+            fc.textAlign = "center";
+            fc.fillStyle = color;
+            fc.font = font;
+            fc.fillText(text, originX, originY - frame);
+            fc.textAlign = "left";
+            return false;
+        } else {
+            return true;
+        }
+    });
+    return floatingTextAction;
+}
+
+function procureHpGaugeTextAction(character, color, text) {
+    var y = (character == hero) ? 70 : 175;
+    return procureFloatingTextAction(60, y, DEFAULT_FONT, color, text);
+}
+
+function procureAttributeTextAction(attribute, color, text) {
+    var y;
+    switch (attribute) {
+        case ATTR_ATTACK:
+            y = INFO_WINDOW_Y + 15;
+            break;
+        case ATTR_DEFENSE:
+            y = INFO_WINDOW_Y + 51;
+            break;
+        case ATTR_AGILITY:
+            y = INFO_WINDOW_Y + 87;
+            break;
+        case ATTR_REFLEXES:
+            y = INFO_WINDOW_Y + 123;
+            break;
+        default:
+            y = -30;
+    }
+    return procureFloatingTextAction(40, y, LARGE_FONT, color, text);
+}
+
+function procureKarmaTextAction(color, text) {
+    return procureFloatingTextAction(273, H - 47, LARGE_FONT, color, text);
+}
+
 function procureGuiEffectAction(guiEffect, color, value) {
     var guiEffectAction = new Action();
     guiEffectAction.definePlayFrame(function (frame) {
@@ -264,27 +368,12 @@ function procureGuiEffectAction(guiEffect, color, value) {
                 }
                 return frame > 50;
                 break;
-            case GFX_HERO_HPGAUGE_SHAKE:
-                if (frame == 1) {
-                    heroHpShake = 20;
-                }
-                if ((frame < 50) && (value != null)) {
+            case GFX_HERO_APGAUGE_FLASH:
+                if (frame % 24 < 12) {
                     fc.beginPath();
-                    fc.fillStyle = color;
-                    fc.font = DEFAULT_FONT;
-                    fc.fillText(value, 60, 70 - frame);
-                }
-                return frame > 50;
-                break;
-            case GFX_ENEMY_HPGAUGE_SHAKE:
-                if (frame == 1) {
-                    enemyHpShake = 20;
-                }
-                if ((frame < 50) && (value != null)) {
-                    fc.beginPath();
-                    fc.fillStyle = color;
-                    fc.font = DEFAULT_FONT;
-                    fc.fillText(value, 60, 175 - frame);
+                    fc.lineWidth = 3;
+                    fc.strokeStyle = color;
+                    fc.strokeRect(HP_GAUGE_X + 58, HP_GAUGE_Y + 47, 235, 16);
                 }
                 return frame > 50;
                 break;
@@ -323,6 +412,14 @@ function procureGuiEffectAction(guiEffect, color, value) {
                     fc.fillStyle = color;
                     fc.fillRect(BGL_LEFT - 2, getBattleGaugeOffset(enemy) - 2,
                         BGL_RIGHT - BGL_LEFT + 4, BGL_HEIGHT + 2);
+                }
+                return frame > BATTLEGAUGE_FLASH_LENGTH;
+                break;
+            case GFX_SCREEN_FLASH:
+                if (frame <= BATTLEGAUGE_FLASH_LENGTH) {
+                    fc.beginPath();
+                    fc.fillStyle = color;
+                    fc.fillRect(0, 0, W, H);
                 }
                 return frame > BATTLEGAUGE_FLASH_LENGTH;
                 break;
@@ -643,11 +740,11 @@ function acquireGradualChangeArtifact(position, leftWidth, rightWidth, weakColor
     return gradualChangeArtifact;
 }
 
-function acquireImpactArtifact(position, image, power) {
+function acquireImpactArtifact(position, image, power, evadable, apGain) {
     var impactArtifact = new BattleGaugeArtifact(position, 10, 10);
     impactArtifact.defineGetEffect(function (position, character) {
         if (position <= BGL_LEFT) {
-            character.strike(power);
+            character.strike(power, evadable, apGain);
             return true;
         } else {
             return false;
@@ -657,13 +754,16 @@ function acquireImpactArtifact(position, image, power) {
         var topOffset = getBattleGaugeOffset(character);
         if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
             fc.beginPath();
-            fc.drawImage(image, position - image.width / 2, topOffset - image.height / 2 + 20);
+            var imageToDraw = (image instanceof HTMLImageElement) ? image : image
+                [Math.floor((globalFrame % (20 * image.length - 1)) / 10) % image.length];
+            fc.drawImage(imageToDraw, position - imageToDraw.width / 2, topOffset - imageToDraw.height / 2 + 20);
         }
     });
     impactArtifact.defineSketch(function (position, character) {
         var topOffset = getBattleGaugeOffset(character);
         fc.beginPath();
-        fc.rect(position - image.width / 2, topOffset - 8, image.width, BGL_HEIGHT + 16);
+        var imageToDraw = (image instanceof HTMLImageElement) ? image : image[0];
+        fc.rect(position - imageToDraw.width / 2, topOffset - 8, imageToDraw.width, BGL_HEIGHT + 16);
         fc.lineWidth = 3;
         fc.strokeStyle = "black";
         fc.stroke();
@@ -842,7 +942,8 @@ function gainAceOfSpadesSkill() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 80, 80, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 40,
-                getImageResource("imgBattleImpactIcon"), 5)
+                [getImageResource("imgBattleAuraImpact1Icon"), getImageResource("imgBattleAuraImpact2Icon")],
+                5, false, false)
         ];
     });
     return aceOfSpadesSkill;
@@ -963,7 +1064,7 @@ function obtainOintmentItem() {
         ["A common curative ointment that is useful when working on flesh wounds. "
             + "Restores 25% HP over a long period of time.", "Обычная целебная мазь, полезна при обработке "
             + "поверхностных ран. Восстанавливает 25% ОЖ за длительный период времени."],
-        getImageResource("imgItemOintment1"), 2);
+        getImageResource("imgItemOintment1"), 2, true);
     ointmentItem.defineGetFieldEffect(function () {
         hero.restoreHp(hero.attrMaxHp * 0.25);
         return true;
@@ -973,7 +1074,8 @@ function obtainOintmentItem() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, false),
             acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
-                0, 100, BGL_COLOR, "#3CFF3C", ATTR_HP, hero.attrMaxHp * 0.25, hero.attrMaxHp * 0.25, false)
+                0, 100, BGL_COLOR, "#3CFF3C", ATTR_HP, hero.attrMaxHp * 0.25, hero.attrMaxHp * 0.25, false),
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
         ];
     });
     return ointmentItem;

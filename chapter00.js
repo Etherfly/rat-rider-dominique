@@ -7,8 +7,8 @@
 /* DATA STORAGE */
 
 var chroniclersNames = [
-    ["Hilbert", "Benjamin", "Aristarchus", "Arnold", "Sebastian", "Anselm"],
-    ["Гильберт", "Бенджамин", "Аристарх", "Арнольд", "Себастьян", "Ансельм"]
+    ["Hilbert", "Benjamin", "Aristarchus", "Arnold", "Sebastian", "Anselm", "Algernon"],
+    ["Гильберт", "Бенджамин", "Аристарх", "Арнольд", "Себастьян", "Ансельм", "Алжернон"]
 ];
 
 var CH00_PHASE = 0;                     // phase

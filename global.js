@@ -21,7 +21,7 @@ var BGL_HEIGHT = 30;
 
 var BGL_COLOR = "#C8FFFF";
 
-var CM_EVENT = 0;    // Control mode: none
+var CM_EVENT = 0;    // Control mode: event
 var CM_FIELD = 1;   // Control mode: field
 var CM_BATTLE = 2;  // Control mode: battle
 
@@ -105,6 +105,8 @@ var ATTR_SP = 1;
 var ATTR_AP = 2;
 
 var SP_RECOVERY_BASIS = 0.05;
+var AP_DIMINISHING_BASIS = 0.0002;
+var AP_GAIN_FACTOR = 0.6;
 var PATH_CHANGE_SP_COST_RATIO = 0.25;
 
 var attrIncrease = [];
@@ -459,11 +461,13 @@ function decorateReaches(path, layerOffset, density, scaleModifier, offset, imag
     }
 }
 
-function registerImpact(attacker, target, attackPower) {
+function registerImpact(attacker, target, attackPower, evadable, apGain) {
     impacts.push({
         attacker: attacker,
         target: target,
-        attackPower: attackPower
+        attackPower: attackPower,
+        evadable: evadable === undefined ? true : evadable,
+        apGain: apGain === undefined ? true : apGain
     });
 }
 
@@ -526,11 +530,10 @@ function handleBattleEnd() {
             heroHpShake = 0;
             enemyHpShake = 0;
 
-            hero.attrAttack += attrIncrease[ATTR_ATTACK];
-            hero.attrDefense += attrIncrease[ATTR_DEFENSE];
-            hero.attrAgility += attrIncrease[ATTR_AGILITY];
-            hero.attrReflexes += attrIncrease[ATTR_REFLEXES];
-            for (var i = 0; i < attrIncrease.length; i++) { attrIncrease[i] = 0; }
+            for (var i = 0; i < attrIncrease.length; i++) {
+                hero.increaseAttribute(i, attrIncrease[i]);
+                attrIncrease[i] = 0;
+            }
             hero.addKarma(karmaGained);
         }));
         if (eventBattleEndSequence != null) {
@@ -541,6 +544,7 @@ function handleBattleEnd() {
             battleEndSequence.addAction(procureResumeAction());
         }
     } else {
+        displayGui = false;
         battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, TXT_DOMINIQUE_HAS_FALLEN, true)
             .addChoice(TXT_LOAD_GAME).addChoice(TXT_RETURN_TO_TITLE));
         battleEndSequence.addAction(procureCodeFragmentAction(function () {
@@ -561,62 +565,72 @@ function handleBattleEnd() {
 function deliverImpacts() {
     for (var i = 0; i < impacts.length; i ++) {
         var guiEffect;
-        if (impacts[i].target == hero) {
-            guiEffect = GFX_HERO_HPGAUGE_SHAKE;
-        } else {
-            guiEffect = GFX_ENEMY_HPGAUGE_SHAKE;
-        }
 
-        /*
-         * DAMAGE FORMULA:
-         * DMG = ATTACKER_BASE_ATK * (1 + (ATTACKER_BASE_ATK * ATTACKER_EFF_ATK - TARGET_BASE_DEF * TARGET_EFF_DEF) / (80~120))
-         *       * (ATTACK_POWER / TARGET_EFF_DEF) * (0.9~1.1)
-         *
-         * Attacker's base attack serves as the damage basis, attack power and target's effective defense serve as
-         * direct multiplier and divisor. Average multiplier difference is 100, thus, if attacker's attack is ~100 more
-         * than target's defense (taking into account effective values) the damage is roughly doubled
-         * than if those attributes were equal. If target's defense is 100+ points ahead, effective modifiers included, chances are
-         * the attack will deal no damage.
-         */
-        var dmg = impacts[i].attacker.attrAttack
-            * (1 + (impacts[i].attacker.attrAttack * impacts[i].attacker.effAttack
-            - impacts[i].target.attrDefense * impacts[i].target.effDefense) / (80 + 40 * Math.random()))
-            * (impacts[i].attackPower / impacts[i].target.effDefense) * (0.9 + 0.2 * Math.random());
-        if (Math.floor(dmg) <= 0) {
-            registerObject(GUI_COMMON, procureGuiEffectAction(guiEffect, "white", 0));
-        } else {
-            impacts[i].target.expendHp(dmg);
-            registerObject(GUI_COMMON, procureGuiEffectAction(guiEffect, "red", Math.floor(dmg).toString()));
-        }
-
-        registerObject(pathToObjectFrontLayer(impacts[i].target.path),
-            impacts[i].target.getEffectAction([
-                getImageResource("imgEffectHit1-1"),
-                getImageResource("imgEffectHit1-2"),
-                getImageResource("imgEffectHit1-3")], 3, 35, 35));
-
-        /*
-         * ATTRIBUTE INCREASE:
-         * Attack is increased by... attacking and dealing damage.
-         * Defense is increased by defending.
-         * Agility is increased by rapid actions, one after another.
-         * Reflexes are increased by precision actions, like attacking the enemy.
-         * in a weakpoint or defending right when the enemy attacks.
-         * The agility gain if defined in useSkill.
-         */
         var enemyStrengthModifier;
+        var enemyAgilityModifier = enemy.attrAgility / hero.attrAgility;
         var enemyReflexesModifier;
-        if (impacts[i].attacker == hero) {
-            enemyStrengthModifier = impacts[i].target.attrDefense / impacts[i].attacker.attrAttack;
-            enemyReflexesModifier = impacts[i].target.attrReflexes / impacts[i].attacker.attrReflexes;
-            attrIncrease[ATTR_ATTACK] += impacts[i].attackPower * enemyStrengthModifier * AIB_ATTACK;
-            attrIncrease[ATTR_REFLEXES] += enemyReflexesModifier * AIB_REFLEXES
-                / (impacts[i].target.effDefense + 0.01);
+        if (Math.random() < impacts[i].target.effEvasion) {
+            /*
+             * DAMAGE FORMULA:
+             * DMG = ATTACKER_BASE_ATK * (1 + (ATTACKER_BASE_ATK * ATTACKER_EFF_ATK - TARGET_BASE_DEF * TARGET_EFF_DEF)
+             *      / (80~120)) * (ATTACK_POWER / TARGET_EFF_DEF) * (0.9~1.1)
+             *
+             * Attacker's base attack serves as the damage basis, attack power and target's effective defense serve as
+             * direct multiplier and divisor. Average mu than target's defense (taking into account effective values)
+             * the damage is roughly doubled than if those attributes were equal. If target's defense is 100+ points
+             * ahead, effective modifiers included, chances are the attack will deal no damage.
+             */
+            var dmg = impacts[i].attacker.attrAttack
+                * (1 + (impacts[i].attacker.attrAttack * impacts[i].attacker.effAttack
+                - impacts[i].target.attrDefense * impacts[i].target.effDefense) / (80 + 40 * Math.random()))
+                * (impacts[i].attackPower / impacts[i].target.effDefense) * (0.9 + 0.2 * Math.random());
+            if (Math.floor(dmg) <= 0) {
+                registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", "0"));
+            } else {
+                impacts[i].target.expendHp(dmg);
+            }
+
+            /* AURA POINTS GAIN */
+            if ((impacts[i].apGain)
+                && ((hero.skillSet[7] != null) || (hero.skillSet[8] != null) || (hero.skillSet[9] != null))) {
+                var apGain = (impacts[i].target == hero) ? dmg / hero.attrMaxHp : dmg / (hero.attrMaxHp * 2);
+                hero.restoreAp(apGain * AP_GAIN_FACTOR);
+            }
+
+            registerObject(pathToObjectFrontLayer(impacts[i].target.path),
+                impacts[i].target.getEffectAction([
+                    getImageResource("imgEffectHit1-1"),
+                    getImageResource("imgEffectHit1-2"),
+                    getImageResource("imgEffectHit1-3")], 3, 35, 35));
+
+            /*
+             * ATTRIBUTE INCREASE:
+             * Attack is increased by... attacking and dealing damage.
+             * Defense is increased by defending.
+             * Agility is increased by rapid actions, one after another, and evasion.
+             * Reflexes are increased by precision actions, like attacking the enemy
+             * in a weakpoint or defending right when the enemy attacks, and evasion.
+             * The agility gain is also defined in useSkill.
+             */
+            if (impacts[i].attacker == hero) {
+                enemyStrengthModifier = impacts[i].target.attrDefense / impacts[i].attacker.attrAttack;
+                enemyReflexesModifier = impacts[i].target.attrReflexes / impacts[i].attacker.attrReflexes;
+                attrIncrease[ATTR_ATTACK] += impacts[i].attackPower * enemyStrengthModifier * AIB_ATTACK;
+                attrIncrease[ATTR_REFLEXES] += enemyReflexesModifier * AIB_REFLEXES
+                    / (impacts[i].target.effDefense + 0.01);
+            } else {
+                enemyStrengthModifier = impacts[i].attacker.attrAttack / impacts[i].target.attrDefense;
+                enemyReflexesModifier = impacts[i].attacker.attrReflexes / impacts[i].target.attrReflexes;
+                attrIncrease[ATTR_DEFENSE] += impacts[i].target.effDefense * enemyStrengthModifier * AIB_DEFENSE;
+                attrIncrease[ATTR_REFLEXES] += enemyReflexesModifier * impacts[i].target.effDefense * AIB_REFLEXES;
+            }
         } else {
-            enemyStrengthModifier = impacts[i].attacker.attrAttack / impacts[i].target.attrDefense;
-            enemyReflexesModifier = impacts[i].attacker.attrReflexes / impacts[i].target.attrReflexes;
-            attrIncrease[ATTR_DEFENSE] += impacts[i].target.effDefense * enemyStrengthModifier * AIB_DEFENSE;
-            attrIncrease[ATTR_REFLEXES] += enemyReflexesModifier * impacts[i].target.effDefense * AIB_REFLEXES;
+            registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", "Miss!"));
+            if (impacts[i].attacker != hero) {
+                enemyReflexesModifier = impacts[i].target.attrReflexes / impacts[i].attacker.attrReflexes;
+                attrIncrease[ATTR_AGILITY] += enemyAgilityModifier * AIB_AGILITY;
+                attrIncrease[ATTR_REFLEXES] += enemyReflexesModifier * AIB_REFLEXES;
+            }
         }
     }
     impacts.length = 0;
@@ -708,6 +722,7 @@ function tick() {
     if (menuState == MS_NONE) {
         if (controlMode == CM_FIELD) {
             hero.restoreSp(SP_RECOVERY_BASIS);
+            hero.expendAp(AP_DIMINISHING_BASIS);
 
             switch (keyPressed) {
                 case KEY_UP:
@@ -719,7 +734,7 @@ function tick() {
             }
         } else if (controlMode == CM_BATTLE) {
             if ((hero.hp > 0) && (enemy.hp > 0)) {
-                hero.restoreSp(0.05 * getGlobalBattleGaugeShiftCoefficient());
+                hero.restoreSp(SP_RECOVERY_BASIS * getGlobalBattleGaugeShiftCoefficient());
 
                 hero.progressBattleGauge();
                 enemy.progressBattleGauge();
@@ -728,8 +743,10 @@ function tick() {
                 if (keyPressed == KEY_ACTION) {
                     if (keyCtrl) {
                         hero.useItem(itemChoice, 0);
-                    } else {
+                    } else if (skillChoice < 7) {
                         hero.useSkill(hero.skillSet[skillChoice], 0);
+                    } else {
+                        hero.useAuraSkill(hero.skillSet[skillChoice], 0);
                     }
                 }
                 battleFrame++;

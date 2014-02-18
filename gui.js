@@ -23,13 +23,20 @@ var MENU_SKILLS_AURA_X = 680;
 var MENU_SKILLS_ACTIVE_X = 1040;
 var MENU_SKILLS_COLUMN_WIDTH = 350;
 
+var AURA_ANIMATION_Y = 200;
+var AURA_ANIMATION_H = 300;
+
+var TEXT_COLOR_GOLD = "#f0f040";
+
 var GFX_HERO_SPGAUGE_FLASH = 0;             // GUI effect: flashing sp gauge
-var GFX_HERO_HPGAUGE_SHAKE = 1;             // GUI effect: shaking hero hp gauge
-var GFX_ENEMY_HPGAUGE_SHAKE = 2;            // GUI effect: shaking enemy hp gauge
-var GFX_HERO_BATTLEGAUGE_FLASH = 3;         // GUI effect: hero battle gauge border flash
-var GFX_HERO_BATTLEGAUGE_FLASH_FILL = 4;    // GUI effect: hero battle gauge fill flash
-var GFX_ENEMY_BATTLEGAUGE_FLASH = 5;        // GUI effect: enemy battle gauge border flash
-var GFX_ENEMY_BATTLEGAUGE_FLASH_FILL = 6;   // GUI effect: enemy battle gauge fill flash
+var GFX_HERO_APGAUGE_FLASH = 1;             // GUI effect: flashing sp gauge
+var GFX_HERO_HPGAUGE_TEXT = 2;              // GUI effect: floating text at hero hp gauge
+var GFX_ENEMY_HPGAUGE_TEXT = 3;             // GUI effect: floating text at enemy hp gauge
+var GFX_HERO_BATTLEGAUGE_FLASH = 4;         // GUI effect: hero battle gauge border flash
+var GFX_HERO_BATTLEGAUGE_FLASH_FILL = 5;    // GUI effect: hero battle gauge fill flash
+var GFX_ENEMY_BATTLEGAUGE_FLASH = 6;        // GUI effect: enemy battle gauge border flash
+var GFX_ENEMY_BATTLEGAUGE_FLASH_FILL = 7;   // GUI effect: enemy battle gauge fill flash
+var GFX_SCREEN_FLASH = 8;                   // GUI effect: screen flash
 
 var heroHpShake = 0;
 var enemyHpShake = 0;
@@ -217,6 +224,12 @@ function initializeGui() {
                 fc.fillStyle = "#FFFF11";
                 fc.fillRect(this.xPos + 59 + shakeXOffset, this.yPos + 32 + shakeYOffset, width, 14);
             }
+            if (hero.ap > 0) {
+                width = 231 * hero.ap;
+                fc.beginPath();
+                fc.fillStyle = ((hero.ap == 1) && (globalFrame % 10 > 4)) ? "#FFBBFF" : "#FFFFFF";
+                fc.fillRect(this.xPos + 59 + shakeXOffset, this.yPos + 48 + shakeYOffset, width, 14);
+            }
         }
     });
     registerObject(GUI_COMMON, hpSpGauge);
@@ -247,7 +260,7 @@ function initializeGui() {
             if (battleFrame > 0) {
                 fc.beginPath();
                 if (attribute > 1) {
-                    fc.fillStyle = "#f0f040";
+                    fc.fillStyle = TEXT_COLOR_GOLD;
                 } else if (attribute < 1) {
                     fc.fillStyle = "#f04040";
                 } else {
@@ -284,7 +297,7 @@ function initializeGui() {
         if (hero != null) {
             drawTextbox(this.xPos, this.yPos, 300, 45);
             fc.beginPath();
-            fc.fillStyle = "white";
+            fc.fillStyle = hero.karma >= 0 ? "white" : "red";
             fc.font = LARGE_FONT;
             fc.fillText(TXT_KARMA[lang], this.xPos + 15, this.yPos + 29);
             var displayValue = hero.karma.toString();
@@ -406,7 +419,7 @@ function initializeGui() {
 
             for (var i = 0; i < hero.skillSet.length; i++) {
                 if (hero.skillSet[i] != null) {
-                    writeLine(hero.skillSet[i].name[lang], i < 7 ? "white" : "#f0f040", i, 50);
+                    writeLine(hero.skillSet[i].name[lang], i < 7 ? "white" : TEXT_COLOR_GOLD, i, 50);
                 }
                 if (i == skillChoice) {
                     if (!keyCtrl) {
@@ -939,7 +952,7 @@ function procureDisplayMenuSkillsAction() {
             for (i = 0; i < hero.availableAuraSkills.length + 1; i++) {
                 lineCount++;
                 if (hero.availableAuraSkills[i] != null) {
-                    writeLine(gainSkill(hero.availableAuraSkills[i]).name[lang], "#f0f040", DEFAULT_FONT, lineCount,
+                    writeLine(gainSkill(hero.availableAuraSkills[i]).name[lang], TEXT_COLOR_GOLD, DEFAULT_FONT, lineCount,
                         MENU_SKILLS_AURA_X + 45);
                 }
                 if (i == objectChoice[1]) {
@@ -1018,11 +1031,11 @@ function procureDisplayMenuSkillsAction() {
             for (i = 0; i < 3; i++) {
                 lineCount++;
                 if (hero.activeAuraSkills[i] == null) {
-                    writeLine(((i + 8) % 10).toString() + ": --------", "#f0f040", DEFAULT_FONT, lineCount,
+                    writeLine(((i + 8) % 10).toString() + ": --------", TEXT_COLOR_GOLD, DEFAULT_FONT, lineCount,
                         MENU_SKILLS_ACTIVE_X + 45);
                 } else {
                     writeLine(((i + 8) % 10).toString() + ": " + gainSkill(hero.activeAuraSkills[i]).name[lang],
-                        "#f0f040", DEFAULT_FONT, lineCount, MENU_SKILLS_ACTIVE_X + 45);
+                        TEXT_COLOR_GOLD, DEFAULT_FONT, lineCount, MENU_SKILLS_ACTIVE_X + 45);
                 }
                 if (i + 7 == objectChoice[2]) {
                     if ((menuState == MS_SKILLS_BROWSE_3) || (menuState == MS_SKILLS_EXCHANGE_2)) {
@@ -1112,6 +1125,7 @@ function procureDisplayMenuItemsAction() {
                 }
             }
 
+            var currentItem;
             var itemInfo;
             var x;
             var i = getItemSetByMenuState(menuState);
@@ -1164,10 +1178,18 @@ function procureDisplayMenuItemsAction() {
             } else if (keyPressed == KEY_ACTION) {
                 switch (menuState) {
                     case MS_ITEMS_BROWSE_1:
-                        menuState = MS_ITEMS_EXCHANGE_1;
+                        if (keyCtrl) {
+                            hero.useItemInField(false, objectChoice[0]);
+                        } else {
+                            menuState = MS_ITEMS_EXCHANGE_1;
+                        }
                         break;
                     case MS_ITEMS_BROWSE_2:
-                        menuState = MS_ITEMS_EXCHANGE_2;
+                        if (keyCtrl) {
+                            hero.useItemInField(true, objectChoice[1]);
+                        } else {
+                            menuState = MS_ITEMS_EXCHANGE_2;
+                        }
                         break;
                     case MS_ITEMS_BROWSE_3:
                         // cannot change equipment at this time
@@ -1204,7 +1226,8 @@ function procureDisplayMenuItemsAction() {
             for (i = scrollOffset; (i < hero.availableItems.length + 1) && (i - scrollOffset < 13); i++) {
                 lineCount++;
                 if (hero.availableItems[i] != null) {
-                    writeLine(obtainItem(hero.availableItems[i].id).name[lang]
+                    currentItem = obtainItem(hero.availableItems[i].id);
+                    writeLine(currentItem.name[lang]
                         + (hero.availableItems[i].charges > 1 ?" x" + hero.availableItems[i].charges : ""),
                         "white", DEFAULT_FONT, lineCount, MENU_SKILLS_AVAILABLE_X + 45);
                 }
@@ -1216,12 +1239,14 @@ function procureDisplayMenuItemsAction() {
                             HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                         if (hero.availableItems[i] != null) {
                             itemInfo = [
-                                obtainItem(hero.availableItems[i].id).name[LANG_ENG]
-                                    + " <br> <br> " + obtainItem(hero.availableItems[i].id).description[LANG_ENG]
-                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.availableItems[i].charges,
-                                obtainItem(hero.availableItems[i].id).name[LANG_RUS]
-                                    + " <br> <br> " + obtainItem(hero.availableItems[i].id).description[LANG_RUS]
+                                currentItem.name[LANG_ENG] + " <br> <br> " + currentItem.description[LANG_ENG]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.availableItems[i].charges
+                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
+                                    ? " <br> <br> " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
+                                currentItem.name[LANG_RUS] + " <br> <br> " + currentItem.description[LANG_RUS]
                                     + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.availableItems[i].charges
+                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
+                                    ? " <br> <br> " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
                             ];
                             processInfoText(itemInfo);
                         }
@@ -1251,7 +1276,8 @@ function procureDisplayMenuItemsAction() {
                     writeLine((i + 1).toString() + ": --------", "white", DEFAULT_FONT, lineCount,
                         MENU_SKILLS_AURA_X + 45);
                 } else {
-                    writeLine((i + 1).toString() + ": " + obtainItem(hero.activeItems[i].id).name[lang]
+                    currentItem = obtainItem(hero.activeItems[i].id);
+                    writeLine((i + 1).toString() + ": " + currentItem.name[lang]
                         + (hero.activeItems[i].charges > 1 ?" x" + hero.activeItems[i].charges : ""),
                         "white", DEFAULT_FONT, lineCount, MENU_SKILLS_AURA_X + 45);
                 }
@@ -1263,12 +1289,14 @@ function procureDisplayMenuItemsAction() {
                             HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                         if (hero.activeItems[i] != null) {
                             itemInfo = [
-                                obtainItem(hero.activeItems[i].id).name[LANG_ENG]
-                                    + " <br> <br> " + obtainItem(hero.activeItems[i].id).description[LANG_ENG]
-                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.activeItems[i].charges,
-                                obtainItem(hero.activeItems[i].id).name[LANG_RUS]
-                                    + " <br> <br> " + obtainItem(hero.activeItems[i].id).description[LANG_RUS]
+                                currentItem.name[LANG_ENG] + " <br> <br> " + currentItem.description[LANG_ENG]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.activeItems[i].charges
+                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
+                                    ? " <br> <br> " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
+                                currentItem.name[LANG_RUS] + " <br> <br> " + currentItem.description[LANG_RUS]
                                     + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.activeItems[i].charges
+                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
+                                    ? " <br> <br> " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
                             ];
                             processInfoText(itemInfo);
                         }
