@@ -328,6 +328,8 @@ function Hero() {
         this.effDefense = 1;
         this.effAgility = 1;
         this.effReflexes = 1;
+        this.effEvasion = 1;
+        this.effReflect = 1;
         for (var i = 0; i < this.battleGaugeArtifacts.length; i++) {
             if (!(typeof this.battleGaugeArtifacts[i] === "undefined")) {
                 if (this.battleGaugeArtifacts[i].getEffect(this.battleGaugeArtifacts[i].position, this)) {
@@ -479,17 +481,24 @@ function Hero() {
         }
     };
 
-    this.strike = function (power, evadable, apGain) {
-        registerImpact(hero, enemy, power, evadable, apGain);
+    this.strike = function (power, evadable, apGain, inflictData) {
+        registerImpact(hero, enemy, power, evadable, apGain, inflictData);
         registerObject(GUI_COMMON,
             procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH_FILL, "#FF4040", null));
         this.setAnimationState(AN_ATTACK);
     };
 
+    this.inflict = function (artifactData) {
+        for (var i = 0; i < artifactData.length; i++) {
+            this.battleGaugeArtifacts.push(artifactData[i]);
+        }
+        registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH_FILL, "#FF0000", null));
+    };
+
     this.expendHp = function (hp) {
         if (Math.floor(hp) > 0) {
             heroHpShake = 20;
-            registerObject(GUI_COMMON, procureHpGaugeTextAction(this, "red", Math.floor(hp)));
+            registerObject(GUI_COMMON, procureHpGaugeTextAction(this, "red", Math.floor(hp).toString()));
         }
         this.hp -= hp;
         if (this.hp < 0) {
@@ -722,6 +731,8 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
         this.effDefense = 1;
         this.effAgility = 1;
         this.effReflexes = 1;
+        this.effEvasion = 1;
+        this.effReflect = 1;
         for (var i = 0; i < this.battleGaugeArtifacts.length; i++) {
             if (!(typeof this.battleGaugeArtifacts[i] === "undefined")) {
                 if (this.battleGaugeArtifacts[i].getEffect(this.battleGaugeArtifacts[i].position, this)) {
@@ -762,16 +773,23 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
         }
     };
 
-    this.strike = function (power, evadable, apGain) {
-        registerImpact(enemy, hero, power, evadable, apGain);
+    this.strike = function (power, evadable, apGain, inflictData) {
+        registerImpact(enemy, hero, power, evadable, apGain, inflictData);
         registerObject(GUI_COMMON, procureGuiEffectAction(GFX_ENEMY_BATTLEGAUGE_FLASH_FILL, "#FF4040", null));
         this.animationObject.setAnimationState(AN_ATTACK);
+    };
+
+    this.inflict = function (artifactData) {
+        for (var i = 0; i < artifactData.length; i++) {
+            this.battleGaugeArtifacts.push(artifactData[i]);
+        }
+        registerObject(GUI_COMMON, procureGuiEffectAction(GFX_ENEMY_BATTLEGAUGE_FLASH_FILL, "#FF0000", null));
     };
 
     this.expendHp = function (hp) {
         if (Math.floor(hp) > 0) {
             enemyHpShake = 20;
-            registerObject(GUI_COMMON, procureHpGaugeTextAction(this, "red", Math.floor(hp)));
+            registerObject(GUI_COMMON, procureHpGaugeTextAction(this, "red", Math.floor(hp).toString()));
         }
         this.hp -= hp;
         if (this.hp < 0) {
@@ -885,6 +903,7 @@ function BattleGaugeArtifact(position, leftCooldown, rightCooldown) {
     this.position = position;
     this.leftCooldown = leftCooldown;
     this.rightCooldown = rightCooldown;
+    this.fluctuation = 0;
 
     /*
      * specify BGA effect by defining the getEffect method

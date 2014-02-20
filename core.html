@@ -79,6 +79,8 @@
             <img id="imgEnemyBandit1Attack" src="resources/enemies/bandit1attack.png">
             <img id="imgEnemyWolf1Stand" src="resources/enemies/wolf1.png">
             <img id="imgEnemyWolf1Attack" src="resources/enemies/wolf1attack.png">
+            <img id="imgEnemyWasp1Stand" src="resources/enemies/wasp1.png">
+            <img id="imgEnemyWasp1Attack" src="resources/enemies/wasp1attack.png">
         </td>
         <td style="display: none;">
             <span id="txtIntro1Eng">
@@ -152,6 +154,7 @@
 <script src="object.js"></script>
 <script src="gui.js"></script>
 <script src="common.js"></script>
+<script src="combat.js"></script>
 <script src="chapter00.js"></script>
 <script type="text/javascript">
 
@@ -239,6 +242,10 @@
     var TXT_COMMON_ENCOUNTER_CHOICE_FIGHT = ["Fight", "Сражаться"];
     var TXT_COMMON_ENCOUNTER_CHOICE_AVOID = ["Avoid fighting", "Избежать боя"];
     var TXT_COMMON_ENCOUNTER_3 = ["Dominique got by without fighting, but lost ", "Доминик избежал боя, но потерял "];
+
+    var TXT_MISS = ["Miss!", "Промах!"];
+    var TXT_RESISTED = ["Resisted!", "Отражено!"];
+    var TXT_INFLICTED = ["Status inflicted: ", "Наложен статус: "];
 
     var TXT_HOTKEY = [" (Hotkey: '", " (Клавиша: '"];
     var TXT_NOCHOSENITEM = ["No item selected", "Предмет не выбран"];

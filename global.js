@@ -80,6 +80,13 @@ var AN_NONE = 7;
 
 var globalFrame = 0;    // global frame counter up to 100 for technical purposes
 
+var reboundFrame = 0;       // karmic rebound frame counter
+var reboundTargetFrame = 0; // karmic rebound current target frame
+
+// karmic rebound period bounds
+var KARMIC_REBOUND_PERIOD_LOW = 100;
+var KARMIC_REBOUND_PERIOD_RANGE = 300;
+
 // characters
 var hero = null;
 var enemy = null;
@@ -461,13 +468,16 @@ function decorateReaches(path, layerOffset, density, scaleModifier, offset, imag
     }
 }
 
-function registerImpact(attacker, target, attackPower, evadable, apGain) {
+function registerImpact(attacker, target, attackPower, evadable, apGain, inflictData) {
     impacts.push({
         attacker: attacker,
         target: target,
         attackPower: attackPower,
         evadable: evadable === undefined ? true : evadable,
-        apGain: apGain === undefined ? true : apGain
+        apGain: apGain === undefined ? true : apGain,
+        defenseThreshold: inflictData === undefined ? null : inflictData.defenseThreshold,
+        statusArtifacts: inflictData === undefined ? null : inflictData.statusArtifacts,
+        statusName: inflictData === undefined ? null : inflictData.statusName
     });
 }
 
@@ -569,32 +579,55 @@ function deliverImpacts() {
         var enemyStrengthModifier;
         var enemyAgilityModifier = enemy.attrAgility / hero.attrAgility;
         var enemyReflexesModifier;
-        if (Math.random() < impacts[i].target.effEvasion) {
-            /*
-             * DAMAGE FORMULA:
-             * DMG = ATTACKER_BASE_ATK * (1 + (ATTACKER_BASE_ATK * ATTACKER_EFF_ATK - TARGET_BASE_DEF * TARGET_EFF_DEF)
-             *      / (80~120)) * (ATTACK_POWER / TARGET_EFF_DEF) * (0.9~1.1)
-             *
-             * Attacker's base attack serves as the damage basis, attack power and target's effective defense serve as
-             * direct multiplier and divisor. Average mu than target's defense (taking into account effective values)
-             * the damage is roughly doubled than if those attributes were equal. If target's defense is 100+ points
-             * ahead, effective modifiers included, chances are the attack will deal no damage.
-             */
-            var dmg = impacts[i].attacker.attrAttack
-                * (1 + (impacts[i].attacker.attrAttack * impacts[i].attacker.effAttack
-                - impacts[i].target.attrDefense * impacts[i].target.effDefense) / (80 + 40 * Math.random()))
-                * (impacts[i].attackPower / impacts[i].target.effDefense) * (0.9 + 0.2 * Math.random());
-            if (Math.floor(dmg) <= 0) {
-                registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", "0"));
-            } else {
-                impacts[i].target.expendHp(dmg);
+        if (!impacts[i].evadable || (Math.random() < impacts[i].target.effEvasion)) { /* EVASION */
+
+            if (impacts[i].attackPower > 0) {
+                /*
+                 * DAMAGE FORMULA:
+                 * DMG = ATTACKER_BASE_ATK
+                 *      * (1 + (ATTACKER_BASE_ATK * ATTACKER_EFF_ATK - TARGET_BASE_DEF * TARGET_EFF_DEF) / (80~120))
+                 *      * (ATTACK_POWER / TARGET_EFF_DEF) * (0.9~1.1)
+                 *
+                 * Attacker's base attack serves as the damage basis, attack power and target's effective defense
+                 * serve as direct multiplier and divisor. Average multiplier difference is 100, thus, if attacker's
+                 * attack is ~100 more than target's defense (taking into account effective values) the damage is
+                 * roughly doubled than if those attributes were equal. If target's defense is 100+ points ahead,
+                 * effective modifiers included, chances are the attack will deal no damage.
+                 */
+                var dmg = impacts[i].attacker.attrAttack
+                    * (1 + (impacts[i].attacker.attrAttack * impacts[i].attacker.effAttack
+                    - impacts[i].target.attrDefense * impacts[i].target.effDefense) / (80 + 40 * Math.random()))
+                    * (impacts[i].attackPower / impacts[i].target.effDefense) * (0.9 + 0.2 * Math.random());
+                if (Math.floor(dmg) <= 0) {
+                    registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", "0"));
+                } else {
+                    impacts[i].target.expendHp(dmg);
+                }
+
+                /* REFLECT */
+                if (impacts[i].target.effReflect < 1) {
+                    impacts[i].attacker.expendHp(dmg * (1 - impacts[i].target.effReflect));
+                }
+
+                /* AURA POINTS GAIN */
+                if ((impacts[i].apGain)
+                    && ((hero.skillSet[7] != null) || (hero.skillSet[8] != null) || (hero.skillSet[9] != null))) {
+                    var apGain = (impacts[i].target == hero) ? dmg / hero.attrMaxHp : dmg / (hero.attrMaxHp * 2);
+                    hero.restoreAp(apGain * AP_GAIN_FACTOR);
+                }
+
             }
 
-            /* AURA POINTS GAIN */
-            if ((impacts[i].apGain)
-                && ((hero.skillSet[7] != null) || (hero.skillSet[8] != null) || (hero.skillSet[9] != null))) {
-                var apGain = (impacts[i].target == hero) ? dmg / hero.attrMaxHp : dmg / (hero.attrMaxHp * 2);
-                hero.restoreAp(apGain * AP_GAIN_FACTOR);
+            /* STATUS EFFECTS */
+            if ((impacts[i].defenseThreshold != null) && (impacts[i].statusArtifacts != null)) {
+                if (impacts[i].target.effDefense > impacts[i].defenseThreshold) {
+                    registerObject(GUI_COMMON, procureStatusTextAction(impacts[i].attacker, "white", TXT_RESISTED));
+                } else {
+                    impacts[i].target.inflict(impacts[i].statusArtifacts);
+                    registerObject(GUI_COMMON, procureStatusTextAction(impacts[i].attacker, "white",
+                        [TXT_INFLICTED[LANG_ENG] + impacts[i].statusName[LANG_ENG],
+                            TXT_INFLICTED[LANG_RUS] + impacts[i].statusName[LANG_RUS]]));
+                }
             }
 
             registerObject(pathToObjectFrontLayer(impacts[i].target.path),
@@ -625,7 +658,7 @@ function deliverImpacts() {
                 attrIncrease[ATTR_REFLEXES] += enemyReflexesModifier * impacts[i].target.effDefense * AIB_REFLEXES;
             }
         } else {
-            registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", "Miss!"));
+            registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", TXT_MISS));
             if (impacts[i].attacker != hero) {
                 enemyReflexesModifier = impacts[i].target.attrReflexes / impacts[i].attacker.attrReflexes;
                 attrIncrease[ATTR_AGILITY] += enemyAgilityModifier * AIB_AGILITY;
@@ -634,6 +667,17 @@ function deliverImpacts() {
         }
     }
     impacts.length = 0;
+}
+
+function performKarmaRebound() {
+    var karmaRebounded = Math.floor(Math.abs(hero.karma) * 0.1 + Math.random() * 10);
+    hero.addKarma(karmaRebounded);
+    if (karmaRebounded <= 10) {
+        hero.expendHp(karmaRebounded * 2);
+    } else if (karmaRebounded <= 100) {
+        hero.expendHp(15);
+        hero.expendSp(30);
+    }
 }
 
 function tick() {
@@ -723,6 +767,22 @@ function tick() {
         if (controlMode == CM_FIELD) {
             hero.restoreSp(SP_RECOVERY_BASIS);
             hero.expendAp(AP_DIMINISHING_BASIS);
+            if (hero.karma < 0) {
+                if (reboundTargetFrame == 0) {
+                    reboundTargetFrame = KARMIC_REBOUND_PERIOD_LOW + Math.random() * (KARMIC_REBOUND_PERIOD_RANGE);
+                }
+                reboundFrame++;
+                if (reboundFrame > reboundTargetFrame) {
+                    performKarmaRebound();
+                    if (hero.karma < 0) {
+                        reboundFrame = 0;
+                        reboundTargetFrame = KARMIC_REBOUND_PERIOD_LOW + Math.random() * (KARMIC_REBOUND_PERIOD_RANGE);
+                    }
+                }
+            } else {
+                reboundFrame = 0;
+                reboundTargetFrame = 0;
+            }
 
             switch (keyPressed) {
                 case KEY_UP:

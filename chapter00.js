@@ -117,6 +117,7 @@ function createPrologueLandscape() {
     prologueLandscape.addObjectType(describeInnType());
     prologueLandscape.addObjectType(describeBanditType());
     prologueLandscape.addObjectType(describeWolfType());
+    prologueLandscape.addObjectType(describeWaspType());
     return prologueLandscape;
 }
 
@@ -309,6 +310,12 @@ function describeWolfType() {
         enlistWolf, 22500, 140000);
 }
 
+function describeWaspType() {
+    return describeCommonEncounter(0.1, ["Wasp", "Оса"],
+        getImageResource("imgEnemyWasp1Stand"), getImageResource("imgEnemyWasp1Attack"),
+        enlistWasp, 22500, 140000);
+}
+
 /* ENEMIES */
 
 function enlistBandit(startingHeroStrength, maxHeroStrength, animationObject) {
@@ -371,4 +378,44 @@ function enlistWolf(startingHeroStrength, maxHeroStrength, animationObject) {
         }
     });
     return wolf;
+}
+
+function enlistWasp(startingHeroStrength, maxHeroStrength, animationObject) {
+    var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
+    var wasp = new Enemy(7 * strScale, 14 * strScale, 12 * strScale, 10 * strScale, 90 * strScale, animationObject);
+    var attackSkill = gainAttackSkill();
+    var defendSkill = gainDefendSkill();
+    var poisonStingSkill = gainPoisonStingSkill(40, 0.3);
+    var thornsSkill = gainThornsSkill(1000, 0.1);
+    wasp.defineBehave(function (character, battleFrame) {
+        if (battleFrame == 0) {
+            character.useSkill(gainOpenerSkill(100), 0);
+            behaviorFluctuation = 1;
+        } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
+            if (behaviorFluctuation == 1) {
+                character.useSkill(attackSkill, character.getRightmostCooldown() + attackSkill.getLeftCooldown()
+                    + 30 +  Math.floor(60 * Math.random()) - getAbsoluteArtifactPosition(0));
+                behaviorFluctuation += 1 + Math.floor(Math.random() * 2);
+            } else if (behaviorFluctuation == 2) {
+                character.useSkill(defendSkill, character.getRightmostCooldown() + defendSkill.getLeftCooldown()
+                    + 30 + Math.floor(30 * Math.random()) - getAbsoluteArtifactPosition(0));
+                behaviorFluctuation += 1;
+            } else if (behaviorFluctuation == 3) {
+                character.useSkill(defendSkill, character.getRightmostCooldown() + defendSkill.getLeftCooldown()
+                    + 30 + Math.floor(50 * Math.random()) - getAbsoluteArtifactPosition(0));
+                behaviorFluctuation += 1;
+            } else if (behaviorFluctuation == 4) {
+                character.useSkill(poisonStingSkill, character.getRightmostCooldown()
+                    + poisonStingSkill.getLeftCooldown() + 30 + Math.floor(50 * Math.random())
+                    - getAbsoluteArtifactPosition(0));
+                behaviorFluctuation += 1;
+            } else if (behaviorFluctuation >= 5) {
+                character.useSkill(thornsSkill, character.getRightmostCooldown()
+                    + thornsSkill.getLeftCooldown() + 500 + Math.floor(50 * Math.random())
+                    - getAbsoluteArtifactPosition(0));
+                behaviorFluctuation = 1;
+            }
+        }
+    });
+    return wasp;
 }
