@@ -586,7 +586,7 @@ function deliverImpacts() {
                  * DAMAGE FORMULA:
                  * DMG = ATTACKER_BASE_ATK
                  *      * (1 + (ATTACKER_BASE_ATK * ATTACKER_EFF_ATK - TARGET_BASE_DEF * TARGET_EFF_DEF) / (80~120))
-                 *      * (ATTACK_POWER / TARGET_EFF_DEF) * (0.9~1.1)
+                 *      * (ATTACK_POWER * ATTACKER_EFF_ATK / TARGET_EFF_DEF) * (0.9~1.1)
                  *
                  * Attacker's base attack serves as the damage basis, attack power and target's effective defense
                  * serve as direct multiplier and divisor. Average multiplier difference is 100, thus, if attacker's
@@ -597,7 +597,8 @@ function deliverImpacts() {
                 var dmg = impacts[i].attacker.attrAttack
                     * (1 + (impacts[i].attacker.attrAttack * impacts[i].attacker.effAttack
                     - impacts[i].target.attrDefense * impacts[i].target.effDefense) / (80 + 40 * Math.random()))
-                    * (impacts[i].attackPower / impacts[i].target.effDefense) * (0.9 + 0.2 * Math.random());
+                    * (impacts[i].attackPower * impacts[i].attacker.effAttack / impacts[i].target.effDefense)
+                    *  (0.9 + 0.2 * Math.random());
                 if (Math.floor(dmg) <= 0) {
                     registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", "0"));
                 } else {
@@ -672,12 +673,58 @@ function deliverImpacts() {
 function performKarmaRebound() {
     var karmaRebounded = Math.floor(Math.abs(hero.karma) * 0.1 + Math.random() * 10);
     hero.addKarma(karmaRebounded);
+    var reboundType;
+    var statusEffect = null;
+    var reboundText;
     if (karmaRebounded <= 10) {
-        hero.expendHp(karmaRebounded * 2);
-    } else if (karmaRebounded <= 100) {
-        hero.expendHp(15);
-        hero.expendSp(30);
+        reboundType = Math.floor(4 * Math.random());
+        if (reboundType == 0) {
+            hero.expendHp(karmaRebounded * 2);
+            reboundText = [
+                TXT_KARMA_REBOUND[LANG_ENG] + TXT_KARMA_REBOUND_1[LANG_ENG],
+                TXT_KARMA_REBOUND[LANG_RUS] + TXT_KARMA_REBOUND_1[LANG_RUS]
+            ];
+        } else if (reboundType == 1) {
+            hero.expendSp(karmaRebounded * 2);
+            reboundText = [
+                TXT_KARMA_REBOUND[LANG_ENG] + TXT_KARMA_REBOUND_2[LANG_ENG] + TXT_KARMA_REBOUND_3[LANG_ENG],
+                TXT_KARMA_REBOUND[LANG_RUS] + TXT_KARMA_REBOUND_2[LANG_RUS] + TXT_KARMA_REBOUND_3[LANG_RUS]
+            ];
+        }
+
+    } else if (karmaRebounded <= 50) {
+        reboundType = Math.floor(4 * Math.random());
+        if (reboundType == 0) {
+            statusEffect = acquireWeakStatus(0, 200 * karmaRebounded, 0.7);
+        } else if (reboundType == 1) {
+            statusEffect = acquireFrailStatus(0, 200 * karmaRebounded, 0.7);
+        } else if (reboundType == 2) {
+            statusEffect = acquireNumbStatus(0, 200 * karmaRebounded, 0.7);
+        } else if (reboundType == 3) {
+            statusEffect = acquireCloudedStatus(0, 200 * karmaRebounded, 0.7);
+        }
+        reboundText = [
+            TXT_KARMA_REBOUND[LANG_ENG] + TXT_KARMA_REBOUND_4[LANG_ENG] + statusEffect.statusName[LANG_ENG] + ".",
+            TXT_KARMA_REBOUND[LANG_RUS] + TXT_KARMA_REBOUND_4[LANG_RUS] + statusEffect.statusName[LANG_RUS] + "."
+        ];
+    } else if (karmaRebounded > 50) {
+        reboundType = Math.floor(2 * Math.random());
+        if (reboundType == 0) {
+            statusEffect = acquirePoisonedStatus(0, 70 * karmaRebounded, karmaRebounded);
+        } else if (reboundType == 1) {
+            statusEffect = acquireExhaustedStatus(0, 70 * karmaRebounded, karmaRebounded);
+        }
+        reboundText = [
+            TXT_KARMA_REBOUND[LANG_ENG] + TXT_KARMA_REBOUND_2[LANG_ENG]
+                + statusEffect.statusName[LANG_ENG].toLowerCase() + ".",
+            TXT_KARMA_REBOUND[LANG_ENG] + TXT_KARMA_REBOUND_2[LANG_RUS]
+                + statusEffect.statusName[LANG_RUS].toLowerCase() + "."
+        ];
     }
+    if (statusEffect != null) {
+        hero.inflict(statusEffect.statusArtifacts);
+    }
+    registerObject(GUI_COMMON, procureHeroTextAction("white", reboundText));
 }
 
 function tick() {

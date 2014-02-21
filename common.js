@@ -307,10 +307,10 @@ function procureDisplayCenteredMessageAction(width, text, displayCursor) {
         (W - width) / 2, H / 2 - 100, width, 50 + DEFAULT_LINE_HEIGHT * lineCount, text, displayCursor);
 }
 
-function procureFloatingTextAction(originX, originY, font, color, text) {
+function procureFloatingTextAction(originX, originY, font, color, text, duration) {
     var floatingTextAction = new Action();
     floatingTextAction.definePlayFrame(function (frame) {
-        if ((frame < 50) && (text != null)) {
+        if ((frame < ((duration === undefined) ? 50 : duration)) && (text != null)) {
             fc.beginPath();
             fc.textAlign = "center";
             fc.fillStyle = color;
@@ -324,6 +324,10 @@ function procureFloatingTextAction(originX, originY, font, color, text) {
         }
     });
     return floatingTextAction;
+}
+
+function procureHeroTextAction(color, text) {
+    return procureFloatingTextAction(hero.position + 200, hero.height, LARGE_FONT, color, text, 150);
 }
 
 function procureHpGaugeTextAction(character, color, text) {

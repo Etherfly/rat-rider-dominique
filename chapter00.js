@@ -42,6 +42,19 @@ var CH00_CHRONICLER_03 = [
     "Летописец успешно записывает историю Доминика."
 ];
 
+var CH00_CHRONICLER_04 = [
+    "Chronicler tries to write down Dominique's story, but the quill falls out of his hands and the ink gets spilt "
+        + "on the floor. ",
+    "Летописец пытается записать историю Доминика, но перо выпадает у него из рук, а чернила проливаются на пол. "
+];
+
+var CH00_CHRONICLER_05 = [
+    " takes this as a bad omen and refuses to serve Dominique. It seems some greater force doesn't want "
+        + "his story to live on.",
+    " принимает это за недобрый знак и отказывается обслуживать Доминика. Похоже, какая-то высшая сила не хочет, "
+        + "чтобы история Доминика жила."
+];
+
 var CH00_INN_01 = [
     "A bustling inn appears along the way. Enticing smells and flavors catch Dominique's attention and his mouth "
         + "waters at the thought of having a grand feast. <br> <br> Wild dreams aside, having a meal and resting "
@@ -171,9 +184,20 @@ function describeChroniclersPavilionType() {
             pavilionSequence.addAction(procureCodeFragmentAction(function () {
                 var pavillionSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
-                    pavillionSequenceAnswered.addAction(
-                        procureDisplayCenteredMessageAction(WW_SMALL, CH00_CHRONICLER_03, true));
-                    pavillionSequenceAnswered.addAction(procureCodeFragmentAction(saveGame));
+                    if (hero.karma >= 0) {
+                        pavillionSequenceAnswered.addAction(
+                            procureDisplayCenteredMessageAction(WW_SMALL, CH00_CHRONICLER_03, true));
+                        pavillionSequenceAnswered.addAction(procureCodeFragmentAction(saveGame));
+                    } else {
+                        chroniclersMessage = [
+                            CH00_CHRONICLER_04[LANG_ENG] + chroniclersNames[LANG_ENG][nameId]
+                                + CH00_CHRONICLER_05[LANG_ENG],
+                            CH00_CHRONICLER_04[LANG_RUS] + chroniclersNames[LANG_RUS][nameId]
+                                + CH00_CHRONICLER_05[LANG_RUS]
+                        ];
+                        pavillionSequenceAnswered.addAction(
+                            procureDisplayCenteredMessageAction(WW_SMALL, chroniclersMessage, true));
+                    }
                 } else {
                     pavillionSequenceAnswered.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));

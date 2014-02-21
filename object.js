@@ -287,7 +287,8 @@ function Hero() {
     this.animationFrame = 0;
 
     // TODO: temporary filled skills and items!
-    this.availableSkills = [SKL_JAB, SKL_CHARGE, SKL_COUNTERATTACK, SKL_GUARDEDSTRIKE, SKL_RATRIDERDANCE];
+    this.availableSkills = [SKL_JAB, SKL_CHARGE, SKL_COUNTERATTACK, SKL_GUARDEDSTRIKE, SKL_RATRIDERDANCE,
+        SKL_DEEPBREATH, SKL_EVADE, SKL_NETCAST, SKL_DOUBLESTRIKE];
     this.availableAuraSkills = [SKL_ACEOFSPADES];
     this.activeSkills = [SKL_ATTACK, SKL_DEFEND];
     this.activeAuraSkills = [];
