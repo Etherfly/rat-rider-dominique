@@ -21,6 +21,11 @@ var BGL_HEIGHT = 30;
 
 var BGL_COLOR = "#C8FFFF";
 
+var DEFAULT_SAVE_KEY = "rrdSavedGame";
+
+var debugMode = false;
+var lagFactor = 0;       // stores the time of last full manifestation
+
 var CM_EVENT = 0;    // Control mode: event
 var CM_FIELD = 1;   // Control mode: field
 var CM_BATTLE = 2;  // Control mode: battle
@@ -63,6 +68,7 @@ var KEY_DOWN = 4;
 var KEY_ACTION = 5;
 var KEY_ESC = 6;
 var KEY_LANG = 7;
+var KEY_DEBUG = 8;
 var KEY_DIGIT_0 = 10;
 
 var keyPressed = KEY_NONE;
@@ -130,6 +136,7 @@ var AIB_REFLEXES = 0.03;
 
 // objects
 var landscape = null;
+var landscapeId = 0;
 
 var objectsOnLayer = [0, 0, 0]; // number of objects on layer
 var farthestObjects = [];       // farthest object position on layer
@@ -228,6 +235,11 @@ function initializeChapterData(chapterId) {
     }
 }
 
+function loadLandscape(id) {
+    landscapeId = id;
+    landscape = createLandscape(landscapeId);
+}
+
 function resetGame() {
     layers.length = 23;
     for (var i = 0; i < layers.length; i++) {
@@ -241,23 +253,85 @@ function resetGame() {
     }
     setControlMode(CM_EVENT);
     initializeGui();
-    landscape = createTitleLandscape();
+    loadLandscape(0);
     landscape.resetTerrain();
     moving = true;
     registerObject(GUI_EVENT, landscape);
 }
 
 function saveGame() {
-    // TODO: localStorage game saving
+    var save = {
+        heroAttrAttack: hero.attrAttack,
+        heroAttrDefense: hero.attrDefense,
+        heroAttrAgility: hero.attrAgility,
+        heroAttrReflexes: hero.attrReflexes,
+        heroAttrMaxHp: hero.attrMaxHp,
+        heroAttrMaxSp: hero.attrMaxSp,
+        heroHp: hero.hp,
+        heroSp: hero.sp,
+        heroAp: hero.ap,
+        heroAvailableSkills: hero.availableSkills,
+        heroAvailableAuraSkills: hero.availableAuraSkills,
+        heroActiveSkills: hero.activeSkills,
+        heroActiveAuraSkills: hero.activeAuraSkills,
+        heroAvailableItems: hero.availableItems,
+        heroActiveItems: hero.activeItems,
+        heroKarma: hero.karma,
+
+        gameState: gst,
+        landscape: landscapeId
+    };
+    localStorage.setItem(DEFAULT_SAVE_KEY, JSON.stringify(save));
 }
 
 function loadGame() {
     resetGame();
-    var loadGameSequence = new Sequence();
-    loadGameSequence.addAction(procureDisplayCenteredMessageAction(400,
-        "Sincerest apologies, but this feature is not implemented yet.", true));
-    loadGameSequence.addAction(procureTitleSequence());
-    registerObject(GUI_EVENT, loadGameSequence);
+    var loadedData = localStorage.getItem(DEFAULT_SAVE_KEY);
+    if (loadedData == null) {
+        var noSavedGameSequence = new Sequence();
+        noSavedGameSequence.addAction(procureDisplayCenteredMessageAction(400, TXT_LOAD_GAME_NO_DATA, true));
+        noSavedGameSequence.addAction(procureTitleSequence());
+        registerObject(GUI_EVENT, noSavedGameSequence);
+    } else {
+
+        var save = JSON.parse(loadedData);
+        hero = new Hero();
+        hero.attrAttack = save.heroAttrAttack;
+        hero.attrDefense = save.heroAttrDefense;
+        hero.attrAgility = save.heroAttrAgility;
+        hero.attrReflexes = save.heroAttrReflexes;
+        hero.attrMaxHp = save.heroAttrMaxHp;
+        hero.attrMaxSp = save.heroAttrMaxSp;
+        hero.hp = save.heroHp;
+        hero.sp = save.heroSp;
+        hero.ap = save.heroAp;
+        hero.availableSkills = save.heroAvailableSkills != null ? save.heroAvailableSkills : [];
+        hero.availableAuraSkills = save.heroAvailableAuraSkills != null ? save.heroAvailableAuraSkills : [];
+        hero.activeSkills = save.heroActiveSkills != null ? save.heroActiveSkills : [];
+        hero.activeAuraSkills = save.heroActiveAuraSkills != null ? save.heroActiveAuraSkills : [];
+        hero.availableItems = save.heroAvailableItems != null ? save.heroAvailableItems : [];
+        hero.activeItems = save.heroActiveItems != null ? save.heroActiveItems : [];
+        hero.karma = save.heroKarma;
+        registerObject(OBJECTS_MID, hero);
+
+        gst = save.gameState;
+
+        blackMask = true;
+        loadLandscape(save.landscape);
+
+        var loadGameSequence = new Sequence();
+        loadGameSequence.addAction(procureCodeFragmentAction(function () {
+            landscape.resetTerrain();
+            registerObject(GUI_EVENT, landscape);
+            setControlMode(CM_FIELD);
+        }));
+        loadGameSequence.addAction(procureResumeAction());
+        loadGameSequence.addAction(procureUnmaskAction());
+        loadGameSequence.addAction(procureCodeFragmentAction(function () {
+            displayGui = true;
+        }));
+        registerObject(GUI_EVENT, loadGameSequence);
+    }
 }
 
 function setControlMode(newControlMode) {
@@ -291,6 +365,9 @@ document.onkeydown = function (event) {
             break;
         case 192:
             keyPressed = KEY_LANG;
+            break;
+        case 220:
+            keyPressed = KEY_DEBUG;
             break;
         default:
             if (event.keyCode >= 48 && event.keyCode <= 57) {
@@ -695,13 +772,13 @@ function performKarmaRebound() {
     } else if (karmaRebounded <= 50) {
         reboundType = Math.floor(4 * Math.random());
         if (reboundType == 0) {
-            statusEffect = acquireWeakStatus(0, 200 * karmaRebounded, 0.7);
+            statusEffect = acquireWeakStatus(0, 400 * karmaRebounded, 0.7);
         } else if (reboundType == 1) {
-            statusEffect = acquireFrailStatus(0, 200 * karmaRebounded, 0.7);
+            statusEffect = acquireFrailStatus(0, 400 * karmaRebounded, 0.7);
         } else if (reboundType == 2) {
-            statusEffect = acquireNumbStatus(0, 200 * karmaRebounded, 0.7);
+            statusEffect = acquireNumbStatus(0, 400 * karmaRebounded, 0.7);
         } else if (reboundType == 3) {
-            statusEffect = acquireCloudedStatus(0, 200 * karmaRebounded, 0.7);
+            statusEffect = acquireCloudedStatus(0, 400 * karmaRebounded, 0.7);
         }
         reboundText = [
             TXT_KARMA_REBOUND[LANG_ENG] + TXT_KARMA_REBOUND_4[LANG_ENG] + statusEffect.statusName[LANG_ENG] + ".",
@@ -710,9 +787,9 @@ function performKarmaRebound() {
     } else if (karmaRebounded > 50) {
         reboundType = Math.floor(2 * Math.random());
         if (reboundType == 0) {
-            statusEffect = acquirePoisonedStatus(0, 70 * karmaRebounded, karmaRebounded);
+            statusEffect = acquirePoisonedStatus(0, 70 * karmaRebounded, karmaRebounded * 2);
         } else if (reboundType == 1) {
-            statusEffect = acquireExhaustedStatus(0, 70 * karmaRebounded, karmaRebounded);
+            statusEffect = acquireExhaustedStatus(0, 70 * karmaRebounded, karmaRebounded * 2);
         }
         reboundText = [
             TXT_KARMA_REBOUND[LANG_ENG] + TXT_KARMA_REBOUND_2[LANG_ENG]
@@ -728,9 +805,15 @@ function performKarmaRebound() {
 }
 
 function tick() {
-    window.setTimeout(tick, 20);
+    if (keyPressed == KEY_DEBUG) {
+        debugMode = !debugMode;
+    }
+
+    if (!debugMode) { window.setTimeout(tick, 20); }
 
     fc.clearRect(0, 0, W, H);
+
+    var timerNick = Date.now();
 
     if (keyPressed == KEY_LANG) {
         lang++;
@@ -870,5 +953,10 @@ function tick() {
 
     keyPressed = KEY_NONE;
 
-    //window.setTimeout(tick, 20);
+    lagFactor = (Date.now() - timerNick) / 20;
+    if (lagFactor > 1) {
+        console.log("Lagging with lag factor of " + lagFactor + "!");
+    }
+
+    if (debugMode) { window.setTimeout(tick, 20); }
 }

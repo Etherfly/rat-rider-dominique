@@ -60,6 +60,17 @@
             <img id="imgHeroDefend" src="resources/hero/defend.png">
 
             <img id="imgItemOintment1" src="resources/items/ointment1.png">
+            <img id="imgItemPotion1" src="resources/items/potion1.png">
+            <img id="imgItemPowder1" src="resources/items/powder1.png">
+            <img id="imgItemPowder2" src="resources/items/powder2.png">
+            <img id="imgItemPlant1" src="resources/items/plant1.png">
+            <img id="imgItemPlant2" src="resources/items/plant2.png">
+            <img id="imgItemDagger1" src="resources/items/dagger1.png">
+            <img id="imgItemShield1" src="resources/items/shield1.png">
+            <img id="imgItemTalisman1" src="resources/items/talisman1.png">
+            <img id="imgItemCube1" src="resources/items/cube1.png">
+            <img id="imgItemCube2" src="resources/items/cube2.png">
+            <img id="imgItemCube3" src="resources/items/cube3.png">
 
             <img id="imgEffectHit1-1" src="resources/effects/hit1-1.png">
             <img id="imgEffectHit1-2" src="resources/effects/hit1-2.png">
@@ -170,6 +181,9 @@
     var TXT_ENDLESS_MODE = ["Endless mode", "Бесконечный режим"];
     var TXT_RETURN_TO_TITLE = ["Return to title", "Вернуться в главное меню"];
 
+    var TXT_LOAD_GAME_NO_DATA = ["No saved game data was found in the local storage of your browser.",
+        "В локальном хранилище Вашего браузера не найдено данных сохранённой игры."];
+
     var TXT_INTRO_1 = [getTextResource("txtIntro1Eng"), getTextResource("txtIntro1Rus")];
     var TXT_INTRO_2 = [getTextResource("txtIntro2Eng"), getTextResource("txtIntro2Rus")];
     var TXT_INTRO_3 = [getTextResource("txtIntro3Eng"), getTextResource("txtIntro3Rus")];
@@ -243,7 +257,7 @@
     var TXT_KARMA_REBOUND_4 = ["Dominique is suddenly struck by an ailment: ", "Доминика внезапно поражает недуг: "];
 
     var TXT_COMMON_ENCOUNTER_1 = [
-        " stands in Dominique's way! Would you like to fight or avoid encounter by sacrificing ",
+        " is in Dominique's way! Would you like to fight or avoid encounter by sacrificing ",
         " преграждает Доминику путь! Вы можете сразиться или избежать столкновения, пожертвовав "
     ];
     var TXT_COMMON_ENCOUNTER_2 = [" karma?", " ед. кармы."];
@@ -254,14 +268,15 @@
     var TXT_MISS = ["Miss!", "Промах!"];
     var TXT_RESISTED = ["Resisted!", "Отражено!"];
     var TXT_INFLICTED = ["Status inflicted: ", "Наложен статус: "];
+    var TXT_ACTIVATED = ["Status activated: ", "Активирован статус: "];
 
     var TXT_HOTKEY = [" (Hotkey: '", " (Клавиша: '"];
     var TXT_NOCHOSENITEM = ["No item selected", "Предмет не выбран"];
     var TXT_CTRLENTER = ["Ctrl + ACTION", "Ctrl + ДЕЙСТВИЕ"];
     var TXT_NOACTIVEITEMS = ["No items ready", "Нет готовых предметов"];
     var TXT_USES_REMAINING = ["Uses remaining: ", "Осталось использований: "];
-    var TXT_USABLE_IN_FIELD = ["This item can be used in the field. Press Ctrl + ACTION to use it.",
-        "Этот предмет может быть использован вне битвы. Нажмите Ctrl + ДЕЙСТВИЕ, чтобы использовать его."];
+    var TXT_USABLE_IN_FIELD = ["Press Ctrl + ACTION to use this item.",
+        "Нажмите Ctrl + ДЕЙСТВИЕ, чтобы использовать предмет."];
     var TXT_FULL_AP_GAUGE_REQ = [" (Full aura gauge required!)", " (Шкала ауры должна быть заполнена!)"];
 
     var TXT_BATTLE_RESULTS_1 = ["BATTLE RESULTS <br> <br> Attack growth +", "РЕЗУЛЬТАТ БОЯ <br> <br> Прирост атаки +"];

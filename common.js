@@ -6,6 +6,7 @@
 
 /* LANDSCAPES */
 
+var LSC_TITLE = 0;
 function createTitleLandscape() {
     var titleLandscape = new Landscape(getImageResource("imgDecGrassBackground"), "#007700", "#009900", "#00AA00", 600);
     titleLandscape.defineGenerateTerrain(function (path) {
@@ -33,6 +34,18 @@ function createTitleLandscape() {
         decorateReaches(path, 0, 2, 1, 10, treeSet);
     });
     return titleLandscape;
+}
+
+/* LANDSCAPES ID MAPPING */
+function createLandscape(id) {
+    switch (id) {
+        case LSC_TITLE:
+            return createTitleLandscape();
+        case LSC_PROLOGUE:
+            return createPrologueLandscape();
+        default:
+            return null;
+    }
 }
 
 /* SEQUENCES */
@@ -803,6 +816,100 @@ function acquireImpactArtifact(position, image, power, evadable, apGain, inflict
     return impactArtifact;
 }
 
+function acquireSelfInflictArtifact(position, cooldown, image, inflictData) {
+    var triggerArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
+    triggerArtifact.defineGetEffect(function (position, character) {
+        if (position <= BGL_LEFT) {
+            registerObject(GUI_COMMON, procureStatusTextAction(character, "white",
+                [TXT_ACTIVATED[LANG_ENG] + inflictData.statusName[LANG_ENG],
+                    TXT_ACTIVATED[LANG_RUS] + inflictData.statusName[LANG_RUS]]));
+            character.inflict(inflictData.statusArtifacts);
+            return true;
+        } else {
+            return false;
+        }
+    });
+    if (image !== undefined) {
+        triggerArtifact.defineDraw(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
+                fc.beginPath();
+                var imageToDraw = (image instanceof HTMLImageElement) ? image : image
+                    [Math.floor((globalFrame % (20 * image.length - 1)) / 10) % image.length];
+                fc.drawImage(imageToDraw, position - imageToDraw.width / 2, topOffset - imageToDraw.height / 2 + 20);
+            }
+        });
+        triggerArtifact.defineSketch(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            fc.beginPath();
+            var imageToDraw = (image instanceof HTMLImageElement) ? image : image[0];
+            fc.rect(position - imageToDraw.width / 2, topOffset - 8, imageToDraw.width, BGL_HEIGHT + 16);
+            fc.lineWidth = 3;
+            fc.strokeStyle = "black";
+            fc.stroke();
+            fc.lineWidth = 1;
+            fc.moveTo(position, topOffset + BGL_HEIGHT + 5);
+            fc.lineTo(position, topOffset + 164);
+            fc.stroke();
+        });
+    }
+    return triggerArtifact;
+}
+
+function acquireTriggerArtifact(triggerFunction, position, cooldown, image) {
+    var triggerArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
+    triggerArtifact.defineGetEffect(function (position, character) {
+        if (position <= BGL_LEFT) {
+            triggerFunction();
+            return true;
+        } else {
+            return false;
+        }
+    });
+    if (image !== undefined) {
+        triggerArtifact.defineDraw(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
+                fc.beginPath();
+                var imageToDraw = (image instanceof HTMLImageElement) ? image : image
+                    [Math.floor((globalFrame % (20 * image.length - 1)) / 10) % image.length];
+                fc.drawImage(imageToDraw, position - imageToDraw.width / 2, topOffset - imageToDraw.height / 2 + 20);
+            }
+        });
+        triggerArtifact.defineSketch(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            fc.beginPath();
+            var imageToDraw = (image instanceof HTMLImageElement) ? image : image[0];
+            fc.rect(position - imageToDraw.width / 2, topOffset - 8, imageToDraw.width, BGL_HEIGHT + 16);
+            fc.lineWidth = 3;
+            fc.strokeStyle = "black";
+            fc.stroke();
+            fc.lineWidth = 1;
+            fc.moveTo(position, topOffset + BGL_HEIGHT + 5);
+            fc.lineTo(position, topOffset + 164);
+            fc.stroke();
+        });
+    }
+    return triggerArtifact;
+}
+
+function acquireKarmaArtifactSet(position, karmaGain, distance, count) {
+    var karmaArtifactSet = [];
+    for (var i = 0; i < count; i++) {
+        var karmaArtifact = new BattleGaugeArtifact(position + distance * i, 0, 0);
+        karmaArtifact.defineGetEffect(function (position, character) {
+            if (position <= BGL_LEFT) {
+                hero.addKarma(karmaGain);
+                return true;
+            } else {
+                return false;
+            }
+        });
+        karmaArtifactSet.push(karmaArtifact);
+    }
+    return karmaArtifactSet;
+}
+
 function acquireEmptyArtifact(position, cooldown, image) {
     var emptyArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
     if (image !== undefined) {
@@ -810,13 +917,16 @@ function acquireEmptyArtifact(position, cooldown, image) {
             var topOffset = getBattleGaugeOffset(character);
             if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
                 fc.beginPath();
-                fc.drawImage(image, position - image.width / 2, topOffset - image.height / 2 + 20);
+                var imageToDraw = (image instanceof HTMLImageElement) ? image : image
+                    [Math.floor((globalFrame % (20 * image.length - 1)) / 10) % image.length];
+                fc.drawImage(imageToDraw, position - imageToDraw.width / 2, topOffset - imageToDraw.height / 2 + 20);
             }
         });
         emptyArtifact.defineSketch(function (position, character) {
             var topOffset = getBattleGaugeOffset(character);
             fc.beginPath();
-            fc.rect(position - image.width / 2, topOffset - 8, image.width, BGL_HEIGHT + 16);
+            var imageToDraw = (image instanceof HTMLImageElement) ? image : image[0];
+            fc.rect(position - imageToDraw.width / 2, topOffset - 8, imageToDraw.width, BGL_HEIGHT + 16);
             fc.lineWidth = 3;
             fc.strokeStyle = "black";
             fc.stroke();

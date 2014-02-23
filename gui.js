@@ -1242,11 +1242,11 @@ function procureDisplayMenuItemsAction() {
                                 currentItem.name[LANG_ENG] + " <br> <br> " + currentItem.description[LANG_ENG]
                                     + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.availableItems[i].charges
                                     + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
-                                    ? " <br> <br> " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
+                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
                                 currentItem.name[LANG_RUS] + " <br> <br> " + currentItem.description[LANG_RUS]
                                     + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.availableItems[i].charges
                                     + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
-                                    ? " <br> <br> " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
+                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
                             ];
                             processInfoText(itemInfo);
                         }
@@ -1292,11 +1292,11 @@ function procureDisplayMenuItemsAction() {
                                 currentItem.name[LANG_ENG] + " <br> <br> " + currentItem.description[LANG_ENG]
                                     + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.activeItems[i].charges
                                     + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
-                                    ? " <br> <br> " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
+                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
                                 currentItem.name[LANG_RUS] + " <br> <br> " + currentItem.description[LANG_RUS]
                                     + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.activeItems[i].charges
                                     + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
-                                    ? " <br> <br> " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
+                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
                             ];
                             processInfoText(itemInfo);
                         }

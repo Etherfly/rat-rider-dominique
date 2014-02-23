@@ -123,6 +123,7 @@ var CH00_HOTSPRING_04_5 = [
 
 /* LANDSCAPE */
 
+var LSC_PROLOGUE = 1;
 function createPrologueLandscape() {
     var prologueLandscape = createTitleLandscape();
     prologueLandscape.addObjectType(describeChroniclersPavilionType());
@@ -152,7 +153,7 @@ function procureStartPrologueSequence() {
         hero = new Hero();
         registerObject(OBJECTS_MID, hero);
 
-        landscape = createPrologueLandscape();
+        loadLandscape(LSC_PROLOGUE);
         landscape.resetTerrain();
         registerObject(GUI_EVENT, landscape);
         setControlMode(CM_FIELD);

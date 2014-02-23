@@ -293,8 +293,11 @@ function Hero() {
     this.activeSkills = [SKL_ATTACK, SKL_DEFEND];
     this.activeAuraSkills = [];
 
-    this.availableItems = [];
-    this.activeItems = [{id: ITM_OINTMENT1, charges: 5}, {id: ITM_OINTMENT1, charges: 3}];
+    this.availableItems = [{id: ITM_DEBUG_HP, charges: 50}, {id: ITM_DEBUG_SPAP, charges: 50},
+        {id: ITM_DEBUG_KARMA, charges: 50}, {id: ITM_SPRES1, charges: 3}, {id: ITM_ATKUP1, charges: 3},
+        {id: ITM_DEFUP1, charges: 3}, {id: ITM_AGIUP1, charges: 3}, {id: ITM_RFXUP1, charges: 3},
+        {id: ITM_DMG1, charges: 3}, {id: ITM_GUARD1, charges: 5}, {id: ITM_TALISMAN1, charges: 1}];
+    this.activeItems = [{id: ITM_HPRES1, charges: 5}, {id: ITM_HPRES1, charges: 3}];
 
     this.skillSet = [];
     this.battleGaugeArtifacts = [];

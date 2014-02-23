@@ -42,6 +42,27 @@ function acquireCloudedStatus(threshold, duration, power) {
         [acquireAttributeAdjustmentArtifact(BGL_LEFT, 0, duration, "", "", ATTR_REFLEXES, 1, power, 0, true)]);
 }
 
+// Empowered--concentrated statuses are essentially the same as above, save for their names
+function acquireEmpoweredStatus(threshold, duration, power) {
+    return wrapInflictData(["Empowered", "Усиление"], threshold,
+        [acquireAttributeAdjustmentArtifact(BGL_LEFT, 0, duration, "", "", ATTR_ATTACK, 1, power, 0, true)]);
+}
+
+function acquireShieldedStatus(threshold, duration, power) {
+    return wrapInflictData(["Shielded", "Щит"], threshold,
+        [acquireAttributeAdjustmentArtifact(BGL_LEFT, 0, duration, "", "", ATTR_DEFENSE, 1, power, 0, true)]);
+}
+
+function acquireNimbleStatus(threshold, duration, power) {
+    return wrapInflictData(["Nimble", "Проворство"], threshold,
+        [acquireAttributeAdjustmentArtifact(BGL_LEFT, 0, duration, "", "", ATTR_AGILITY, 1, power, 0, true)]);
+}
+
+function acquireConcentratedStatus(threshold, duration, power) {
+    return wrapInflictData(["Concentrated", "Концентрация"], threshold,
+        [acquireAttributeAdjustmentArtifact(BGL_LEFT, 0, duration, "", "", ATTR_REFLEXES, 1, power, 0, true)]);
+}
+
 // Trapped status: power is the maximum factor for effective evasion
 // and thrice the maximum factor for effectuve agility according to the formula 1 - (p - 1) / 3
 function acquireTrappedStatus(threshold, duration, power) {
@@ -213,10 +234,10 @@ function gainRatRiderDanceSkill() {
 var SKL_ACEOFSPADES = 8;
 function gainAceOfSpadesSkill() {
     var aceOfSpadesSkill = new CombatSkill(["Ace of Spades", "Пиковый Туз"], [
-        "An powerful technique for the Queen of Spades that utilizes aura for added strike force. 500% attack power impact in the right side "
-            + "of a huge guard down period.",
-        "Мощная техника для Пиковой Дамы, используюзая ауру для увеличения силы удара. Воздействие 500% силы атаки в правой части "
-            + "огромной зоны пониженной защиты."], 40);
+        "An powerful technique for the Queen of Spades that utilizes aura for added strike force. 500% attack power "
+            + "impact in the right side of a huge guard down period.",
+        "Мощная техника для Пиковой Дамы, используюзая ауру для увеличения силы удара. Воздействие 500% силы атаки "
+            + "в правой части огромной зоны пониженной защиты."], 40);
     aceOfSpadesSkill.defineGetArtifacts(function (position) {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
@@ -233,7 +254,8 @@ var SKL_DEEPBREATH = 9;
 function gainDeepBreathkill() {
     var deepBreathSkill = new CombatSkill(["Deep breath", "Глубокий вдох"], [
         "A deep breath for relaxation and respite. A huge guard down period during which 5 SP is recovered.",
-        "Глубокий вдох для расслабления и восстановления сил. Огромный период пониженной защиты, во время которого восстанавливается 5 ОВ."], 0);
+        "Глубокий вдох для расслабления и восстановления сил. Огромный период пониженной защиты, во время которого "
+            + "восстанавливается 5 ОВ."], 0);
     deepBreathSkill.defineGetArtifacts(function (position) {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
@@ -263,10 +285,10 @@ function gainEvadeSkill() {
 var SKL_NETCAST = 11;
 function gainNetCasSkill() {
     var netCastSkill = new CombatSkill(["Net cast", "Забрасывание сети"], [
-        "A casting of a hemp net to limit enemy's mobility. A weak impact that decreases evasion and agility in the left side of a medium-sized "
-            + "guard down period.",
-        "Поимка врага в пеньковую сеть для ограничения его подвижности. Слабое воздействие, снижающее уклонение и ловкость, в левой части "
-            + "средних размеров зоны пониженной защиты."], 30);
+        "A casting of a net to limit enemy's mobility. A weak impact that decreases evasion and agility in the left "
+            + "side of a medium-sized guard down period.",
+        "Поимка врага в сеть для ограничения его подвижности. Слабое воздействие, снижающее уклонение и ловкость, "
+            + "в левой части средних размеров зоны пониженной защиты."], 30);
     netCastSkill.defineGetArtifacts(function (position) {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
@@ -282,7 +304,8 @@ var SKL_DOUBLESTRIKE = 12;
 function gainDoubleStrikeSkill() {
     var doubleStrikeSkill = new CombatSkill(["Double strike", "Двойной удар"], [
         "A risky double attack. Two 70% attack power impact in the left and right side of a large guard down period.",
-        "Рискованный двойной выпад. Два воздействия 70% силы атаки в левой и правой части большого периода пониженной защиты."], 15);
+        "Рискованный двойной выпад. Два воздействия 70% силы атаки в левой и правой части большого периода "
+            + "пониженной защиты."], 15);
     doubleStrikeSkill.defineGetArtifacts(function (position) {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
@@ -294,7 +317,7 @@ function gainDoubleStrikeSkill() {
     return doubleStrikeSkill;
 }
 
-var SKL_OMNISLASH = 100;
+var SKL_OMNISLASH = 1001;
 function gainOmnislashSkill() {
     var omnislashSkill = new CombatSkill(["Omnislash", "Омнислэш"], [
         "Nine crushing blows from all possible and impossible angles.",
@@ -436,7 +459,7 @@ function gainThornsSkill(width, reflect) {
 
 /* ITEMS */
 
-var ITM_OINTMENT1 = 1;
+var ITM_HPRES1 = 1;
 function obtainOintmentItem() {
     var ointmentItem = new UsableItem(["Ointment", "Мазь"],
         ["A common curative ointment that is useful when working on flesh wounds. "
@@ -459,11 +482,279 @@ function obtainOintmentItem() {
     return ointmentItem;
 }
 
+var ITM_SPRES1 = 2;
+function obtainSpineappleJuiceItem() {
+    var spineappleJuiceItem = new UsableItem(["Spineapple juice", "Спинанасовый сок"],
+        ["An energizing spineapple juice. A few draughts will make weariness go away, "
+            + "restoring 25% SP over a long period of time", "Тонизирующий сок спинанаса. Несколько глотков прогонят "
+            + "усталость, восстанавливая 25% ОВ за длительный период времени."],
+        getImageResource("imgItemPotion1"), 2, true);
+    spineappleJuiceItem.defineGetFieldEffect(function () {
+        hero.restoreSp(hero.attrMaxSp * 0.25);
+        return true;
+    });
+    spineappleJuiceItem.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
+            acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
+                0, 100, BGL_COLOR, "#3CFF3C", ATTR_SP, hero.attrMaxSp * 0.25, hero.attrMaxSp * 0.25, 0, false),
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+        ];
+    });
+    return spineappleJuiceItem;
+}
+
+var ITM_ATKUP1 = 3;
+function obtainMagineticPowderCutItem() {
+    var magneticPowderCutItem = new UsableItem(["Maginetic powder: CUT", "Магинитная пыль: МЕЧ"],
+        ["A pouch of ensorcelled powder, which aligns itself on the cutting edge of a weapon to increase its power. "
+            + "When applied, it raises effective attack by 20%. Medium duration.",
+            "Мешочек с зачарованной пылью, которая располагает себя на режущей кромке оружия для увеличения его "
+                + "силы. При применении увеличивает эффективную атаку на 20%. Средняя длительность."],
+        getImageResource("imgItemPowder1"), 2, true);
+    magneticPowderCutItem.defineGetFieldEffect(function () {
+        var status = acquireEmpoweredStatus(0, 3000, 1.2);
+        registerObject(GUI_COMMON, procureHeroTextAction("white",
+            [TXT_ACTIVATED[LANG_ENG] + status.statusName[LANG_ENG],
+                TXT_ACTIVATED[LANG_RUS] + status.statusName[LANG_RUS]]));
+        hero.inflict(status.statusArtifacts);
+        return true;
+    });
+    magneticPowderCutItem.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
+            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getImageResource("imgBattleItemIcon"),
+                acquireEmpoweredStatus(0, 3000, 1.2))
+        ];
+    });
+    return magneticPowderCutItem;
+}
+
+var ITM_DEFUP1 = 4;
+function obtainMagineticPowderPadItem() {
+    var magneticPowderPadItem = new UsableItem(["Maginetic powder: PAD", "Магинитная пыль: ЩИТ"],
+        ["A pouch of ensorcelled powder, which aligns itself on the armor, covering its weak points and increasing "
+            + "its protective properties. When applied, it raises effective defense by 20%. Medium duration.",
+            "Мешочек с зачарованной пылью, которая располагает себя на доспехе, прикрывая уязвимые места и увеличивая "
+                + "защитные свойства. При применении увеличивает эффективную защиту на 20%. Средняя длительность."],
+        getImageResource("imgItemPowder2"), 2, true);
+    magneticPowderPadItem.defineGetFieldEffect(function () {
+        var status = acquireShieldedStatus(0, 3000, 1.2);
+        registerObject(GUI_COMMON, procureHeroTextAction("white",
+            [TXT_ACTIVATED[LANG_ENG] + status.statusName[LANG_ENG],
+                TXT_ACTIVATED[LANG_RUS] + status.statusName[LANG_RUS]]));
+        hero.inflict(status.statusArtifacts);
+        return true;
+    });
+    magneticPowderPadItem.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
+            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getImageResource("imgBattleItemIcon"),
+                acquireShieldedStatus(0, 3000, 1.2))
+        ];
+    });
+    return magneticPowderPadItem;
+}
+
+var ITM_AGIUP1 = 5;
+function obtainMuscleflexItem() {
+    var muscleflexItem = new UsableItem(["Muscleflex", "Мышцегиб"],
+        ["A stem of a muscleflex, a common ingredient in all sorts of alchemical potions. Makes the body nimble and "
+            + "flexible. When chewed upon, it raises effective agility by 20%. Medium duration.",
+            "Стебель мышцегиба, часто используемого в приготовлении всяческих алхимических зелий ингредиента. Делает "
+                + "тело ловким и гибким. При пережёвывании увеличивает эффективную ловкость на 20%. "
+                + "Средняя длительность."],
+        getImageResource("imgItemPlant1"), 2, true);
+    muscleflexItem.defineGetFieldEffect(function () {
+        var status = acquireNimbleStatus(0, 3000, 1.2);
+        registerObject(GUI_COMMON, procureHeroTextAction("white",
+            [TXT_ACTIVATED[LANG_ENG] + status.statusName[LANG_ENG],
+                TXT_ACTIVATED[LANG_RUS] + status.statusName[LANG_RUS]]));
+        hero.inflict(status.statusArtifacts);
+        return true;
+    });
+    muscleflexItem.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
+            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getImageResource("imgBattleItemIcon"),
+                acquireNimbleStatus(0, 3000, 1.2))
+        ];
+    });
+    return muscleflexItem;
+}
+
+var ITM_RFXUP1 = 6;
+function obtainWedgewingItem() {
+    var wedgewingItem = new UsableItem(["Wedgewing", "Клинокрыл"],
+        ["A dried wedgewing can be used as a base for brewing invigorative drinks, as a piquant spice or simply "
+            + "inhaled as dust or ingested for a boost of concentration. Some say it's addictive, but these claims "
+            + "were never proven. When used, it raises effective reflexes by 20%. Medium duration.",
+            "Сушёный клинокрыл можно использовать как основу для приготовления бодрящих напитков, как пикантную "
+                + "приправу или просто вдохнуть как порошок или разжевать для повышения концентрации. Некоторые "
+                + "говорят, что он вызывает привыкание, но эти доводы остаются недоказанными. При употреблении "
+                + "увеличивает эффективную реакцию на 20%. Средняя длительность."],
+        getImageResource("imgItemPlant2"), 2, true);
+    wedgewingItem.defineGetFieldEffect(function () {
+        var status = acquireConcentratedStatus(0, 3000, 1.2);
+        registerObject(GUI_COMMON, procureHeroTextAction("white",
+            [TXT_ACTIVATED[LANG_ENG] + status.statusName[LANG_ENG],
+                TXT_ACTIVATED[LANG_RUS] + status.statusName[LANG_RUS]]));
+        hero.inflict(status.statusArtifacts);
+        return true;
+    });
+    wedgewingItem.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
+            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getImageResource("imgBattleItemIcon"),
+                acquireConcentratedStatus(0, 3000, 1.2))
+        ];
+    });
+    return wedgewingItem;
+}
+
+var ITM_DMG1 = 7;
+function obtainFlyingDaggerItem() {
+    var flyingDaggerItem = new UsableItem(["Flying dagger", "Летающий кинжал"],
+        ["An enchanted dagger that seeks the target on its own. Just throw it into the air. 50% attack power impact.",
+            "Заколдованный кинжал, который самостоятельно ищет цель. Просто подбросьте его в воздух. "
+                + "Воздействие 50% силы атаки."], getImageResource("imgItemDagger1"), 3, false);
+    flyingDaggerItem.defineGetFieldEffect(function () { return false; });
+    flyingDaggerItem.defineGetArtifacts(function (position) {
+        return [
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"), 0.5)
+        ];
+    });
+    return flyingDaggerItem;
+}
+
+var ITM_GUARD1 = 8;
+function obtainBucklerItem() {
+    var bucklerItem = new UsableItem(["Buckler", "Баклер"],
+        ["A small round shield that protects from particularly nasty blows. Medium guard up by 30~80% period.",
+            "Небольшой круглый щит, который защитит от особо коварных ударов. "
+                + "Средних размеров зона повышенной на 30~80% защиты."], getImageResource("imgItemShield1"), 5, false);
+    bucklerItem.defineGetFieldEffect(function () { return false; });
+    bucklerItem.defineGetArtifacts(function (position) {
+        return [acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+            60, 60, "8CA8FF", "#3C78FF", ATTR_DEFENSE, 1.3, 1.8, 0, false)];
+    });
+    return bucklerItem;
+}
+
+var ITM_TALISMAN1 = 9;
+function obtainLuckyCharmItem() {
+    var luckyCharmItem = new UsableItem(["Lucky charm", "Талисман на удачу"],
+        ["A copper charm worn around the neck, believed to bring good luck to the wearer. An amalgamation of good luck "
+            + "is etched on its surface. One may gift it to a random stranger for 10 karma or wear during a battle "
+            + "to unlock its potential for a continuous accumulation of 20 karma.",
+            "Медный талисман, носимый на шее; существует поверье, что он приносит удачу. Смешение разных символов "
+                + "удачи вытравлено на его поверхности. Его можно подарить случайному прохожему за 10 ед. кармы или "
+                + "надеть в битве, чтобы раскрыть его потенциал и накопить с течением времени 20 ед. кармы."],
+        getImageResource("imgItemTalisman1"), 1, true);
+    luckyCharmItem.defineGetFieldEffect(function () {
+        hero.addKarma(10);
+        return true;
+    });
+    luckyCharmItem.defineGetArtifacts(function (position) {
+        return acquireKarmaArtifactSet(getAbsoluteArtifactPosition(position),2, 500, 10);
+    });
+    return luckyCharmItem;
+}
+
+var ITM_DEBUG_HP = 1001;
+function obtainDebugCube1Item() {
+    var cubeItem = new UsableItem(["Mystic Cube: HP", "Мистический Куб: ОЖ"],
+        ["A mystic debug cube which heals Dominiqe's wounds instantly.",
+            "Мистический отладочный куб, который полностью вылечивает раны Доминика."],
+        getImageResource("imgItemCube1"), 50, true);
+    cubeItem.defineGetFieldEffect(function () {
+        hero.restoreHp(hero.attrMaxHp);
+        return true;
+    });
+    cubeItem.defineGetArtifacts(function (position) {
+        return [
+            acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
+                0, 5, BGL_COLOR, "#3CFF3C", ATTR_HP, hero.attrMaxHp, hero.attrMaxHp, 0, false),
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+        ];
+    });
+    return cubeItem;
+}
+
+var ITM_DEBUG_SPAP = 1002;
+function obtainDebugCube2Item() {
+    var cubeItem = new UsableItem(["Mystic Cube: SP/AP", "Мистический Куб: ОВ/ОА"],
+        ["A mystic debug cube which reenergizes Dominique instantly.",
+            "Мистический отладочный куб, который мгновенно заряжает Доминика энергией."],
+        getImageResource("imgItemCube2"), 50, true);
+    cubeItem.defineGetFieldEffect(function () {
+        hero.restoreSp(hero.attrMaxSp);
+        hero.restoreAp(1);
+        return true;
+    });
+    cubeItem.defineGetArtifacts(function (position) {
+        return [
+            acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
+                0, 5, BGL_COLOR, "#3CFF3C", ATTR_SP, hero.attrMaxHp, hero.attrMaxHp, 0, false),
+            acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
+                0, 5, BGL_COLOR, "#3CFF3C", ATTR_AP, 1, 1, 0, false),
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+        ];
+    });
+    return cubeItem;
+}
+
+var ITM_DEBUG_KARMA = 1003;
+function obtainDebugCube3Item() {
+    var cubeItem = new UsableItem(["Mystic Cube: Karma", "Мистический Куб: Карма"],
+        ["A mystic debug cube which enriches Dominique with Karma.",
+            "Мистический отладочный куб, который обогащает Доминика кармой."],
+        getImageResource("imgItemCube3"), 50, true);
+    cubeItem.defineGetFieldEffect(function () {
+        hero.addKarma(200);
+        return true;
+    });
+    cubeItem.defineGetArtifacts(function (position) {
+        return [
+            acquireTriggerArtifact(function () { hero.addKarma(200); },
+                getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+        ];
+    });
+    return cubeItem;
+}
+
 /* OBTAINABLE ITEMS ID MAPPING */
 function obtainItem(id) {
     switch (id) {
-        case ITM_OINTMENT1:
+        case ITM_HPRES1:
             return obtainOintmentItem();
+        case ITM_SPRES1:
+            return obtainSpineappleJuiceItem();
+        case ITM_ATKUP1:
+            return obtainMagineticPowderCutItem();
+        case ITM_DEFUP1:
+            return obtainMagineticPowderPadItem();
+        case ITM_AGIUP1:
+            return obtainMuscleflexItem();
+        case ITM_RFXUP1:
+            return obtainWedgewingItem();
+        case ITM_DMG1:
+            return obtainFlyingDaggerItem();
+        case ITM_GUARD1:
+            return obtainBucklerItem();
+        case ITM_TALISMAN1:
+            return obtainLuckyCharmItem();
+        case ITM_DEBUG_HP:
+            return obtainDebugCube1Item();
+        case ITM_DEBUG_SPAP:
+            return obtainDebugCube2Item();
+        case ITM_DEBUG_KARMA:
+            return obtainDebugCube3Item();
         default:
             return null;
     }
