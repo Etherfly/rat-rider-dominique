@@ -163,33 +163,51 @@ function drawLimitedGradient(xStart, yStart, xEnd, yEnd, startColorHex, endColor
     var realEndColor;
     if (xStart < BGL_LEFT) {
         realXStart = BGL_LEFT;
-        realStartColor = rgbToHex(
-            Math.floor(startColor.r - (startColor.r - endColor.r) * (1 - (xEnd - realXStart) / (xEnd - xStart))),
-            Math.floor(startColor.g - (startColor.g - endColor.g) * (1 - (xEnd - realXStart) / (xEnd - xStart))),
-            Math.floor(startColor.b - (startColor.b - endColor.b) * (1 - (xEnd - realXStart) / (xEnd - xStart)))
-        );
+        realStartColor = {
+            r: Math.floor(startColor.r - (startColor.r - endColor.r) * (1 - (xEnd - realXStart) / (xEnd - xStart))),
+            g: Math.floor(startColor.g - (startColor.g - endColor.g) * (1 - (xEnd - realXStart) / (xEnd - xStart))),
+            b: Math.floor(startColor.b - (startColor.b - endColor.b) * (1 - (xEnd - realXStart) / (xEnd - xStart)))
+        };
     } else {
         realXStart = xStart;
-        realStartColor = rgbToHex(startColor.r, startColor.g, startColor.b);
+        realStartColor = startColor;
     }
     if (xEnd > BGL_RIGHT) {
         realXEnd = BGL_RIGHT;
-        realEndColor = rgbToHex(
-            Math.floor(endColor.r - (endColor.r - startColor.r) * (1 - (realXEnd - xStart) / (xEnd - xStart))),
-            Math.floor(endColor.g - (endColor.g - startColor.g) * (1 - (realXEnd - xStart) / (xEnd - xStart))),
-            Math.floor(endColor.b - (endColor.b - startColor.b) * (1 - (realXEnd - xStart) / (xEnd - xStart)))
-        );
+        realEndColor = {
+            r: Math.floor(endColor.r - (endColor.r - startColor.r) * (1 - (realXEnd - xStart) / (xEnd - xStart))),
+            g: Math.floor(endColor.g - (endColor.g - startColor.g) * (1 - (realXEnd - xStart) / (xEnd - xStart))),
+            b: Math.floor(endColor.b - (endColor.b - startColor.b) * (1 - (realXEnd - xStart) / (xEnd - xStart)))
+        };
     } else {
         realXEnd = xEnd;
-        realEndColor = rgbToHex(endColor.r, endColor.g, endColor.b);
+        realEndColor = endColor;
     }
     if (realXEnd > realXStart) {
         fc.beginPath();
-        var limitedGradient = fc.createLinearGradient(realXStart, 0, realXEnd, 0);
-        limitedGradient.addColorStop(0, realStartColor);
-        limitedGradient.addColorStop(1, realEndColor);
-        fc.fillStyle = limitedGradient;
-        fc.fillRect(realXStart, yStart, realXEnd - realXStart, yEnd - yStart);
+        var colorRange = {
+            r: realEndColor.r - realStartColor.r,
+            g: realEndColor.g - realStartColor.g,
+            b: realEndColor.b - realStartColor.b
+        };
+        var rectColor;
+        if (realXEnd - realXStart <= 5) {
+            rectColor = rgbToHex(Math.floor(realStartColor.r + colorRange.r / 2),
+                Math.floor(realStartColor.g + colorRange.g / 2),
+                Math.floor(realStartColor.b + colorRange.b / 2));
+            fc.fillStyle = rectColor;
+            fc.fillRect(realXStart, yStart, realXEnd - realXStart, yEnd - yStart);
+        } else {
+            var streamersQuantity = Math.floor((realXEnd - realXStart) / 3) + 1;
+            for (var i = 0; i <= streamersQuantity; i++) {
+                rectColor = rgbToHex(Math.floor(realStartColor.r + i * colorRange.r / streamersQuantity),
+                    Math.floor(realStartColor.g + i * colorRange.g / streamersQuantity),
+                    Math.floor(realStartColor.b + i * colorRange.b / streamersQuantity));
+                fc.fillStyle = rectColor;
+                fc.fillRect(realXStart + i * (realXEnd - realXStart) / streamersQuantity, yStart,
+                    (realXEnd - realXStart) / streamersQuantity, yEnd - yStart);
+            }
+        }
     }
 }
 

@@ -38,10 +38,12 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
             -200, Math.floor(random() * 120) + 130);
         reaches[NEAR] = new Terrain(NEAR, this.terrainColorNear,
             -200, Math.floor(random() * 120) + 130);
+        upperReaches = new Decoration(null, 1, MID, 0, -200);
         for (i = 0; i < 10; i++) {
             this.generateTerrain(FAR);
             this.generateTerrain(MID);
             this.generateTerrain(NEAR);
+            this.generateUpperDecoration();
         }
     };
 
@@ -69,6 +71,12 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
 
     this.generateTerrain = function (path) {};
 
+    this.defineGenerateUpperDecoration = function (generateUpperDecoration) {
+        this.generateUpperDecoration = generateUpperDecoration;
+    };
+
+    this.generateUpperDecoration = function () {};
+
     this.manifest = function () {
         if (this.objectTypes.length > 0) {
             for (var path = 0; path < 3; path++) {
@@ -92,15 +100,18 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
                 }
             }
         }
-    };
 
-    this.move = function () {
-        for (var i = 0; i < 3; i++) {
+        for (i = 0; i < 3; i++) {
             if (reaches[i].position < W + 600) {
                 this.generateTerrain(i);
             }
         }
+        if (upperReaches.position < W + 600) {
+            this.generateUpperDecoration();
+        }
     };
+
+    this.move = function () { };
 
     this.destroy = function() {
         clearObjectType("FieldObject");
@@ -135,23 +146,35 @@ function Terrain(path, color, position, radius) {
 function Decoration(image, scale, path, offset, position) {
     this.image = image;         // decoration image
     this.scale = scale;         // image scale
-    this.path = path;   // path layer
+    this.path = path;           // path layer
     this.offset = offset;       // height offset from the optimal value
     this.position = position;   // center position
+    this.movementFactor = 1;    // decoration movement speed factor
+    this.deleteRange = this.image != null ? -this.image.width * this.scale : 0;
 
     this.type = "Decoration";   // type definition
     this.deletable = false;     // universal deletability flag
 
-    this.manifest = function() {
+    this.defineDraw = function (draw) {
+        this.draw = draw;
+    };
+
+    this.draw = function () {
         var height = getOptimalHeight(this.path, this.position) + this.offset;
-        fc.beginPath();
-        fc.drawImage(this.image, this.position - this.image.width / 2, height,
-            this.image.width * this.scale, this.image.height * this.scale);
+        if (this.image != null) {
+            fc.beginPath();
+            fc.drawImage(this.image, this.position - this.image.width / 2, height,
+                this.image.width * this.scale, this.image.height * this.scale);
+        }
+    };
+
+    this.manifest = function() {
+        this.draw();
     };
 
     this.move = function() {
-        this.position -= movementCoefficient;
-        if (this.position < -this.image.width * this.scale) {
+        this.position -= movementCoefficient * this.movementFactor;
+        if (this.position < this.deleteRange) {
             this.deletable = true;
         }
     };
@@ -546,13 +569,28 @@ function Hero() {
     };
 
     this.addKarma = function (karma) {
-        registerObject(GUI_COMMON, procureKarmaTextAction(TEXT_COLOR_GOLD, "+" + karma));
+        registerObject(GUI_COMMON, procureKarmaTextAction(TEXT_COLOR_GOLD, "+" + karma).authorizeMenuPlay());
         this.karma += karma;
     };
 
     this.expendKarma = function (karma) {
-        registerObject(GUI_COMMON, procureKarmaTextAction("red", "-" + karma));
+        registerObject(GUI_COMMON, procureKarmaTextAction("red", "-" + karma).authorizeMenuPlay());
         this.karma -= karma;
+    };
+
+    this.getAttribute = function (attribute) {
+        switch (attribute) {
+            case ATTR_ATTACK:
+                return hero.attrAttack;
+            case ATTR_DEFENSE:
+                return hero.attrDefense;
+            case ATTR_AGILITY:
+                return hero.attrAgility;
+            case ATTR_REFLEXES:
+                return hero.attrReflexes;
+            default:
+                return null;
+        }
     };
 
     this.increaseAttribute = function (attribute, increment) {
@@ -576,7 +614,8 @@ function Hero() {
                 break;
         }
         if (intGain > 0) {
-            registerObject(GUI_COMMON, procureAttributeTextAction(attribute, "#30E030", "+" + intGain));
+            registerObject(GUI_COMMON,
+                procureAttributeTextAction(attribute, "#30E030", "+" + intGain).authorizeMenuPlay());
         }
     };
 

@@ -25,6 +25,7 @@ var DEFAULT_SAVE_KEY = "rrdSavedGame";
 
 var debugMode = false;
 var lagFactor = 0;       // stores the time of last full manifestation
+var timerNick;
 
 var CM_EVENT = 0;    // Control mode: event
 var CM_FIELD = 1;   // Control mode: field
@@ -55,7 +56,10 @@ var GUI_EVENT = 22;
 // path layers
 var FAR = 0; var MID = 1; var NEAR = 2;
 
+var CLOUD_HEIGHT = 80;
+
 var reaches = [];               // farthest terrain chunks (corresponding to paths FAR, MID and NEAR)
+var upperReaches;               // farthest upper decoration
 var moving = true;              // terrain movement
 var movementCoefficient = 3;    // movement speed
 
@@ -165,11 +169,19 @@ var LANG_RUS = 1;       // Русский язык
 
 var lang = LANG_ENG;    // current language
 
+var CASE_NOMINATIVE = 0;
+var CASE_ACCUSATIVE = 1;
+
 // global game state storage
 
 var gst = [];
 
 var CH00 = 0;   // prologue
+
+// hero strength scale border values
+
+var HS_BASE = 22500;
+var HS_CH00 = 140000;
 
 /* RESOURCES */
 
@@ -385,6 +397,36 @@ document.onkeyup = function (event) {
     }
 };
 
+function attributeIdToName(attribute, wordCase) {
+    if (wordCase == CASE_ACCUSATIVE) {
+        switch (attribute) {
+            case ATTR_ATTACK:
+                return ["Attack", "Атаку"];
+            case ATTR_DEFENSE:
+                return ["Defense", "Защиту"];
+            case ATTR_AGILITY:
+                return ["Agility", "Ловкость"];
+            case ATTR_REFLEXES:
+                return ["Reflexes", "Реакцию"];
+            default:
+                return null;
+        }
+    } else {
+        switch (attribute) {
+            case ATTR_ATTACK:
+                return ["Attack", "Атака"];
+            case ATTR_DEFENSE:
+                return ["Defense", "Защита"];
+            case ATTR_AGILITY:
+                return ["Agility", "Ловкость"];
+            case ATTR_REFLEXES:
+                return ["Reflexes", "Реакция"];
+            default:
+                return null;
+        }
+    }
+}
+
 function pathToLandscapeLayer(path) {
     switch (path) {
         case FAR:
@@ -520,8 +562,8 @@ function getAgilityDifferenceCoefficient() {
 }
 
 function generateSurface(path, color) {
-    var newRadius = Math.floor(random() * 120) + 130;
-    var offset = reaches[path].radius + Math.floor(random() * 100);
+    var newRadius = Math.floor(Math.random() * 120) + 130;
+    var offset = reaches[path].radius + Math.floor(Math.random() * 100);
     if (newRadius > 2 * reaches[path].radius) {
         offset += newRadius - 2 * reaches[path].radius + 20;
     }
@@ -532,11 +574,11 @@ function generateSurface(path, color) {
 }
 
 function decorateReaches(path, layerOffset, density, scaleModifier, offset, imageSet) {
-    var decorationCount = Math.floor(random() * density);
+    var decorationCount = Math.floor(Math.random() * density);
     for (var i = 0; i < decorationCount; i++) {
         var image = imageSet[Math.floor(Math.random() * imageSet.length)];
-        var scale =  (getPathScale(path) + (random() * 0.6)) * scaleModifier;
-        var position = Math.floor(random() * reaches[path].radius * 2)
+        var scale =  (getPathScale(path) + (Math.random() * 0.6)) * scaleModifier;
+        var position = Math.floor(Math.random() * reaches[path].radius * 2)
             + reaches[path].position - reaches[path].radius;
         var decorationOffset = (Math.floor(Math.random() * (offset / 5)) + image.height + offset);
 
@@ -813,7 +855,7 @@ function tick() {
 
     fc.clearRect(0, 0, W, H);
 
-    var timerNick = Date.now();
+    timerNick = Date.now();
 
     if (keyPressed == KEY_LANG) {
         lang++;

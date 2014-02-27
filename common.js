@@ -33,6 +33,27 @@ function createTitleLandscape() {
         }
         decorateReaches(path, 0, 2, 1, 10, treeSet);
     });
+    titleLandscape.defineGenerateUpperDecoration(function () {
+        var cloud = new Decoration(null, 1, MID, -50 + Math.random() * 100, upperReaches.position + 270 + Math.random() * 70);
+        cloud.movementFactor = 0.4;
+        cloud.deleteRange = -400;
+        var puffSeed = Math.random() * 10000;
+        cloud.defineDraw(function () {
+            this.position -= movementCoefficient * 0.2;
+            setSeed(puffSeed);
+            var puffQuantity = 3 + Math.floor(random() * 3);
+            for (var i = 0; i < puffQuantity; i++) {
+                var middlanceFactor = puffQuantity - Math.abs((puffQuantity - 1) / 2 - i);
+                var radius = 12 * middlanceFactor + random() * 8;
+                fc.beginPath();
+                fc.fillStyle = "#f0ffff";
+                fc.arc(this.position + i * radius, CLOUD_HEIGHT + this.offset, radius, 0, 2 * Math.PI);
+                fc.fill();
+            }
+        });
+        upperReaches = cloud;
+        registerObject(DECORATIONS_MID, cloud);
+    });
     return titleLandscape;
 }
 

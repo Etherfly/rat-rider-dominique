@@ -594,9 +594,9 @@ function obtainWedgewingItem() {
             + "inhaled as dust or ingested for a boost of concentration. Some say it's addictive, but these claims "
             + "were never proven. When used, it raises effective reflexes by 20%. Medium duration.",
             "Сушёный клинокрыл можно использовать как основу для приготовления бодрящих напитков, как пикантную "
-                + "приправу или просто вдохнуть как порошок или разжевать для повышения концентрации. Некоторые "
-                + "говорят, что он вызывает привыкание, но эти доводы остаются недоказанными. При употреблении "
-                + "увеличивает эффективную реакцию на 20%. Средняя длительность."],
+                + "приправу или просто вдохнуть как порошок или разжевать для повышения концентрации. Говорят, "
+                + "что он вызывает привыкание, но эти доводы не доказаны. При употреблении увеличивает "
+                + "эффективную реакцию на 20%. Средняя длительность."],
         getImageResource("imgItemPlant2"), 2, true);
     wedgewingItem.defineGetFieldEffect(function () {
         var status = acquireConcentratedStatus(0, 3000, 1.2);

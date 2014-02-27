@@ -121,6 +121,127 @@ var CH00_HOTSPRING_04_5 = [
         + "его раны тут же закрываются, и все тревоги покидают его разум."
 ];
 
+var CH00_WEAPONSMITH_01 = [
+    "Dominique enters the workshop of a local weaponsmith. Swords, axes and daggers lie around the place, begging to "
+        + "be bought and swung in battle. But none of them interest Dominique, for Queen of Spades serves him well. "
+        + " <br> <br> The smith still offers his services to repair and sharpen the weapon to provide a ",
+    "Доминик заходит в мастерскую местного оружейника. Всюду лежат мечи, топоры и кинжалы, как будто желают, чтобы "
+        + "их купили и использовали по назначению в битве. Но они неинтересны Доминику, ибо ему верно служит "
+        + "Пиковая Дама. <br> <br> Кузнец тем не менее предлагает свои услуги по починке и заточке оружия, что даст "
+];
+
+var CH00_WEAPONSMITH_02 = [
+    "% growth to attack. He also has some maginetic powder that temporary improves attack on sale. A special deal "
+        + "awaits those who take up on both offers. So what do you say?",
+    "%-ный прирост к атаке. У него также есть на продажу немного магинитной пыли, временно увеливающей атаку. "
+        + "Особое предложение ожидает того, кто согласится на обе сделки. Что скажете?"
+];
+
+var CH00_WEAPONSMITH_03 = [
+    "Dominique lets the smith take care of the Queen of Spades. When the work is done, it looks shines in the light.",
+    "Доминик позволяет кузнецу позаботиться о Пиковой Даме. По окончании работы, она сверкает на свету."
+];
+
+var CH00_WEAPONSMITH_04 = [
+    " <br> <br> Dominique also buys some maginetic powder enchanted with the rune CUT.",
+    " <br> <br> Доминик также покупает немного магинитной пыли, зачарованной руной МЕЧ."
+];
+
+var CH00_WEAPONSMITH_05 = [
+    "Dominique buys some maginetic powder enchanted with the rune CUT.",
+    "Доминик покупает немного магинитной пыли, зачарованной руной МЕЧ."
+];
+
+var CH00_ARMORSMITH_01 = [
+    "Dominique enters the workshop of a local armorsmith. Chainmails, helmets and shields are on display, begging to "
+        + "be bought and donned to protect its owner in battle. But none of them interest Dominique, for his armor is "
+        + "on an entirely different level of quality. "
+        + " <br> <br> The smith still offers his services to repair and reinforce the armor to provide a ",
+    "Доминик заходит в мастерскую местного кузнеца, изготавливающего доспехи. Напоказ выставлены кольчуги, шлемы и "
+        + "щиты, ожидающие, когда их купят и позволят защищать хозяина. Но они неинтересны Доминику, ибо его доспехи "
+        + "- это совершенно другой уровень качества."
+        + " <br> <br> Кузнец тем не менее предлагает свои услуги по починке и усилению брони, что даст "
+];
+
+var CH00_ARMORSMITH_02 = [
+    "% growth to defense. He also has some maginetic powder that temporary improves defense on sale. A special deal "
+        + "awaits those who take up on both offers. So what do you say?",
+    "%-ный прирост к защите. У него также есть на продажу немного магинитной пыли, временно увеливающей защиту. "
+        + "Особое предложение ожидает того, кто согласится на обе сделки. Что скажете?"
+];
+
+var CH00_ARMORSMITH_03 = [
+    "Dominique lets the smith take care of the white steel armor. When the work is done, it looks even brighter.",
+    "Доминик позволяет кузнецу позаботиться о доспехах из белой стали. По окончании работы, они выглядят ещё ярче."
+];
+
+var CH00_ARMORSMITH_04 = [
+    " <br> <br> Dominique also buys some maginetic powder enchanted with the rune PAD.",
+    " <br> <br> Доминик также покупает немного магинитной пыли, зачарованной руной ЩИТ."
+];
+
+var CH00_ARMORSMITH_05 = [
+    "Dominique buys some maginetic powder enchanted with the rune PAD.",
+    "Доминик покупает немного магинитной пыли, зачарованной руной ЩИТ."
+];
+
+var CH00_DOJO_01 = [
+    "Dominique stands before one of many training halls around these parts. The doorkeeper greets him with a bow and "
+        + "seeing that he knows his way around in a fight, invites him to train with the adepts. Being admitted "
+        + "into an inner circle of a fighting guild should not be taken lightly, for it takes a toll on the karma. "
+        + " <br> <br> Training with these adepts will grant Dominique a ",
+    "Доминик стоит перед одним из многих тренировочных залов этих мест. Дверник приветствует его поклоном и, видя, "
+        + "что он не новичок в бою, приглашает потренироваться с адептами. Допуск ко внутреннему кругу "
+        + "бойцовской гильдии - серьёзный шаг, который скажется на карме."
+        + " <br> <br> Тренировка с этими адептами даст Доминику "
+];
+
+var CH00_AGIDOJO_02 = [
+    "% growth to agility. They also have a stash of muscleflex they use in the training, and they are willing to "
+        + "share. It's probably better to take up on both offers but there is a limit to anyone's hospitality. "
+        + "So what do you say?",
+    "%-ный прирост к ловкости. У них также есть запас мышцегиба, который они используют в тренировках и которым они "
+        + "готовы поделиться. Наверное, имеет смысл принять оба предложения, но всякому гостеприимству есть предел. "
+        + "Что скажете?"
+];
+
+var CH00_DOJO_03 = [
+    "Dominique trains hard with the adepts and stays late to discuss certain spiritual aspects of martial arts. "
+        + "He is even allowed to stay overnight, so, while he barely rests, his mind absorbs many new things.",
+    "Доминик усердно тренируется с адептами и остаётся, чтобы обсудить отдельные духовные аспекты боевых "
+        + "искусств. Ему даже позволено остаться на ночь, так что хотя он едва ли отдыхает, его разум впитывает много "
+        + "нового."
+];
+
+var CH00_AGIDOJO_04 = [
+    " <br> <br> Dominique also takes some muscleflex along with the secrets of this place.",
+    " <br> <br> Доминик также берёт немного мышцегиба в нагрузку к секретам этого места."
+];
+
+var CH00_AGIDOJO_05 = [
+    "Dominique takes some muscleflex instead of training. Well, that's also a way.",
+    "Доминик берёт немного мышцегиба вместо того, чтобы тренироваться. Ну, что ж, это тоже вариант."
+];
+
+var CH00_RFXDOJO_02 = [
+    "% growth to reflexes. They also have a stash of wedgewing they brew into beverages, and they are willing to "
+        + "share. It's probably better to take up on both offers but there is a limit to anyone's hospitality. "
+        + "So what do you say?",
+    "%-ный прирост к реакции. У них также есть запас клинокрыла, из которого они делают напитки и которым они "
+        + "готовы поделиться. Наверное, имеет смысл принять оба предложения, но всякому гостеприимству есть предел. "
+        + "Что скажете?"
+];
+
+var CH00_RFXDOJO_04 = [
+    " <br> <br> Dominique also takes some wedgewing along with the secrets of this place.",
+    " <br> <br> Доминик также берёт немного клинокрыла в нагрузку к секретам этого места."
+];
+
+var CH00_RFXDOJO_05 = [
+    "Dominique takes some wedgewing instead of training. Well, that's also a way.",
+    "Доминик берёт немного клинокрыла вместо того, чтобы тренироваться. Ну, что ж, это тоже вариант."
+];
+
 /* LANDSCAPE */
 
 var LSC_PROLOGUE = 1;
@@ -129,6 +250,7 @@ function createPrologueLandscape() {
     prologueLandscape.addObjectType(describeChroniclersPavilionType());
     prologueLandscape.addObjectType(describeHotspringType());
     prologueLandscape.addObjectType(describeInnType());
+    prologueLandscape.addObjectType(describeTrainerType());
     prologueLandscape.addObjectType(describeBanditType());
     prologueLandscape.addObjectType(describeWolfType());
     prologueLandscape.addObjectType(describeWaspType());
@@ -186,9 +308,9 @@ function describeChroniclersPavilionType() {
                 var pavillionSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
                     if (hero.karma >= 0) {
+                        pavillionSequenceAnswered.addAction(procureCodeFragmentAction(saveGame));
                         pavillionSequenceAnswered.addAction(
                             procureDisplayCenteredMessageAction(WW_SMALL, CH00_CHRONICLER_03, true));
-                        pavillionSequenceAnswered.addAction(procureCodeFragmentAction(saveGame));
                     } else {
                         chroniclersMessage = [
                             CH00_CHRONICLER_04[LANG_ENG] + chroniclersNames[LANG_ENG][nameId]
@@ -323,22 +445,164 @@ function describeInnType() {
     return innType;
 }
 
+function describeTrainerType() {
+    var trainerType = new ObjectType(0.1);
+    trainerType.defineGenerateObject(function (path, position) {
+        var attribute = Math.floor(Math.random() * 4);
+        var trainer = new FieldObject(path, position, 50,
+            attribute < 2 ? getImageResource("imgObjSmith") : getImageResource("imgObjDojo"));
+        trainer.defineTrigger(function () {
+            var trainerSequence = new Sequence();
+            trainerSequence.addAction(procureStopAction());
+            var growth = (70 + Math.floor(Math.random() * 50)) / 100;
+            var karmaCostIncrease = Math.floor(hero.getAttribute(attribute) * growth * (1.6 + Math.random() * 0.8));
+            var karmaCostItem = Math.floor(20 * (0.8 + Math.random() * 0.4));
+            growth = growth / getHeroStrengthScale(HS_BASE, HS_CH00);
+
+            var messageGreet;
+            var messageTaken1;
+            var messageTaken2;
+            var messageTakenBoth;
+            var itemId;
+            switch (attribute) {
+                case ATTR_ATTACK:
+                    messageGreet = [
+                        CH00_WEAPONSMITH_01[LANG_ENG] + (growth * 100).toFixed(0) + CH00_WEAPONSMITH_02[LANG_ENG],
+                        CH00_WEAPONSMITH_01[LANG_RUS] + (growth * 100).toFixed(0) + CH00_WEAPONSMITH_02[LANG_RUS]
+                    ];
+                    messageTaken1 = CH00_WEAPONSMITH_03;
+                    messageTaken2 = CH00_WEAPONSMITH_05;
+                    messageTakenBoth = [
+                        CH00_WEAPONSMITH_03[LANG_ENG] + CH00_WEAPONSMITH_04[LANG_ENG],
+                        CH00_WEAPONSMITH_03[LANG_RUS] + CH00_WEAPONSMITH_04[LANG_RUS]
+                    ];
+                    itemId = ITM_ATKUP1;
+                    break;
+                case ATTR_DEFENSE:
+                    messageGreet = [
+                        CH00_ARMORSMITH_01[LANG_ENG] + (growth * 100).toFixed(0) + CH00_ARMORSMITH_02[LANG_ENG],
+                        CH00_ARMORSMITH_01[LANG_RUS] + (growth * 100).toFixed(0) + CH00_ARMORSMITH_02[LANG_RUS]
+                    ];
+                    messageTaken1 = CH00_ARMORSMITH_03;
+                    messageTaken2 = CH00_ARMORSMITH_05;
+                    messageTakenBoth = [
+                        CH00_ARMORSMITH_03[LANG_ENG] + CH00_ARMORSMITH_04[LANG_ENG],
+                        CH00_ARMORSMITH_03[LANG_RUS] + CH00_ARMORSMITH_04[LANG_RUS]
+                    ];
+                    itemId = ITM_DEFUP1;
+                    break;
+                case ATTR_AGILITY:
+                    messageGreet = [
+                        CH00_DOJO_01[LANG_ENG] + (growth * 100).toFixed(0) + CH00_AGIDOJO_02[LANG_ENG],
+                        CH00_DOJO_01[LANG_RUS] + (growth * 100).toFixed(0) + CH00_AGIDOJO_02[LANG_RUS]
+                    ];
+                    messageTaken1 = CH00_DOJO_03;
+                    messageTaken2 = CH00_AGIDOJO_05;
+                    messageTakenBoth = [
+                        CH00_DOJO_03[LANG_ENG] + CH00_AGIDOJO_04[LANG_ENG],
+                        CH00_DOJO_03[LANG_RUS] + CH00_AGIDOJO_04[LANG_RUS]
+                    ];
+                    itemId = ITM_AGIUP1;
+                    break;
+                case ATTR_REFLEXES:
+                    messageGreet = [
+                        CH00_DOJO_01[LANG_ENG] + (growth * 100).toFixed(0) + CH00_RFXDOJO_02[LANG_ENG],
+                        CH00_DOJO_01[LANG_RUS] + (growth * 100).toFixed(0) + CH00_RFXDOJO_02[LANG_RUS]
+                    ];
+                    messageTaken1 = CH00_DOJO_03;
+                    messageTaken2 = CH00_RFXDOJO_05;
+                    messageTakenBoth = [
+                        CH00_DOJO_03[LANG_ENG] + CH00_RFXDOJO_04[LANG_ENG],
+                        CH00_DOJO_03[LANG_RUS] + CH00_RFXDOJO_04[LANG_RUS]
+                    ];
+                    itemId = ITM_RFXUP1;
+                    break;
+            }
+
+            var answer1 = [
+                TXT_INCREASE_ATTR[LANG_ENG] + attributeIdToName(attribute, CASE_ACCUSATIVE)[LANG_ENG].toLowerCase()
+                    + TXT_BY[LANG_ENG] + growth.toFixed(2) + TXT_FOR[LANG_ENG] + karmaCostIncrease
+                    + TXT_KARMA_COST[LANG_ENG],
+                TXT_INCREASE_ATTR[LANG_RUS] + attributeIdToName(attribute, CASE_ACCUSATIVE)[LANG_RUS].toLowerCase()
+                    + TXT_BY[LANG_RUS] + growth.toFixed(2) + TXT_FOR[LANG_RUS] + karmaCostIncrease
+                    + TXT_KARMA_COST[LANG_RUS]
+            ];
+            var answer2 = [
+                TXT_BUY[LANG_ENG] + obtainItem(itemId).name[LANG_ENG].toLowerCase() + " (x"
+                    + obtainItem(itemId).defaultCharges + ")" + TXT_FOR[LANG_ENG] + karmaCostItem
+                    + TXT_KARMA_COST[LANG_ENG],
+                TXT_BUY[LANG_RUS] + obtainItem(itemId).name[LANG_RUS].toLowerCase() + " (x"
+                    + obtainItem(itemId).defaultCharges + ")" + TXT_FOR[LANG_RUS] + karmaCostItem
+                    + TXT_KARMA_COST[LANG_RUS]
+            ];
+            var answer3 = [
+                TXT_GET_BOTH[LANG_ENG] + TXT_FOR[LANG_ENG] + Math.floor((karmaCostIncrease + karmaCostItem) * 0.75)
+                    + TXT_KARMA_COST[LANG_ENG],
+                TXT_GET_BOTH[LANG_RUS] + TXT_FOR[LANG_RUS] + Math.floor((karmaCostIncrease + karmaCostItem) * 0.75)
+                    + TXT_KARMA_COST[LANG_RUS]
+            ];
+            var answer4 = [TXT_NOTHING[LANG_ENG] + ".", TXT_NOTHING[LANG_RUS] + "."];
+
+            trainerSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, messageGreet, true)
+                .addChoice(answer1).addChoice(answer2).addChoice(answer3).addChoice(answer4));
+            trainerSequence.addAction(procureCodeFragmentAction(function () {
+                var trainerSequenceAnswered = new Sequence();
+                switch (eventChoice) {
+                    case 0:
+                        trainerSequenceAnswered.addAction(
+                            procureDisplayCenteredMessageAction(WW_SMALL, messageTaken1, true));
+                        trainerSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                            hero.increaseAttribute(attribute, growth);
+                            hero.expendKarma(karmaCostIncrease);
+                        }));
+                        break;
+                    case 1:
+                        trainerSequenceAnswered.addAction(
+                            procureDisplayCenteredMessageAction(WW_SMALL, messageTaken2, true));
+                        trainerSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                            hero.obtainItem(itemId);
+                            hero.expendKarma(karmaCostItem);
+                        }));
+                        break;
+                    case 2:
+                        trainerSequenceAnswered.addAction(
+                            procureDisplayCenteredMessageAction(WW_SMALL, messageTakenBoth, true));
+                        trainerSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                            hero.increaseAttribute(attribute, growth);
+                            hero.obtainItem(itemId);
+                            hero.expendKarma(Math.floor((karmaCostIncrease + karmaCostItem) * 0.75));
+                        }));
+                        break;
+                    default:
+                        trainerSequenceAnswered.addAction(
+                            procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
+                }
+                trainerSequenceAnswered.addAction(procureResumeAction());
+                registerObject(GUI_EVENT, trainerSequenceAnswered);
+            }));
+            registerObject(GUI_EVENT, trainerSequence);
+        });
+        return trainer;
+    });
+    return trainerType;
+}
+
 function describeBanditType() {
     return describeCommonEncounter(0.1, ["Bandit", "Разбойник"],
         getImageResource("imgEnemyBandit1Stand"), getImageResource("imgEnemyBandit1Attack"),
-        enlistBandit, 22500, 140000);
+        enlistBandit, HS_BASE, HS_CH00);
 }
 
 function describeWolfType() {
     return describeCommonEncounter(0.1, ["Wolf", "Волк"],
         getImageResource("imgEnemyWolf1Stand"), getImageResource("imgEnemyWolf1Attack"),
-        enlistWolf, 22500, 140000);
+        enlistWolf, HS_BASE, HS_CH00);
 }
 
 function describeWaspType() {
     return describeCommonEncounter(0.1, ["Wasp", "Оса"],
         getImageResource("imgEnemyWasp1Stand"), getImageResource("imgEnemyWasp1Attack"),
-        enlistWasp, 22500, 140000);
+        enlistWasp, HS_BASE, HS_CH00);
 }
 
 /* ENEMIES */
