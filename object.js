@@ -17,7 +17,7 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
 
     this.objectsMin = 2 * W / objectFrequency;  // objects to be present on the layer simultaneously
 
-    for (i = 0; i < 3; i++) { objectsOnLayer[i] = 0; }
+    for (var i = 0; i < 3; i++) { objectsOnLayer[i] = 0; }
     farthestObjects[FAR] = (new FieldObject(FAR, 600, 0, null));
     farthestObjects[MID] = (new FieldObject(MID, 600, 0, null));
     farthestObjects[NEAR] = (new FieldObject(NEAR, 600, 0, null));
@@ -28,6 +28,20 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     this.addObjectType = function(objectType) {
         this.objectTypes.push(objectType);
     };
+
+    this.clearObjectTypes = function () {
+        this.objectTypes.length = 0;
+    };
+
+    this.defineActualize = function (actualize) {
+        this.actualize = actualize;
+    };
+
+    /*
+     * This function is meant to reinstall object type data based on the global variables,
+     * i.e. actualize landscape state
+     */
+    this.actualize = function () { };
 
     this.resetTerrain = function () {
         clearObjectType("Terrain");
@@ -81,20 +95,26 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
         if (this.objectTypes.length > 0) {
             for (var path = 0; path < 3; path++) {
                 while (objectsOnLayer[path] < this.objectsMin) {
-                    var newObjectPosition = farthestObjects[path].position + this.objectFrequency * (0.5 + Math.random());
+                    var newObjectPosition = farthestObjects[path].position
+                        + this.objectFrequency * (0.5 + Math.random());
                     var probabilityScale = 0;
                     for (var i = 0; i < this.objectTypes.length; i++) {
-                        probabilityScale += this.objectTypes[i].chanceToAppear;
+                        probabilityScale += !this.objectTypes[i].available ? 0 : this.objectTypes[i].chanceToAppear;
                     }
-                    var chanceHit = Math.random() * probabilityScale;
+                    var chanceRoll = Math.random() * probabilityScale;
                     var currentObjectTypeId = 0;
                     var chanceArea = this.objectTypes[currentObjectTypeId].chanceToAppear;
-                    while ((currentObjectTypeId + 1 < this.objectTypes.length) && (chanceArea < chanceHit)) {
+                    while ((currentObjectTypeId + 1 < this.objectTypes.length) && (chanceArea < chanceRoll)) {
                         currentObjectTypeId++;
-                        chanceArea += this.objectTypes[currentObjectTypeId].chanceToAppear;
+                        chanceArea += !this.objectTypes[currentObjectTypeId].available
+                            ? 0 : this.objectTypes[currentObjectTypeId].chanceToAppear;
                     }
                     var newObject = this.objectTypes[currentObjectTypeId].generateObject(path, newObjectPosition);
-                    registerObject(pathToObjectFrontLayer(path), newObject);
+                    newObject.objectType = this.objectTypes[currentObjectTypeId];
+                    if (this.objectTypes[currentObjectTypeId].singleton) {
+                        this.objectTypes[currentObjectTypeId].available = false;
+                    }
+                    registerObject(pathToObjectFrontLayer(path) + newObject.layerOffset, newObject);
                     objectsOnLayer[path]++;
                     farthestObjects[path] = newObject;
                 }
@@ -399,6 +419,7 @@ function Hero() {
         } else if (this.sp < skill.spCost) {
             registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_SPGAUGE_FLASH, "#FF6060", null));
         } else {
+
             /* ATTRIBUTE INCREASE FOR AGILITY */
             var enemyAgilityModifier = enemy.attrAgility / hero.attrAgility;
             var agilityIncreaseMultiplier = 100 / (skill.getLeftCooldown(position) - this.getRightmostCooldown() + 50);
@@ -635,7 +656,10 @@ function Hero() {
         if (charges === undefined) {
             charges = obtainItem(itemId).defaultCharges;
         }
-        this.availableItems.push({id: itemId, charges: charges});
+        var itemRecord = {id: itemId, charges: charges};
+        this.availableItems.push(itemRecord);
+        menuState = MS_ITEM_OBTAINED;
+        registerObject(GUI_EVENT, procureItemObtainedSequence(itemRecord));
     };
 
     this.setAnimationState = function (animationState) {
@@ -895,10 +919,11 @@ function CombatSkill(name, description, spCost) {
     }
 }
 
-function UsableItem(name, description, image, defaultCharges, usableInField) {
+function UsableItem(name, description, image, karmaValue, defaultCharges, usableInField) {
     this.name = name;
     this.description = description;
     this.image = image;
+    this.karmaValue = karmaValue;
     this.defaultCharges = defaultCharges;
     this.usableInField = usableInField;
 
@@ -980,6 +1005,8 @@ function BattleGaugeArtifact(position, leftCooldown, rightCooldown) {
 
 function ObjectType(chanceToAppear) {
     this.chanceToAppear = chanceToAppear;
+    this.singleton = false; // singleton means that this object can only be present single on the field
+    this.available = true;  // available means that this object can be generated
 
     this.defineGenerateObject = function(generateObject) {
         this.generateObject = generateObject;
@@ -990,9 +1017,11 @@ function ObjectType(chanceToAppear) {
 
 function FieldObject(path, position, offset, defaultImage) {
     this.defaultImage = defaultImage;   // image in a default state
-    this.path = path;           // path layer
+    this.path = path;                   // path layer
+    this.layerOffset = 0;               // layer offset
     this.position = position;           // center position
     this.offset = offset;               // offset from the center position
+    this.objectType = null;             // object type that generated this object
 
     this.finished = false;              // trigger finish flag
     this.scale = getPathScale(this.path);
@@ -1056,6 +1085,9 @@ function FieldObject(path, position, offset, defaultImage) {
         if (this.position < -this.defaultImage.width * this.scale) {
             objectsOnLayer[this.path]--;
             this.deletable = true;
+            if ((this.objectType != null) && (this.objectType.singleton)) {
+                this.objectType.available = true;
+            }
         }
     };
 }

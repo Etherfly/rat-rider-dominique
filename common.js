@@ -610,22 +610,20 @@ function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, ene
                 .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_FIGHT)
                 .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_AVOID));
             encounterSequence.addAction(procureCodeFragmentAction(function () {
-                var encounterSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
-                    encounterSequenceAnswered.addAction(procureInitiateBattleAction(enemy));
+                    encounterSequence.addAction(procureInitiateBattleAction(enemy));
                 } else {
                     var avoidMessage = [
                         TXT_COMMON_ENCOUNTER_3[LANG_ENG] + karmaCost + TXT_KARMA_COST[LANG_ENG],
                         TXT_COMMON_ENCOUNTER_3[LANG_RUS] + karmaCost + TXT_KARMA_COST[LANG_RUS]
                     ];
-                    encounterSequenceAnswered.addAction(
+                    encounterSequence.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL,  avoidMessage, true));
-                    encounterSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                    encounterSequence.addAction(procureCodeFragmentAction(function () {
                         hero.expendKarma(karmaCost);
                     }));
-                    encounterSequenceAnswered.addAction(procureResumeAction());
+                    encounterSequence.addAction(procureResumeAction());
                 }
-                registerObject(GUI_EVENT, encounterSequenceAnswered);
             }));
             registerObject(GUI_EVENT, encounterSequence);
         });

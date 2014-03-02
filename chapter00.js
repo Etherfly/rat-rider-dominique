@@ -11,6 +11,20 @@ var chroniclersNames = [
     ["Гильберт", "Бенджамин", "Аристарх", "Арнольд", "Себастьян", "Ансельм", "Алжернон"]
 ];
 
+var houseInhabitants = [
+    ["An elderly couple", "A lonely young hogman", "A hogwoman with three sons", "A rugged wolf"],
+    ["Пожилая пара", "Одинокий молодой кабан", "Кабаниха с трёмя сыновьями", "Суровый волк"]
+];
+
+var houseTasks = [
+    ["killing some rats in the basement (Sallinger gives a disapproving look), okay, asking them to leave",
+        "doing laundry and picking out poison thorns from clothes", "cooking a meal for an important guest",
+        "repairing the roof"],
+    ["убив несколько крыс в подвале (Сэллинджер бросает осуждающий взгляд), ладно, попросив их уйти",
+        "занявшись стиркой и вытаскиванием ядовитых шипов из одежды", "приготовив ужин для важного гостя",
+        "починив крышу"]
+];
+
 var CH00_PHASE = 0;                     // phase
 var CH00_TUTORIAL_FIELD = 1;            // tutorial message: basic field control
 var CH00_TUTORIAL_SAVING = 2;           // tutorial message: saving game
@@ -242,18 +256,99 @@ var CH00_RFXDOJO_05 = [
     "Доминик берёт немного клинокрыла вместо того, чтобы тренироваться. Ну, что ж, это тоже вариант."
 ];
 
+var CH00_HOUSE_REST_01 = [
+    " greets Dominique by the house and invites inside to share a meal. Being a rat rider certainly has some "
+        + "advantages, especially in a land where bandits roam. <br> <br> Staying here will restore some HP or SP "
+        + "for free. Would you like to stay?",
+    " приветствует Доминика возле дома и приглашает внутрь, чтобы отобедать. В том, что Доминик - крысиный всадник, "
+        + "определённо есть преимущества, особенно когда в округе рыщут бандиты. <br> <br> Если он останется, он "
+        + "восстановит немного ОЖ или ОВ. Желаете остановиться?"
+];
+
+var CH00_HOUSE_REST_02 = [
+    "Dominique eats some home-cooked food, hears some everyday life stories and expresses sincere gratitude before "
+        + "leaving.", "Доминик отведывает домашнюю еду, выслушивает несколько бытовых историй и выражает искреннюю "
+        + "благодарность, прежде чем покинуть этот дом."
+];
+
+var CH00_HOUSE_WORK_01 = [
+    " greets Dominique and after some prompt introductions asks him to help around the house by ",
+    " приветствует Доминика и после короткого знакомства просит его помочь по дому, "
+];
+
+var CH00_HOUSE_WORK_02 = [
+    ". Not the most fitting task for a rat rider, but occasional housework may ease the spirit and helping another "
+        + "never hurts. Participating in this will expend up to ", ". Не самое подходящее задание для крысиного "
+        + "всадника, но работа по дому время от времени облегчает груз на душе, да и помощь другому - хорошее дело. "
+        + "Поучаствовав в этом, Доминик может потратить до "
+];
+
+var CH00_HOUSE_WORK_03 = [" and net up to ", " и заработать до "];
+
+var CH00_HOUSE_WORK_04 = [" <br> <br> Would you like to work?", " <br> <br> Желаете поработать?"];
+
+var CH00_HOUSE_WORK_05 = [
+    "After some time the work is done, and everyone is happy with the result, Dominique not the least. Although he is "
+        + "tired, after all.", "По прошествии некоторого времени работа сделана, и все довольны результатом, в том "
+        + "числе и сам Доминик. Хотя в итоге он всё-таки устал."
+];
+
+var CH00_HOUSE_WORK_ANSWER1 = ["Exert to the fullest", "Выложиться по полной"];
+var CH00_HOUSE_WORK_ANSWER2 = ["Work at a forgiving pace", "Работать в щадящем темпе"];
+
+var CH00_TRADING_POST_01 = [
+    "A trading post appears by the road. Dominique takes a moment to look what's on sale today. Among many things "
+        + "one item catches his attention: ",
+    "Вдоль дороги возник торговый пост. Доминик уделяет немного времени просмотру того, что сегодня продаётся. "
+        + "Среди разных вещиц одна привлекает его внимание: "
+];
+
+var CH00_TRADING_POST_02 =
+    [". To take it with him, he will have to pay ", ". Чтобы взять её с собой, придётся заплатить "];
+
+var CH00_TRADING_POST_03 = [" <br> <br> Would you like to trade?", " <br> <br> Желаете поторговать?"];
+
+var CH00_TRADING_POST_04 = ["Dominique takes the item with him, offering his gratitude and karma as payment.",
+    "Доминик берёт товар с собой, отдавая свою благодарность и карму в качестве платы."];
+
+var CH00_COMMON_CHEST_01 = [
+    "Dominique spots a dirty iron-banded chest. Would you like to open it?",
+    "Доминик замечает грязный обитый железными пластинами сундук. Желаете открыть его?"
+];
+
+var CH00_COMMON_CHEST_02_1 = [
+    "Nothing is inside, except for a few dried leaves.", "Внутри пусто, за исключением нескольких высохших листьев."
+];
+
+var CH00_COMMON_CHEST_02_2 = [
+    "It seems there were spirits magically imprisoned inside. Opening the chest set them free and earned Dominique ",
+    "Похоже, внутри были магически заточены духи. Открыв сундук, Доминик освободил их и обрёл "
+];
+
+var CH00_COMMON_CHEST_02_3 = [
+    "As Dominique opens the chest, a cloud of dust bursts from it! He starts feeling funny.",
+    "Когда Доминик открыл сундук, из него вырвалось облако пыли! Доминику становится нехорошо."
+];
+
 /* LANDSCAPE */
 
 var LSC_PROLOGUE = 1;
 function createPrologueLandscape() {
     var prologueLandscape = createTitleLandscape();
-    prologueLandscape.addObjectType(describeChroniclersPavilionType());
-    prologueLandscape.addObjectType(describeHotspringType());
-    prologueLandscape.addObjectType(describeInnType());
-    prologueLandscape.addObjectType(describeTrainerType());
-    prologueLandscape.addObjectType(describeBanditType());
-    prologueLandscape.addObjectType(describeWolfType());
-    prologueLandscape.addObjectType(describeWaspType());
+    prologueLandscape.defineActualize(function () {
+        this.clearObjectTypes();
+        this.addObjectType(describeChroniclersPavilionType(0.1));
+        this.addObjectType(describeHotspringType(0.1));
+        this.addObjectType(describeInnType(0.1));
+        this.addObjectType(describeTrainerType(0.1));
+        this.addObjectType(describeHouseRestType(0.1));
+        this.addObjectType(describeHouseWorkType(0.1));
+        this.addObjectType(describeTradingPostType(0.1));
+        this.addObjectType(describeCommonChestType(0.1));
+        this.addObjectType(describeBanditType(0.1));
+        this.addObjectType(describeWolfType(0.1));
+        this.addObjectType(describeWaspType(0.1));
+    });
     return prologueLandscape;
 }
 
@@ -290,14 +385,14 @@ function procureStartPrologueSequence() {
 
 /* FIELD OBJECTS */
 
-function describeChroniclersPavilionType() {
-    var chroniclersPavilionType = new ObjectType(0.1);
+function describeChroniclersPavilionType(chance) {
+    var chroniclersPavilionType = new ObjectType(chance);
     chroniclersPavilionType.defineGenerateObject(function (path, position) {
         var chroniclersPavilion = new FieldObject(path, position, 50, getImageResource("imgObjArbor"));
         chroniclersPavilion.defineTrigger(function () {
             var pavilionSequence = new Sequence();
             pavilionSequence.addAction(procureStopAction());
-            var nameId = Math.floor(Math.random() * chroniclersNames[0].length);
+            var nameId = Math.floor(Math.random() * chroniclersNames[LANG_ENG].length);
             var chroniclersMessage = [
                 CH00_CHRONICLER_01[LANG_ENG] + chroniclersNames[LANG_ENG][nameId] + CH00_CHRONICLER_02[LANG_ENG],
                 CH00_CHRONICLER_01[LANG_RUS] + chroniclersNames[LANG_RUS][nameId] + CH00_CHRONICLER_02[LANG_RUS]
@@ -305,11 +400,10 @@ function describeChroniclersPavilionType() {
             pavilionSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM,
                 chroniclersMessage, true).addChoice(TXT_YES).addChoice(TXT_NO));
             pavilionSequence.addAction(procureCodeFragmentAction(function () {
-                var pavillionSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
                     if (hero.karma >= 0) {
-                        pavillionSequenceAnswered.addAction(procureCodeFragmentAction(saveGame));
-                        pavillionSequenceAnswered.addAction(
+                        pavilionSequence.addAction(procureCodeFragmentAction(saveGame));
+                        pavilionSequence.addAction(
                             procureDisplayCenteredMessageAction(WW_SMALL, CH00_CHRONICLER_03, true));
                     } else {
                         chroniclersMessage = [
@@ -318,15 +412,14 @@ function describeChroniclersPavilionType() {
                             CH00_CHRONICLER_04[LANG_RUS] + chroniclersNames[LANG_RUS][nameId]
                                 + CH00_CHRONICLER_05[LANG_RUS]
                         ];
-                        pavillionSequenceAnswered.addAction(
+                        pavilionSequence.addAction(
                             procureDisplayCenteredMessageAction(WW_SMALL, chroniclersMessage, true));
                     }
                 } else {
-                    pavillionSequenceAnswered.addAction(
+                    pavilionSequence.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
                 }
-                pavillionSequenceAnswered.addAction(procureResumeAction());
-                registerObject(GUI_EVENT, pavillionSequenceAnswered);
+                pavilionSequence.addAction(procureResumeAction());
             }));
             registerObject(GUI_EVENT, pavilionSequence);
         });
@@ -335,8 +428,8 @@ function describeChroniclersPavilionType() {
     return chroniclersPavilionType;
 }
 
-function describeHotspringType() {
-    var hotspringType = new ObjectType(0.1);
+function describeHotspringType(chance) {
+    var hotspringType = new ObjectType(chance);
     hotspringType.defineGenerateObject(function (path, position) {
         var hotspring = new FieldObject(path, position, 60, getImageResource("imgObjHotspring"));
         hotspring.defineTrigger(function () {
@@ -355,7 +448,6 @@ function describeHotspringType() {
             hotspringSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, hotspringMessage, true)
                 .addChoice(TXT_YES).addChoice(TXT_NO));
             hotspringSequence.addAction(procureCodeFragmentAction(function () {
-                var hotspringSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
                     var qualityMessage;
                     if (restoreAmount < 20) {
@@ -369,19 +461,18 @@ function describeHotspringType() {
                     } else {
                         qualityMessage = CH00_HOTSPRING_04_5;
                     }
-                    hotspringSequenceAnswered.addAction(
+                    hotspringSequence.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL, qualityMessage, true));
-                    hotspringSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                    hotspringSequence.addAction(procureCodeFragmentAction(function () {
                         hero.restoreHp(hero.attrMaxHp * (restoreAmount * 2 / 100));
                         hero.restoreSp(hero.attrMaxSp * (restoreAmount / 100));
                         hero.expendKarma(karmaCost);
                     }));
                 } else {
-                    hotspringSequenceAnswered.addAction(
+                    hotspringSequence.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
                 }
-                hotspringSequenceAnswered.addAction(procureResumeAction());
-                registerObject(GUI_EVENT, hotspringSequenceAnswered);
+                hotspringSequence.addAction(procureResumeAction());
             }));
             registerObject(GUI_EVENT, hotspringSequence);
         });
@@ -390,8 +481,8 @@ function describeHotspringType() {
     return hotspringType;
 }
 
-function describeInnType() {
-    var innType = new ObjectType(0.1);
+function describeInnType(chance) {
+    var innType = new ObjectType(chance);
     innType.defineGenerateObject(function (path, position) {
         var inn = new FieldObject(path, position, 50, getImageResource("imgObjInn"));
         inn.defineTrigger(function () {
@@ -410,7 +501,6 @@ function describeInnType() {
             innSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, innMessage, true)
                 .addChoice(TXT_YES).addChoice(TXT_NO));
             innSequence.addAction(procureCodeFragmentAction(function () {
-                var innSequenceAnswered = new Sequence();
                 if (eventChoice == 0) {
                     var qualityMessage;
                     if (restoreAmount < 20) {
@@ -424,19 +514,18 @@ function describeInnType() {
                     } else {
                         qualityMessage = CH00_INN_04_5;
                     }
-                    innSequenceAnswered.addAction(
+                    innSequence.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL, qualityMessage, true));
-                    innSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                    innSequence.addAction(procureCodeFragmentAction(function () {
                         hero.restoreHp(hero.attrMaxHp * (restoreAmount / 100));
                         hero.restoreSp(hero.attrMaxSp * (restoreAmount * 2 / 100));
                         hero.expendKarma(karmaCost);
                     }));
                 } else {
-                    innSequenceAnswered.addAction(
+                    innSequence.addAction(
                         procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
                 }
-                innSequenceAnswered.addAction(procureResumeAction());
-                registerObject(GUI_EVENT, innSequenceAnswered);
+                innSequence.addAction(procureResumeAction());
             }));
             registerObject(GUI_EVENT, innSequence);
         });
@@ -445,8 +534,8 @@ function describeInnType() {
     return innType;
 }
 
-function describeTrainerType() {
-    var trainerType = new ObjectType(0.1);
+function describeTrainerType(chance) {
+    var trainerType = new ObjectType(chance);
     trainerType.defineGenerateObject(function (path, position) {
         var attribute = Math.floor(Math.random() * 4);
         var trainer = new FieldObject(path, position, 50,
@@ -456,7 +545,6 @@ function describeTrainerType() {
             trainerSequence.addAction(procureStopAction());
             var growth = (70 + Math.floor(Math.random() * 50)) / 100;
             var karmaCostIncrease = Math.floor(hero.getAttribute(attribute) * growth * (1.6 + Math.random() * 0.8));
-            var karmaCostItem = Math.floor(20 * (0.8 + Math.random() * 0.4));
             growth = growth / getHeroStrengthScale(HS_BASE, HS_CH00);
 
             var messageGreet;
@@ -518,6 +606,7 @@ function describeTrainerType() {
                     itemId = ITM_RFXUP1;
                     break;
             }
+            var karmaCostItem = Math.floor(obtainItem(itemId).karmaValue * (0.8 + Math.random() * 0.4));
 
             var answer1 = [
                 TXT_INCREASE_ATTR[LANG_ENG] + attributeIdToName(attribute, CASE_ACCUSATIVE)[LANG_ENG].toLowerCase()
@@ -528,12 +617,10 @@ function describeTrainerType() {
                     + TXT_KARMA_COST[LANG_RUS]
             ];
             var answer2 = [
-                TXT_BUY[LANG_ENG] + obtainItem(itemId).name[LANG_ENG].toLowerCase() + " (x"
-                    + obtainItem(itemId).defaultCharges + ")" + TXT_FOR[LANG_ENG] + karmaCostItem
-                    + TXT_KARMA_COST[LANG_ENG],
-                TXT_BUY[LANG_RUS] + obtainItem(itemId).name[LANG_RUS].toLowerCase() + " (x"
-                    + obtainItem(itemId).defaultCharges + ")" + TXT_FOR[LANG_RUS] + karmaCostItem
-                    + TXT_KARMA_COST[LANG_RUS]
+                TXT_BUY[LANG_ENG] + obtainItem(itemId).name[LANG_ENG] + " (x" + obtainItem(itemId).defaultCharges + ")"
+                    + TXT_FOR[LANG_ENG] + karmaCostItem + TXT_KARMA_COST[LANG_ENG],
+                TXT_BUY[LANG_RUS] + obtainItem(itemId).name[LANG_RUS] + " (x" + obtainItem(itemId).defaultCharges + ")"
+                    + TXT_FOR[LANG_RUS] + karmaCostItem + TXT_KARMA_COST[LANG_RUS]
             ];
             var answer3 = [
                 TXT_GET_BOTH[LANG_ENG] + TXT_FOR[LANG_ENG] + Math.floor((karmaCostIncrease + karmaCostItem) * 0.75)
@@ -546,39 +633,37 @@ function describeTrainerType() {
             trainerSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, messageGreet, true)
                 .addChoice(answer1).addChoice(answer2).addChoice(answer3).addChoice(answer4));
             trainerSequence.addAction(procureCodeFragmentAction(function () {
-                var trainerSequenceAnswered = new Sequence();
                 switch (eventChoice) {
                     case 0:
-                        trainerSequenceAnswered.addAction(
+                        trainerSequence.addAction(
                             procureDisplayCenteredMessageAction(WW_SMALL, messageTaken1, true));
-                        trainerSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                        trainerSequence.addAction(procureCodeFragmentAction(function () {
                             hero.increaseAttribute(attribute, growth);
                             hero.expendKarma(karmaCostIncrease);
                         }));
                         break;
                     case 1:
-                        trainerSequenceAnswered.addAction(
+                        trainerSequence.addAction(
                             procureDisplayCenteredMessageAction(WW_SMALL, messageTaken2, true));
-                        trainerSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                        trainerSequence.addAction(procureCodeFragmentAction(function () {
                             hero.obtainItem(itemId);
                             hero.expendKarma(karmaCostItem);
                         }));
                         break;
                     case 2:
-                        trainerSequenceAnswered.addAction(
+                        trainerSequence.addAction(
                             procureDisplayCenteredMessageAction(WW_SMALL, messageTakenBoth, true));
-                        trainerSequenceAnswered.addAction(procureCodeFragmentAction(function () {
+                        trainerSequence.addAction(procureCodeFragmentAction(function () {
                             hero.increaseAttribute(attribute, growth);
                             hero.obtainItem(itemId);
                             hero.expendKarma(Math.floor((karmaCostIncrease + karmaCostItem) * 0.75));
                         }));
                         break;
                     default:
-                        trainerSequenceAnswered.addAction(
+                        trainerSequence.addAction(
                             procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
                 }
-                trainerSequenceAnswered.addAction(procureResumeAction());
-                registerObject(GUI_EVENT, trainerSequenceAnswered);
+                trainerSequence.addAction(procureResumeAction());
             }));
             registerObject(GUI_EVENT, trainerSequence);
         });
@@ -587,20 +672,250 @@ function describeTrainerType() {
     return trainerType;
 }
 
-function describeBanditType() {
-    return describeCommonEncounter(0.1, ["Bandit", "Разбойник"],
+function describeHouseRestType(chance) {
+    var houseRestType = new ObjectType(chance);
+    houseRestType.defineGenerateObject(function (path, position) {
+        var houseRest = new FieldObject(path, position, 50,
+            getRandomObject([getImageResource("imgObjHouse1"), getImageResource("imgObjHouse2")]));
+        houseRest.defineTrigger(function () {
+            var houseRestSequence = new Sequence();
+            houseRestSequence.addAction(procureStopAction());
+            var inhabitantId = Math.floor(Math.random() * houseInhabitants[LANG_ENG].length);
+            var houseMessage = [
+                houseInhabitants[LANG_ENG][inhabitantId] + CH00_HOUSE_REST_01[LANG_ENG],
+                houseInhabitants[LANG_RUS][inhabitantId] + CH00_HOUSE_REST_01[LANG_RUS]
+            ];
+
+            houseRestSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, houseMessage, true)
+                .addChoice(TXT_YES).addChoice(TXT_NO));
+            houseRestSequence.addAction(procureCodeFragmentAction(function () {
+                if (eventChoice == 0) {
+                    houseRestSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, CH00_HOUSE_REST_02, true));
+                    houseRestSequence.addAction(procureCodeFragmentAction(function () {
+                        var restoreAmount = 15 + Math.floor(Math.random() * 15);
+                        if (Math.random() * 2 > 1) {
+                            hero.restoreHp(hero.attrMaxHp * (restoreAmount / 100));
+                        } else {
+                            hero.restoreSp(hero.attrMaxSp * (restoreAmount / 100));
+                        }
+                    }));
+                } else {
+                    houseRestSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
+                }
+                houseRestSequence.addAction(procureResumeAction());
+            }));
+            registerObject(GUI_EVENT, houseRestSequence);
+        });
+        return houseRest;
+    });
+    return houseRestType;
+}
+
+function describeHouseWorkType(chance) {
+    var houseWorkType = new ObjectType(chance);
+    houseWorkType.defineGenerateObject(function (path, position) {
+        var houseWork = new FieldObject(path, position, 50,
+            getRandomObject([getImageResource("imgObjHouse1"), getImageResource("imgObjHouse2")]));
+        houseWork.defineTrigger(function () {
+            var houseWorkSequence = new Sequence();
+            houseWorkSequence.addAction(procureStopAction());
+            var maxSpCostPercentage = 15 + Math.floor(Math.random() * 25);
+            var maxSpCost = maxSpCostPercentage * hero.attrMaxSp / 100;
+            var maxKarmaGain = Math.floor((0.9 + Math.random() * 0.3) * maxSpCostPercentage * hero.attrMaxSp / 100);
+            var inhabitantId = Math.floor(Math.random() * houseInhabitants[LANG_ENG].length);
+            var taskId = Math.floor(Math.random() * houseTasks[LANG_ENG].length);
+            var houseMessage = [
+                houseInhabitants[LANG_ENG][inhabitantId] + CH00_HOUSE_WORK_01[LANG_ENG] + houseTasks[LANG_ENG][taskId]
+                    + CH00_HOUSE_WORK_02[LANG_ENG] + maxSpCostPercentage + "% " + TXT_SP[LANG_ENG]
+                    + CH00_HOUSE_WORK_03[LANG_ENG] + maxKarmaGain + TXT_KARMA_COST[LANG_ENG]
+                    + CH00_HOUSE_WORK_04[LANG_ENG],
+                houseInhabitants[LANG_RUS][inhabitantId] + CH00_HOUSE_WORK_01[LANG_RUS] + houseTasks[LANG_RUS][taskId]
+                    + CH00_HOUSE_WORK_02[LANG_RUS] + maxSpCostPercentage + "% " + TXT_SP[LANG_RUS]
+                    + CH00_HOUSE_WORK_03[LANG_RUS] + maxKarmaGain + TXT_KARMA_COST[LANG_RUS]
+                    + CH00_HOUSE_WORK_04[LANG_RUS]
+            ];
+
+            houseWorkSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, houseMessage, true)
+                .addChoice(CH00_HOUSE_WORK_ANSWER1).addChoice(CH00_HOUSE_WORK_ANSWER2).addChoice(TXT_NO));
+            houseWorkSequence.addAction(procureCodeFragmentAction(function () {
+                if (eventChoice == 0) {
+                    houseWorkSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, CH00_HOUSE_WORK_05, true));
+                    houseWorkSequence.addAction(procureCodeFragmentAction(function () {
+                        var actualSpCost = maxSpCost;
+                        if (hero.sp < actualSpCost) {
+                            actualSpCost = hero.sp;
+                        }
+                        var karmaSpFactor = actualSpCost / maxSpCost;
+                        hero.expendSp(actualSpCost);
+                        hero.addKarma(Math.floor(maxKarmaGain * karmaSpFactor));
+                    }));
+                } else if (eventChoice == 1) {
+                    houseWorkSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, CH00_HOUSE_WORK_05, true));
+                    houseWorkSequence.addAction(procureCodeFragmentAction(function () {
+                        var actualSpCost = maxSpCost / 2;
+                        if (hero.sp < actualSpCost) {
+                            actualSpCost = hero.sp;
+                        }
+                        var karmaSpFactor = actualSpCost / maxSpCost;
+                        hero.expendSp(actualSpCost);
+                        hero.addKarma(Math.floor(maxKarmaGain * karmaSpFactor));
+                    }));
+                } else {
+                    houseWorkSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
+                }
+                houseWorkSequence.addAction(procureResumeAction());
+            }));
+            registerObject(GUI_EVENT, houseWorkSequence);
+        });
+        return houseWork;
+    });
+    return houseWorkType;
+}
+
+function describeTradingPostType(chance) {
+    var objectType = new ObjectType(chance);
+    objectType.defineGenerateObject(function (path, position) {
+        var object = new FieldObject(path, position, 50, getImageResource("imgObjTradingPost"));
+        object.defineTrigger(function () {
+            var objectSequence = new Sequence();
+            objectSequence.addAction(procureStopAction());
+            var itemId = getRandomObject([ITM_HPRES1, ITM_SPRES1, ITM_DMG1, ITM_GUARD1, ITM_TALISMAN1]);
+            var karmaCost = Math.floor(obtainItem(itemId).karmaValue * (0.8 + Math.random() * 0.4));
+            var message = [
+                CH00_TRADING_POST_01[LANG_ENG] + obtainItem(itemId).name[LANG_ENG] + CH00_TRADING_POST_02[LANG_ENG]
+                    + karmaCost + TXT_KARMA_COST[LANG_ENG] + CH00_TRADING_POST_03[LANG_ENG],
+                CH00_TRADING_POST_01[LANG_RUS] + obtainItem(itemId).name[LANG_RUS] + CH00_TRADING_POST_02[LANG_RUS]
+                    + karmaCost + TXT_KARMA_COST[LANG_RUS] + CH00_TRADING_POST_03[LANG_RUS]
+            ];
+
+            var answerTrade = [
+                TXT_BUY[LANG_ENG] + obtainItem(itemId).name[LANG_ENG] + " (x" + obtainItem(itemId).defaultCharges + ")"
+                    + TXT_FOR[LANG_ENG] + karmaCost + TXT_KARMA_COST[LANG_ENG],
+                TXT_BUY[LANG_RUS] + obtainItem(itemId).name[LANG_RUS] + " (x" + obtainItem(itemId).defaultCharges + ")"
+                    + TXT_FOR[LANG_RUS] + karmaCost + TXT_KARMA_COST[LANG_RUS]
+            ];
+
+            objectSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, message, true)
+                .addChoice(answerTrade).addChoice(TXT_NO));
+            objectSequence.addAction(procureCodeFragmentAction(function () {
+                if (eventChoice == 0) {
+                    objectSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, CH00_TRADING_POST_04, true));
+                    objectSequence.addAction(procureCodeFragmentAction(function () {
+                        hero.obtainItem(itemId);
+                        hero.expendKarma(karmaCost);
+                    }));
+                } else {
+                    objectSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
+                }
+                objectSequence.addAction(procureResumeAction());
+            }));
+            registerObject(GUI_EVENT, objectSequence);
+        });
+        return object;
+    });
+    return objectType;
+}
+
+function describeCommonChestType(chance) {
+    var objectType = new ObjectType(chance);
+    objectType.defineGenerateObject(function (path, position) {
+        var object = new FieldObject(path, position, 50, getImageResource("imgObjChest1"));
+        object.layerOffset = -2;
+        object.defineTrigger(function () {
+            var objectSequence = new Sequence();
+            objectSequence.addAction(procureStopAction());
+            objectSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, CH00_COMMON_CHEST_01, true)
+                .addChoice(TXT_YES).addChoice(TXT_NO));
+            objectSequence.addAction(procureCodeFragmentAction(function () {
+                if (eventChoice == 0) {
+                    var contentRoll = Math.floor(Math.random() * 10);
+                    switch (contentRoll) {
+                        case 0:
+                        case 1:
+                        case 2:
+                            var itemId = getRandomObject(
+                                [ITM_HPRES1, ITM_SPRES1, ITM_DMG1, ITM_GUARD1, ITM_TALISMAN1]);
+                            objectSequence.addAction(procureCodeFragmentAction(function () {
+                                hero.obtainItem(itemId);
+                            }));
+                            break;
+                        case 3:
+                        case 4:
+                        case 5:
+                            var karmaGain = 11 + Math.floor(Math.random() * 20);
+                            var karmaMessage = [
+                                CH00_COMMON_CHEST_02_2[LANG_ENG] + karmaGain + TXT_KARMA_COST[LANG_ENG],
+                                CH00_COMMON_CHEST_02_2[LANG_RUS] + karmaGain + TXT_KARMA_COST[LANG_RUS]
+                            ];
+                            objectSequence.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL, karmaMessage, true));
+                            objectSequence.addAction(procureCodeFragmentAction(function () {
+                                hero.addKarma(karmaGain);
+                            }));
+                            break;
+                        case 6:
+                            var effectRoll = Math.floor(Math.random() * 4);
+                            var statusEffect;
+                            if (effectRoll == 0) {
+                                statusEffect = acquireWeakStatus(0, 800, 0.7 + Math.random() * 0.15);
+                            } else if (effectRoll == 1) {
+                                statusEffect = acquireFrailStatus(0, 800, 0.7 + Math.random() * 0.15);
+                            } else if (effectRoll == 2) {
+                                statusEffect = acquireNumbStatus(0, 800, 0.7 + Math.random() * 0.15);
+                            } else if (effectRoll == 3) {
+                                statusEffect = acquireCloudedStatus(0, 800, 0.7 + Math.random() * 0.15);
+                            }
+                            objectSequence.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL, CH00_COMMON_CHEST_02_3, true));
+                            objectSequence.addAction(procureCodeFragmentAction(function () {
+                                hero.inflict(statusEffect.statusArtifacts);
+                                registerObject(GUI_COMMON, procureHeroTextAction("white",
+                                    [
+                                        TXT_INFLICTED[LANG_ENG] + statusEffect.statusName[LANG_ENG],
+                                        TXT_INFLICTED[LANG_RUS] + statusEffect.statusName[LANG_RUS]
+                                    ]));
+                            }));
+                            break;
+                        default:
+                            objectSequence.addAction(
+                                procureDisplayCenteredMessageAction(WW_SMALL, CH00_COMMON_CHEST_02_1, true));
+                            break;
+                    }
+
+                } else {
+                    objectSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
+                }
+                objectSequence.addAction(procureResumeAction());
+            }));
+            registerObject(GUI_EVENT, objectSequence);
+        });
+        return object;
+    });
+    return objectType;
+}
+
+function describeBanditType(chance) {
+    return describeCommonEncounter(chance, ["Bandit", "Разбойник"],
         getImageResource("imgEnemyBandit1Stand"), getImageResource("imgEnemyBandit1Attack"),
         enlistBandit, HS_BASE, HS_CH00);
 }
 
-function describeWolfType() {
-    return describeCommonEncounter(0.1, ["Wolf", "Волк"],
+function describeWolfType(chance) {
+    return describeCommonEncounter(chance, ["Wolf", "Волк"],
         getImageResource("imgEnemyWolf1Stand"), getImageResource("imgEnemyWolf1Attack"),
         enlistWolf, HS_BASE, HS_CH00);
 }
 
-function describeWaspType() {
-    return describeCommonEncounter(0.1, ["Wasp", "Оса"],
+function describeWaspType(chance) {
+    return describeCommonEncounter(chance, ["Wasp", "Оса"],
         getImageResource("imgEnemyWasp1Stand"), getImageResource("imgEnemyWasp1Attack"),
         enlistWasp, HS_BASE, HS_CH00);
 }

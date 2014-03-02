@@ -56,7 +56,7 @@ var GUI_EVENT = 22;
 // path layers
 var FAR = 0; var MID = 1; var NEAR = 2;
 
-var CLOUD_HEIGHT = 80;
+var CLOUD_HEIGHT = 120;
 
 var reaches = [];               // farthest terrain chunks (corresponding to paths FAR, MID and NEAR)
 var upperReaches;               // farthest upper decoration
@@ -233,6 +233,10 @@ function getTextResource(id) {
     return string.replace(/\n/g, "").replace(/ +/g, " ").replace(/^ /, "");
 }
 
+function getRandomObject(objectSet) {
+    return objectSet[Math.floor(Math.random() * objectSet.length)];
+}
+
 function initializeChapterData(chapterId) {
     switch (chapterId) {
         case CH00:
@@ -250,6 +254,7 @@ function initializeChapterData(chapterId) {
 function loadLandscape(id) {
     landscapeId = id;
     landscape = createLandscape(landscapeId);
+    landscape.actualize();
 }
 
 function resetGame() {
@@ -796,7 +801,7 @@ function performKarmaRebound() {
     var statusEffect = null;
     var reboundText;
     if (karmaRebounded <= 10) {
-        reboundType = Math.floor(4 * Math.random());
+        reboundType = Math.floor(2 * Math.random());
         if (reboundType == 0) {
             hero.expendHp(karmaRebounded * 2);
             reboundText = [
