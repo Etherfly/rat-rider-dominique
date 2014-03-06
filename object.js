@@ -99,20 +99,20 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
                         + this.objectFrequency * (0.5 + Math.random());
                     var probabilityScale = 0;
                     for (var i = 0; i < this.objectTypes.length; i++) {
-                        probabilityScale += !this.objectTypes[i].available ? 0 : this.objectTypes[i].chanceToAppear;
+                        probabilityScale += !this.objectTypes[i].available() ? 0 : this.objectTypes[i].chanceToAppear;
                     }
                     var chanceRoll = Math.random() * probabilityScale;
                     var currentObjectTypeId = 0;
                     var chanceArea = this.objectTypes[currentObjectTypeId].chanceToAppear;
                     while ((currentObjectTypeId + 1 < this.objectTypes.length) && (chanceArea < chanceRoll)) {
                         currentObjectTypeId++;
-                        chanceArea += !this.objectTypes[currentObjectTypeId].available
+                        chanceArea += !this.objectTypes[currentObjectTypeId].available()
                             ? 0 : this.objectTypes[currentObjectTypeId].chanceToAppear;
                     }
                     var newObject = this.objectTypes[currentObjectTypeId].generateObject(path, newObjectPosition);
                     newObject.objectType = this.objectTypes[currentObjectTypeId];
-                    if (this.objectTypes[currentObjectTypeId].singleton) {
-                        this.objectTypes[currentObjectTypeId].available = false;
+                    if (this.objectTypes[currentObjectTypeId].singletonId != null) {
+                        singletonIds.push(this.objectTypes[currentObjectTypeId].singletonId);
                     }
                     registerObject(pathToObjectFrontLayer(path) + newObject.layerOffset, newObject);
                     objectsOnLayer[path]++;
@@ -377,6 +377,7 @@ function Hero() {
         this.effReflexes = 1;
         this.effEvasion = 1;
         this.effReflect = 1;
+        heroResponseHandlers.length = 0;
         for (var i = 0; i < this.battleGaugeArtifacts.length; i++) {
             if (!(typeof this.battleGaugeArtifacts[i] === "undefined")) {
                 if (this.battleGaugeArtifacts[i].getEffect(this.battleGaugeArtifacts[i].position, this)) {
@@ -387,7 +388,9 @@ function Hero() {
         var battleGaugeShift = BATTLEGAUGE_SHIFT_BASIS * getGlobalBattleGaugeShiftCoefficient();
         for (i = 0; i < this.battleGaugeArtifacts.length; i++) {
             if (!(typeof this.battleGaugeArtifacts[i] === "undefined")) {
-                this.battleGaugeArtifacts[i].position -= battleGaugeShift;
+                if (!this.battleGaugeArtifacts[i].static) {
+                    this.battleGaugeArtifacts[i].position -= battleGaugeShift;
+                }
             }
         }
 
@@ -540,7 +543,7 @@ function Hero() {
         for (var i = 0; i < artifactData.length; i++) {
             this.battleGaugeArtifacts.push(artifactData[i]);
         }
-        registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH_FILL, "#FF0000", null));
+        //registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH_FILL, "#FF0000", null));
     };
 
     this.expendHp = function (hp) {
@@ -800,6 +803,7 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
         this.effReflexes = 1;
         this.effEvasion = 1;
         this.effReflect = 1;
+        enemyResponseHandlers.length = 0;
         for (var i = 0; i < this.battleGaugeArtifacts.length; i++) {
             if (!(typeof this.battleGaugeArtifacts[i] === "undefined")) {
                 if (this.battleGaugeArtifacts[i].getEffect(this.battleGaugeArtifacts[i].position, this)) {
@@ -811,7 +815,9 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
             * getGlobalBattleGaugeShiftCoefficient() * getAgilityDifferenceCoefficient();
         for (i = 0; i < this.battleGaugeArtifacts.length; i++) {
             if (!(typeof this.battleGaugeArtifacts[i] === "undefined")) {
-                this.battleGaugeArtifacts[i].position -= battleGaugeShift;
+                if (!this.battleGaugeArtifacts[i].static) {
+                    this.battleGaugeArtifacts[i].position -= battleGaugeShift;
+                }
             }
         }
     };
@@ -850,7 +856,7 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
         for (var i = 0; i < artifactData.length; i++) {
             this.battleGaugeArtifacts.push(artifactData[i]);
         }
-        registerObject(GUI_COMMON, procureGuiEffectAction(GFX_ENEMY_BATTLEGAUGE_FLASH_FILL, "#FF0000", null));
+        //registerObject(GUI_COMMON, procureGuiEffectAction(GFX_ENEMY_BATTLEGAUGE_FLASH_FILL, "#FF0000", null));
     };
 
     this.expendHp = function (hp) {
@@ -971,7 +977,13 @@ function BattleGaugeArtifact(position, leftCooldown, rightCooldown) {
     this.position = position;
     this.leftCooldown = leftCooldown;
     this.rightCooldown = rightCooldown;
+    this.static = false;    // static artifact flag
     this.fluctuation = 0;
+
+    this.perpetuate = function () {
+        this.static = true;
+        return this;
+    };
 
     /*
      * specify BGA effect by defining the getEffect method
@@ -1005,8 +1017,12 @@ function BattleGaugeArtifact(position, leftCooldown, rightCooldown) {
 
 function ObjectType(chanceToAppear) {
     this.chanceToAppear = chanceToAppear;
-    this.singleton = false; // singleton means that this object can only be present single on the field
-    this.available = true;  // available means that this object can be generated
+    this.singletonId = null;    // singleton means that this object can only be present single on the field
+                                // singletonId is used to track the object's presence
+
+    this.available = function () {
+        return (this.singletonId == null) || (singletonIds.indexOf(this.singletonId) < 0);
+    };
 
     this.defineGenerateObject = function(generateObject) {
         this.generateObject = generateObject;
@@ -1085,8 +1101,11 @@ function FieldObject(path, position, offset, defaultImage) {
         if (this.position < -this.defaultImage.width * this.scale) {
             objectsOnLayer[this.path]--;
             this.deletable = true;
-            if ((this.objectType != null) && (this.objectType.singleton)) {
-                this.objectType.available = true;
+            if (this.objectType != null) {
+                var singletonIdIndex = singletonIds.indexOf(this.objectType.singletonId);
+                if (singletonIdIndex >= 0) {
+                    singletonIds[singletonIdIndex] = null;
+                }
             }
         }
     };

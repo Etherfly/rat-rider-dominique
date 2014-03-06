@@ -28,6 +28,9 @@ var AURA_ANIMATION_H = 300;
 
 var TEXT_COLOR_GOLD = "#f0f040";
 
+var heroBGNicksPosition = 0;
+var enemyBGNicksPosition = 0;
+
 var GFX_HERO_SPGAUGE_FLASH = 0;             // GUI effect: flashing sp gauge
 var GFX_HERO_APGAUGE_FLASH = 1;             // GUI effect: flashing sp gauge
 var GFX_HERO_HPGAUGE_TEXT = 2;              // GUI effect: floating text at hero hp gauge
@@ -82,11 +85,11 @@ var MS_ITEM_OBTAINED = 21;
  * Supported tags: <br>
  * Returns the line count.
  */
-function processText(text, x, y, w) {
+function processText(text, x, y, w, font) {
     function writeLine(line, lineCount) {
         fc.beginPath();
         fc.fillStyle = "white";
-        fc.font = DEFAULT_FONT;
+        fc.font = font === undefined ? DEFAULT_FONT : font;
         fc.fillText(line, x, y + 10 + DEFAULT_LINE_HEIGHT * (lineCount + 1));
     }
 
@@ -355,27 +358,27 @@ function initializeGui() {
     var battleGauges = new GuiElement(null, (W - imgGuiBattleGauges.width) / 2 - 20, 22);
     battleGauges.defineReflect(function() {
         if ((battleFrame > 0) && (hero != null) && (enemy != null)) {
-            var weightedBattleFrameOffset = (BATTLEGAUGE_SHIFT_BASIS * battleFrame
+            heroBGNicksPosition = (heroBGNicksPosition + BATTLEGAUGE_SHIFT_BASIS
                 * getGlobalBattleGaugeShiftCoefficient()) % 40;
             for (var i = 0; i < 57; i++) {
                 fc.beginPath();
                 fc.strokeStyle = "black";
                 fc.lineWidth = 1;
-                fc.moveTo(BGL_LEFT + 30 + i * 10 - weightedBattleFrameOffset,
+                fc.moveTo(BGL_LEFT + 30 + i * 10 - heroBGNicksPosition,
                     getBattleGaugeOffset(hero) - 3);
-                fc.lineTo(BGL_LEFT + 30 + i * 10 - weightedBattleFrameOffset,
+                fc.lineTo(BGL_LEFT + 30 + i * 10 - heroBGNicksPosition,
                     getBattleGaugeOffset(hero) - (i % 4 == 0 ? 18 : 12));
                 fc.stroke();
             }
-            weightedBattleFrameOffset = (BATTLEGAUGE_SHIFT_BASIS * battleFrame
+            enemyBGNicksPosition = (enemyBGNicksPosition + BATTLEGAUGE_SHIFT_BASIS
                 * getGlobalBattleGaugeShiftCoefficient() * getAgilityDifferenceCoefficient()) % 40;
             for (i = 0; i < 57; i++) {
                 fc.beginPath();
                 fc.strokeStyle = "black";
                 fc.lineWidth = 1;
-                fc.moveTo(BGL_LEFT + 30 + i * 10 - weightedBattleFrameOffset,
+                fc.moveTo(BGL_LEFT + 30 + i * 10 - enemyBGNicksPosition,
                     getBattleGaugeOffset(enemy) - 3);
-                fc.lineTo(BGL_LEFT + 30 + i * 10 - weightedBattleFrameOffset,
+                fc.lineTo(BGL_LEFT + 30 + i * 10 - enemyBGNicksPosition,
                     getBattleGaugeOffset(enemy) - (i % 4 == 0 ? 18 : 12));
                 fc.stroke();
             }
@@ -495,7 +498,7 @@ function initializeGui() {
                             itemChoice = 0;
                         }
                     }
-                } else if (keyCtrl && (keyPressed >= KEY_DIGIT_0) && (keyPressed <= KEY_DIGIT_0 + 4)) {
+                } else if (keyCtrl && (keyPressed >= KEY_DIGIT_0 + 1) && (keyPressed <= KEY_DIGIT_0 + 5)) {
                     var itemChoiceToBe = (keyPressed - KEY_DIGIT_0 + 4) % 5;
                     if (hero.activeItems[itemChoiceToBe] != null) {
                         itemChoice = itemChoiceToBe;

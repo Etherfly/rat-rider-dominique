@@ -107,6 +107,12 @@ function acquireTwitchStatus(threshold, duration, power) {
         [acquireAttributeAdjustmentArtifact(BGL_LEFT, 0, duration, "", "", ATTR_AGILITY, 1, 1, power, true)]);
 }
 
+function acquirePerpetualAttributeModifierArtifact(attribute, power) {
+    var artifact = acquireAttributeAdjustmentArtifact(BGL_LEFT, 1, 1, "", "", attribute, 1, power, 0, true);
+    artifact.static = true;
+    return artifact;
+}
+
 /* OBTAINABLE SKILLS */
 
 var SKL_ATTACK = 1;
@@ -401,10 +407,37 @@ function gainOpenerSkill(cooldown) {
 function gainOpeningSkill(width, vulnerability) {
     var openingSkill = new CombatSkill("Opening", "Not so much of a skill. More like a lack thereof.", 5);
     openingSkill.defineGetArtifacts(function (position) {
-        return [acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
-            width / 2, width / 2, BGL_COLOR, "#EE8C8C", ATTR_DEFENSE, 1, vulnerability, 0, false)];
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width / 2, width / 2, BGL_COLOR, BGL_COLOR, ATTR_EVASION, 1, 2 - vulnerability / 2, 0, true),
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, "#EE8C8C", ATTR_DEFENSE, 1, vulnerability, 0, false)];
     });
     return openingSkill;
+}
+
+function gainEnemyAttackSkill(width, vulnerability, power) {
+    var fumbledAttackSkill = new CombatSkill("Enemy attack", "A customizable attack skill.", 10);
+    fumbledAttackSkill.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 1, vulnerability, 0, false),
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position),
+                getImageResource("imgBattleImpactIcon"), power)
+        ];
+    });
+    return fumbledAttackSkill;
+}
+
+function gainEnemyDefenseSkill(width, armor) {
+    var fumbledAttackSkill = new CombatSkill("Enemy defense", "A customizable defense skill.", 5);
+    fumbledAttackSkill.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, armor, 0, false)
+        ];
+    });
+    return fumbledAttackSkill;
 }
 
 function gainFumbledAttackSkill(width, vulnerability) {
@@ -420,6 +453,47 @@ function gainFumbledAttackSkill(width, vulnerability) {
     return fumbledAttackSkill;
 }
 
+function gainPowerAttackSkill(width, vulnerability, power) {
+    var fumbledAttackSkill = new CombatSkill("Power attack", "A mighty, but slow strike.", 20);
+    fumbledAttackSkill.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 1, vulnerability, 0, false),
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, BGL_COLOR, ATTR_AGILITY, 1, vulnerability, 0, true),
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position),
+                getImageResource("imgBattleImpactIcon"), power)
+        ];
+    });
+    return fumbledAttackSkill;
+}
+
+function gainEnemyEvadeSkill(width, power) {
+    var evadeSkill = new CombatSkill("Evade", "A customizable evasion skill.", 5);
+    evadeSkill.defineGetArtifacts(function (position) {
+        return [acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+            width, width, BGL_COLOR, "#FFCC00", ATTR_EVASION, 1, power, 0, false)];
+    });
+    return evadeSkill;
+}
+
+function gainStatusAttackSkill(width, weakness, statusFunction, defenseThreshold, duration, power) {
+    var poisonStingSkill = new CombatSkill("Status attack",
+        "A status-inflicting attack. Evasion down near impact.", 20);
+    poisonStingSkill.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, "#FF4C4C", ATTR_DEFENSE, 1, weakness, 0, false),
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, BGL_COLOR, ATTR_EVASION, 1, 2 - weakness / 2, 0, true),
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position),
+                [getImageResource("imgBattleInflictImpact1Icon"), getImageResource("imgBattleInflictImpact2Icon")],
+                weakness, true, true, statusFunction(defenseThreshold, duration, power))
+        ];
+    });
+    return poisonStingSkill;
+}
+
 function gainFullguardAttackSkill(width, armor) {
     var fullguardAttackSkill = new CombatSkill("Fullguard attack", "An attack with a guard up area around.", 20);
     fullguardAttackSkill.defineGetArtifacts(function (position) {
@@ -432,29 +506,22 @@ function gainFullguardAttackSkill(width, armor) {
     return fullguardAttackSkill;
 }
 
-function gainPoisonStingSkill(width, armor) {
-    var poisonStingSkill = new CombatSkill("Poison sting", "A poisoning attack.", 20);
-    poisonStingSkill.defineGetArtifacts(function (position) {
+function gainLieInWaitSkill(width, defenseFluct, agilityFluct) {
+    var lieInWaitSkill = new CombatSkill("Lie in wait", "Slow down and guard, then quickly lunge at a foe.", 20);
+    lieInWaitSkill.defineGetArtifacts(function (position) {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
-                width / 2, width / 2, BGL_COLOR, "#AA40F0", ATTR_DEFENSE, 1, armor, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"), 0.4,
-                true, true, acquireFrailStatus(1.2, 700, 0.4)
-            )
-        ];
-    });
-    return poisonStingSkill;
-}
-
-function gainThornsSkill(width, reflect) {
-    var poisonStingSkill = new CombatSkill("Thorns", "An area of reflection.", 20);
-    poisonStingSkill.defineGetArtifacts(function (position) {
-        return [
+                width, 0, BGL_COLOR, "#AA40F0", ATTR_DEFENSE, 1, 2 - defenseFluct, 0, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
-                width, width, BGL_COLOR, "#FFCC00", ATTR_REFLECT, 1, reflect, 0, false)
+                width, 0, BGL_COLOR, BGL_COLOR, ATTR_AGILITY, 1, agilityFluct, 0, true),
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                0, width, BGL_COLOR, "#FF4C4C", ATTR_DEFENSE, 1, defenseFluct, 0, false),
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                0, width * 2, BGL_COLOR, BGL_COLOR, ATTR_AGILITY, 1, 1 + agilityFluct, 0, true),
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleImpactIcon"))
         ];
     });
-    return poisonStingSkill;
+    return lieInWaitSkill;
 }
 
 /* ITEMS */
@@ -680,7 +747,7 @@ function obtainDebugCube1Item() {
     cubeItem.defineGetArtifacts(function (position) {
         return [
             acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
-                0, 5, BGL_COLOR, "#3CFF3C", ATTR_HP, hero.attrMaxHp, hero.attrMaxHp, 0, false),
+                0, 10, BGL_COLOR, "#3CFF3C", ATTR_HP, hero.attrMaxHp, hero.attrMaxHp, 0, false),
             acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
         ];
     });

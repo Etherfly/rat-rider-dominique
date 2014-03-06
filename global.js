@@ -76,6 +76,7 @@ var KEY_DEBUG = 8;
 var KEY_DIGIT_0 = 10;
 
 var keyPressed = KEY_NONE;
+var keyShift = false;
 var keyCtrl = false;
 
 // animation states
@@ -104,6 +105,9 @@ var enemy = null;
 var BATTLEGAUGE_SHIFT_BASIS = 3;
 
 var impacts = [];
+var heroResponseHandlers = [];
+var enemyResponseHandlers = [];
+
 var battleFrame;            // number of frames that have passed in the current battle
 var behaviorFluctuation;    // random offset to be used in behavioral patterns of AI
 
@@ -144,6 +148,7 @@ var landscapeId = 0;
 
 var objectsOnLayer = [0, 0, 0]; // number of objects on layer
 var farthestObjects = [];       // farthest object position on layer
+var singletonIds = [];          // array of singleton object ids present on the field
 
 var collisionDistance = 40;
 
@@ -254,6 +259,7 @@ function initializeChapterData(chapterId) {
 function loadLandscape(id) {
     landscapeId = id;
     landscape = createLandscape(landscapeId);
+    singletonIds.length = 0;
     landscape.actualize();
 }
 
@@ -393,11 +399,14 @@ document.onkeydown = function (event) {
                 keyPressed = KEY_NONE;
             }
     }
+    keyShift = event.shiftKey;
     keyCtrl = event.ctrlKey;
 };
 
 document.onkeyup = function (event) {
-    if (event.keyCode == 17) {
+    if (event.keyCode == 16) {
+        keyShift = false;
+    } else if (event.keyCode == 17) {
         keyCtrl = false;
     }
 };
@@ -559,18 +568,25 @@ function getHeroStrengthScale(startingHeroStrength, maxHeroStrength) {
 }
 
 function getGlobalBattleGaugeShiftCoefficient() {
-    return (enemy.attrReflexes * enemy.effReflexes) / (hero.attrReflexes * hero.effReflexes);
+    return Math.sqrt(enemy.attrReflexes / hero.attrReflexes) * enemy.effReflexes / hero.effReflexes;
 }
 
 function getAgilityDifferenceCoefficient() {
-    return (enemy.attrAgility * enemy.effAgility) / (hero.attrAgility * hero.effAgility);
+    var adc = Math.sqrt(enemy.attrAgility / hero.attrAgility) * enemy.effAgility / hero.effAgility;
+    if (keyShift && (adc < 1)) {
+        adc = 1;
+    }
+    return adc;
 }
 
-function generateSurface(path, color) {
-    var newRadius = Math.floor(Math.random() * 120) + 130;
+function generateSurface(path, color, radiusBase) {
+    if (radiusBase === undefined) {
+        radiusBase = 120;
+    }
+    var newRadius = Math.floor(Math.random() * radiusBase) + radiusBase;
     var offset = reaches[path].radius + Math.floor(Math.random() * 100);
     if (newRadius > 2 * reaches[path].radius) {
-        offset += newRadius - 2 * reaches[path].radius + 20;
+        offset += newRadius - 2 * reaches[path].radius;
     }
     var terrain = new Terrain(path, color,
         reaches[path].position + offset, newRadius);
@@ -705,24 +721,42 @@ function deliverImpacts() {
         var enemyReflexesModifier;
         if (!impacts[i].evadable || (Math.random() < impacts[i].target.effEvasion)) { /* EVASION */
 
+
+            /*
+             * DAMAGE FORMULA:
+             * DMG = ATTACKER_BASE_ATK
+             *      * (1 + (ATTACKER_BASE_ATK * ATTACKER_EFF_ATK - TARGET_BASE_DEF * TARGET_EFF_DEF) / (80~120))
+             *      * (ATTACK_POWER * ATTACKER_EFF_ATK / TARGET_EFF_DEF) * (0.9~1.1)
+             *
+             * Attacker's base attack serves as the damage basis, attack power and target's effective defense
+             * serve as direct multiplier and divisor. Average multiplier difference is 100, thus, if attacker's
+             * attack is ~100 more than target's defense (taking into account effective values) the damage is
+             * roughly doubled than if those attributes were equal. If target's defense is 100+ points ahead,
+             * effective modifiers included, chances are the attack will deal no damage.
+             */
+            var dmg = impacts[i].attacker.attrAttack
+                * (1 + (impacts[i].attacker.attrAttack * impacts[i].attacker.effAttack
+                - impacts[i].target.attrDefense * impacts[i].target.effDefense) / (80 + 40 * Math.random()))
+                * (impacts[i].attackPower * impacts[i].attacker.effAttack / impacts[i].target.effDefense)
+                * (0.9 + 0.2 * Math.random());
+
+            var j;
+            if (impacts[i].target == hero) {
+                for (j = 0; j < heroResponseHandlers.length; j++) {
+                    if (!(heroResponseHandlers[j] === undefined)) {
+                        dmg = heroResponseHandlers[j](dmg);
+                    }
+                }
+            } else {
+                for (j = 0; j < enemyResponseHandlers.length; j++) {
+                    if (!(enemyResponseHandlers[j] === undefined)) {
+                        dmg = enemyResponseHandlers[j](dmg);
+                    }
+                }
+            }
+
             if (impacts[i].attackPower > 0) {
-                /*
-                 * DAMAGE FORMULA:
-                 * DMG = ATTACKER_BASE_ATK
-                 *      * (1 + (ATTACKER_BASE_ATK * ATTACKER_EFF_ATK - TARGET_BASE_DEF * TARGET_EFF_DEF) / (80~120))
-                 *      * (ATTACK_POWER * ATTACKER_EFF_ATK / TARGET_EFF_DEF) * (0.9~1.1)
-                 *
-                 * Attacker's base attack serves as the damage basis, attack power and target's effective defense
-                 * serve as direct multiplier and divisor. Average multiplier difference is 100, thus, if attacker's
-                 * attack is ~100 more than target's defense (taking into account effective values) the damage is
-                 * roughly doubled than if those attributes were equal. If target's defense is 100+ points ahead,
-                 * effective modifiers included, chances are the attack will deal no damage.
-                 */
-                var dmg = impacts[i].attacker.attrAttack
-                    * (1 + (impacts[i].attacker.attrAttack * impacts[i].attacker.effAttack
-                    - impacts[i].target.attrDefense * impacts[i].target.effDefense) / (80 + 40 * Math.random()))
-                    * (impacts[i].attackPower * impacts[i].attacker.effAttack / impacts[i].target.effDefense)
-                    *  (0.9 + 0.2 * Math.random());
+
                 if (Math.floor(dmg) <= 0) {
                     registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", "0"));
                 } else {

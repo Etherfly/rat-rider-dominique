@@ -334,11 +334,39 @@ function procureDisplayCenteredMessageAction(width, text, displayCursor) {
             line += words[i] + " ";
         }
     }
-    if (displayCursor) {
+    if ((displayCursor === undefined) || displayCursor) {
         lineCount++;
     }
     return procureDisplayMessageAction(
         (W - width) / 2, H / 2 - 100, width, 50 + DEFAULT_LINE_HEIGHT * lineCount, text, displayCursor);
+}
+
+function procureDisplaySpeechMessageAction(name, portrait, text) {
+    var displaySpeechMessageAction = new Action();
+    displaySpeechMessageAction.definePlayFrame(function (frame) {
+        if (frame < 10) {
+            drawTextbox(INFO_WINDOW_X, INFO_WINDOW_Y, INFO_WINDOW_W * frame / 10, INFO_WINDOW_H * frame / 10);
+        } else {
+            drawInfoWindow();
+            fc.beginPath();
+            fc.drawImage(portrait, INFO_WINDOW_X + 12, INFO_WINDOW_Y + 12, 196, 196);
+            processText(name, INFO_WINDOW_X + 220, INFO_WINDOW_Y, INFO_WINDOW_W - 220, LARGE_FONT);
+            var translatedText = (typeof text === "string") ? text : text[lang];
+            var printedText = frame * 3 >= translatedText.length ? translatedText : translatedText.substr(0, (frame - 10) * 3);
+            var lineCount = processText(printedText, INFO_WINDOW_X + 220, INFO_WINDOW_Y + LARGE_LINE_HEIGHT, INFO_WINDOW_W - 220);
+
+            if ((frame - 10) * 3 >= text.length) {
+                fc.beginPath();
+                var cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                fc.drawImage(CURSOR_DOWN, INFO_WINDOW_X + 220 + (INFO_WINDOW_W - 220) / 2 - CURSOR_DOWN.width / 2,
+                    INFO_WINDOW_Y + cursorOffset + LARGE_LINE_HEIGHT + DEFAULT_LINE_HEIGHT * lineCount);
+            }
+
+            return keyPressed == KEY_ACTION;
+        }
+        return false;
+    });
+    return displaySpeechMessageAction;
 }
 
 function procureFloatingTextAction(originX, originY, font, color, text, duration) {
@@ -545,6 +573,8 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
                     }
                 }
                 battleFrame = 0;
+                heroBGNicksPosition = 0;
+                enemyBGNicksPosition = 0;
                 behaviorFluctuation = 0;
                 enemy = newEnemy;
                 controlMode = CM_BATTLE;
@@ -587,6 +617,24 @@ function procureDeathAnimationAction(character) {
         }
     });
     return deathAnimationAction;
+}
+
+function procureFloatingImageAction(linkedObject, floatingImage, terminationFunction) {
+    if (terminationFunction === undefined) {
+        terminationFunction = function () { return false; };
+    }
+    var floatingImageAction = new Action();
+    floatingImageAction.definePlayFrame(function (frame) {
+        if (linkedObject != null) {
+            fc.beginPath();
+            fc.drawImage(floatingImage, linkedObject.position - floatingImage.width / 2, getOptimalHeight(linkedObject.path,
+                linkedObject.position) + linkedObject.offset - floatingImage.height - 20 + 10 * Math.sin(frame * 2 * Math.PI / 100));
+            return terminationFunction();
+        } else {
+            return true;
+        }
+    });
+    return floatingImageAction;
 }
 
 /* OBJECT TYPES */
@@ -632,10 +680,62 @@ function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, ene
     return encounterType;
 }
 
+function describeDangerEncounter(chanceToAppear, enemyName, enemyImageStand, enemyImageAttack, enlistEnemyFunction,
+                                 startingHeroStrength, maxHeroStrength) {
+    var encounterType = new ObjectType(chanceToAppear);
+    encounterType.singletonId = "singleton: " + enemyName[LANG_ENG];
+    encounterType.defineGenerateObject(function (path, position) {
+        var enemyObject = new FieldObject(path, position, 50, enemyImageStand);
+        enemyObject.setAttackImage(enemyImageAttack);
+        var triggered = false;
+        registerObject(pathToObjectLayer(path),
+            procureFloatingImageAction(enemyObject, getImageResource("imgDangerMark"), function () {
+                return triggered;
+            }));
+        var enemy = enlistEnemyFunction(startingHeroStrength, maxHeroStrength, enemyObject);
+        enemyObject.defineTrigger(function () {
+            var encounterSequence = new Sequence();
+            encounterSequence.addAction(procureStopAction());
+            var karmaCost = Math.floor(enemy.getKarma() / 2);
+            var encounterMessage = [
+                enemyName[LANG_ENG] + TXT_DANGER_ENCOUNTER_1[LANG_ENG] + karmaCost + TXT_COMMON_ENCOUNTER_2[LANG_ENG],
+                enemyName[LANG_RUS] + TXT_DANGER_ENCOUNTER_1[LANG_RUS] + karmaCost + TXT_COMMON_ENCOUNTER_2[LANG_RUS]
+            ];
+            encounterSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, encounterMessage, true)
+                .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_FIGHT)
+                .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_AVOID));
+            encounterSequence.addAction(procureCodeFragmentAction(function () {
+                triggered = true;
+                if (eventChoice == 0) {
+                    encounterSequence.addAction(procureInitiateBattleAction(enemy));
+                } else {
+                    var avoidMessage = [
+                        TXT_COMMON_ENCOUNTER_3[LANG_ENG] + karmaCost + TXT_KARMA_COST[LANG_ENG],
+                        TXT_COMMON_ENCOUNTER_3[LANG_RUS] + karmaCost + TXT_KARMA_COST[LANG_RUS]
+                    ];
+                    encounterSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL,  avoidMessage, true));
+                    encounterSequence.addAction(procureCodeFragmentAction(function () {
+                        hero.expendKarma(karmaCost);
+                    }));
+                    encounterSequence.addAction(procureResumeAction());
+                }
+            }));
+            registerObject(GUI_EVENT, encounterSequence);
+        });
+        return enemyObject;
+    });
+    return encounterType;
+}
+
 /* BATTLE GAUGE ARTIFACTS */
 
 function getAbsoluteArtifactPosition(position) {
     return (W / 2) - 10 + position;
+}
+
+function getStandardEnemyOffset(skill) {
+    return enemy.getRightmostCooldown() + skill.getLeftCooldown() - getAbsoluteArtifactPosition(0);
 }
 
 function acquireAttributeAdjustmentArtifact(position, leftWidth, rightWidth, weakColor, strongColor,
@@ -750,23 +850,23 @@ function acquireGradualChangeArtifact(position, leftWidth, rightWidth, weakColor
         switch (attribute) {
             case ATTR_HP:
                 if (power >= 0) {
-                    hero.restoreHp(power);
+                    character.restoreHp(power);
                 } else {
-                    hero.expendHp(-power);
+                    character.expendHp(-power);
                 }
                 break;
             case ATTR_SP:
                 if (power >= 0) {
-                    hero.restoreSp(power);
+                    character.restoreSp(power);
                 } else {
-                    hero.expendSp(-power);
+                    character.expendSp(-power);
                 }
                 break;
             case ATTR_AP:
                 if (power >= 0) {
-                    hero.restoreAp(power);
+                    character.restoreAp(power);
                 } else {
-                    hero.expendAp(-power);
+                    character.expendAp(-power);
                 }
                 break;
         }
@@ -836,8 +936,8 @@ function acquireImpactArtifact(position, image, power, evadable, apGain, inflict
 }
 
 function acquireSelfInflictArtifact(position, cooldown, image, inflictData) {
-    var triggerArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
-    triggerArtifact.defineGetEffect(function (position, character) {
+    var selfInflictArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
+    selfInflictArtifact.defineGetEffect(function (position, character) {
         if (position <= BGL_LEFT) {
             registerObject(GUI_COMMON, procureStatusTextAction(character, "white",
                 [TXT_ACTIVATED[LANG_ENG] + inflictData.statusName[LANG_ENG],
@@ -849,7 +949,7 @@ function acquireSelfInflictArtifact(position, cooldown, image, inflictData) {
         }
     });
     if (image !== undefined) {
-        triggerArtifact.defineDraw(function (position, character) {
+        selfInflictArtifact.defineDraw(function (position, character) {
             var topOffset = getBattleGaugeOffset(character);
             if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
                 fc.beginPath();
@@ -858,7 +958,7 @@ function acquireSelfInflictArtifact(position, cooldown, image, inflictData) {
                 fc.drawImage(imageToDraw, position - imageToDraw.width / 2, topOffset - imageToDraw.height / 2 + 20);
             }
         });
-        triggerArtifact.defineSketch(function (position, character) {
+        selfInflictArtifact.defineSketch(function (position, character) {
             var topOffset = getBattleGaugeOffset(character);
             fc.beginPath();
             var imageToDraw = (image instanceof HTMLImageElement) ? image : image[0];
@@ -872,7 +972,7 @@ function acquireSelfInflictArtifact(position, cooldown, image, inflictData) {
             fc.stroke();
         });
     }
-    return triggerArtifact;
+    return selfInflictArtifact;
 }
 
 function acquireTriggerArtifact(triggerFunction, position, cooldown, image) {
@@ -929,6 +1029,52 @@ function acquireKarmaArtifactSet(position, karmaGain, distance, count) {
     return karmaArtifactSet;
 }
 
+function acquireResponseArtifact(position, leftWidth, rightWidth, weakColor, strongColor, responseHandler, hidden) {
+    var responseArtifact = new BattleGaugeArtifact(position, leftWidth, rightWidth);
+    if (hidden) {
+        responseArtifact.leftCooldown = 0;
+        responseArtifact.rightCooldown = 0;
+    }
+    responseArtifact.defineGetEffect(function (position, character) {
+        if (((position >= BGL_LEFT) && (leftWidth != 0) && (position - BGL_LEFT <= leftWidth))
+            || ((position <= BGL_LEFT) && (rightWidth != 0) && (BGL_LEFT - position <= rightWidth))) {
+
+            if (character == hero) {
+                heroResponseHandlers.push(responseHandler);
+            } else {
+                enemyResponseHandlers.push(responseHandler);
+            }
+        }
+        return position + rightWidth < BGL_LEFT;
+    });
+    if (!hidden) {
+        responseArtifact.defineDraw(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            drawLimitedGradient(position - leftWidth, topOffset, position, topOffset + BGL_HEIGHT,
+                weakColor, strongColor
+            );
+            drawLimitedGradient(position, topOffset, position + rightWidth, topOffset + BGL_HEIGHT,
+                strongColor, weakColor
+            );
+        });
+        responseArtifact.defineSketch(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            fc.beginPath();
+            fc.rect(position - leftWidth, topOffset - 5, rightWidth + leftWidth, BGL_HEIGHT + 10);
+            fc.lineWidth = 3;
+            fc.strokeStyle = "black";
+            fc.stroke();
+            fc.lineWidth = 1;
+            fc.moveTo(position - leftWidth, topOffset - 5);
+            fc.lineTo(position - leftWidth, topOffset + 164);
+            fc.moveTo(position + rightWidth, topOffset - 5);
+            fc.lineTo(position + rightWidth, topOffset + 164);
+            fc.stroke();
+        });
+    }
+    return responseArtifact;
+}
+
 function acquireEmptyArtifact(position, cooldown, image) {
     var emptyArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
     if (image !== undefined) {
@@ -959,4 +1105,31 @@ function acquireEmptyArtifact(position, cooldown, image) {
         return position < BGL_LEFT;
     });
     return emptyArtifact;
+}
+
+function acquireLabelArtifact(position, text) {
+    var labelArtifact = new BattleGaugeArtifact(position, 0, 0);
+    labelArtifact.defineDraw(function (position, character) {
+        var topOffset = getBattleGaugeOffset(character);
+        if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
+            var leftEdge = getImageResource("imgBattleLabelLeft");
+            var rightEdge = getImageResource("imgBattleLabelRight");
+            fc.beginPath();
+            fc.font = DEFAULT_FONT;
+            var displayText = (typeof text === "string") ? text : text[lang];
+            var lineWidth = fc.measureText(displayText).width + 8;
+            fc.drawImage(leftEdge, position - (lineWidth + leftEdge.width + rightEdge.width) / 2, topOffset + 30);
+            fc.drawImage(rightEdge, position + (lineWidth + leftEdge.width - rightEdge.width) / 2, topOffset + 30);
+            fc.fillStyle = "#F1ECAD";
+            fc.fillRect(position - lineWidth / 2 - 1, topOffset + 34, lineWidth + 2, 19);
+            fc.fillStyle = "#111133";
+            fc.textAlign = "center";
+            fc.fillText(displayText, position, topOffset + 48);
+            fc.textAlign = "left";
+        }
+    });
+    labelArtifact.defineGetEffect(function (position) {
+        return position < BGL_LEFT;
+    });
+    return labelArtifact;
 }

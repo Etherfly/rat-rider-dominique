@@ -31,15 +31,22 @@
             <img id="imgIconAttrReflexes" src="resources/other/icons/attrReflexes.png">
             <img id="imgKarma" src="resources/other/karma.png">
             <img id="imgBattleGauges" src="resources/other/battleGauges.png">
+            <img id="imgQuestMark" src="resources/other/quest-mark.png">
+            <img id="imgDangerMark" src="resources/other/danger-mark.png">
 
+            <img id="imgBattleLabelLeft" src="resources/other/battlegauge/bgLabelLeft.png">
+            <img id="imgBattleLabelRight" src="resources/other/battlegauge/bgLabelRight.png">
             <img id="imgBattleImpactIcon" src="resources/other/battlegauge/iconImpact.png">
+            <img id="imgBattleInflictImpact1Icon" src="resources/other/battlegauge/iconInflictImpact1.png">
+            <img id="imgBattleInflictImpact2Icon" src="resources/other/battlegauge/iconInflictImpact2.png">
             <img id="imgBattleAuraImpact1Icon" src="resources/other/battlegauge/iconAuraImpact1.png">
             <img id="imgBattleAuraImpact2Icon" src="resources/other/battlegauge/iconAuraImpact2.png">
             <img id="imgBattleItemIcon" src="resources/other/battlegauge/iconItem.png">
             <img id="imgBattleItemTrap" src="resources/other/battlegauge/iconTrap.png">
+            <img id="imgAuraDominique" src="resources/other/dominique-aura.png">
 
             <img id="imgPortraitDominique" src="resources/portraits/dominique.png">
-            <img id="imgAuraDominique" src="resources/other/dominique-aura.png">
+            <img id="imgPortraitSallinger" src="resources/portraits/sallinger.png">
 
             <img id="imgDecGrassBackground" src="resources/decorations/grasslands/bg.png">
             <img id="imgDecGrassTree1" src="resources/decorations/grasslands/tree1.png">
@@ -83,6 +90,10 @@
             <img id="imgObjDojo" src="resources/objects/dojo.png">
             <img id="imgObjTradingPost" src="resources/objects/tradingpost.png">
             <img id="imgObjLibrary" src="resources/objects/library.png">
+            <img id="imgObjMilestone" src="resources/objects/milestone.png">
+            <img id="imgObjDestroyedHouse" src="resources/objects/destroyedhouse.png">
+            <img id="imgObjSeersHut" src="resources/objects/seershut.png">
+            <img id="imgObjCave" src="resources/objects/cave.png">
 
             <img id="imgObjHouse1" src="resources/objects/house1.png">
             <img id="imgObjHouse2" src="resources/objects/house2.png">
@@ -91,10 +102,24 @@
 
             <img id="imgEnemyBandit1Stand" src="resources/enemies/bandit1.png">
             <img id="imgEnemyBandit1Attack" src="resources/enemies/bandit1attack.png">
+            <img id="imgEnemyBandit2Stand" src="resources/enemies/bandit2.png">
+            <img id="imgEnemyBandit2Attack" src="resources/enemies/bandit2attack.png">
+            <img id="imgEnemyBandit3Stand" src="resources/enemies/bandit3.png">
+            <img id="imgEnemyBandit3Attack" src="resources/enemies/bandit3attack.png">
             <img id="imgEnemyWolf1Stand" src="resources/enemies/wolf1.png">
             <img id="imgEnemyWolf1Attack" src="resources/enemies/wolf1attack.png">
+            <img id="imgEnemyWolf2Stand" src="resources/enemies/wolf2.png">
+            <img id="imgEnemyWolf2Attack" src="resources/enemies/wolf2attack.png">
             <img id="imgEnemyWasp1Stand" src="resources/enemies/wasp1.png">
             <img id="imgEnemyWasp1Attack" src="resources/enemies/wasp1attack.png">
+            <img id="imgEnemyWasp2Stand" src="resources/enemies/wasp2.png">
+            <img id="imgEnemyWasp2Attack" src="resources/enemies/wasp2attack.png">
+            <img id="imgEnemyArmadillo1Stand" src="resources/enemies/armadillo1.png">
+            <img id="imgEnemyArmadillo1Attack" src="resources/enemies/armadillo1attack.png">
+            <img id="imgEnemyArmadillo2Stand" src="resources/enemies/armadillo2.png">
+            <img id="imgEnemyArmadillo2Attack" src="resources/enemies/armadillo2attack.png">
+            <img id="imgEnemySerpent1Stand" src="resources/enemies/serpent1.png">
+            <img id="imgEnemySerpent1Attack" src="resources/enemies/serpent1attack.png">
         </td>
         <td style="display: none;">
             <span id="txtIntro1Eng">
@@ -171,6 +196,20 @@
 <script src="combat.js"></script>
 <script src="chapter00.js"></script>
 <script type="text/javascript">
+
+    /* ================================ */
+    /* ======== CHARACTER DATA ======== */
+    /* ================================ */
+
+    var CHR_DOMINIQUE = {
+        name: ["Dominique", "Доминик"],
+        portrait: getImageResource("imgPortraitDominique")
+    };
+
+    var CHR_SALLINGER = {
+        name: ["Sallinger", "Сэллинджер"],
+        portrait: getImageResource("imgPortraitSallinger")
+    };
 
     /* ================================== */
     /* ======== GLOBAL TEXT DATA ======== */
@@ -271,6 +310,13 @@
     var TXT_COMMON_ENCOUNTER_CHOICE_FIGHT = ["Fight", "Сражаться"];
     var TXT_COMMON_ENCOUNTER_CHOICE_AVOID = ["Avoid fighting", "Избежать боя"];
     var TXT_COMMON_ENCOUNTER_3 = ["Dominique got by without fighting, but lost ", "Доминик избежал боя, но потерял "];
+
+    var TXT_DANGER_ENCOUNTER_1 = [
+        " appears before Dominique! Rat rider's danger sense is ringing alarm, meaning this foe is not to be taken lightly. "
+                + "Would you like to fight or avoid encounter by sacrificing ",
+        " появился перед Домиником! Чутьё крысиного всадника бьёт тревогу, а это значит, что такого врага нельзя недооценивать. "
+                + "Вы можете сразиться или избежать столкновения, пожертвовав "
+    ];
 
     var TXT_MISS = ["Miss!", "Промах!"];
     var TXT_RESISTED = ["Resisted!", "Отражено!"];
