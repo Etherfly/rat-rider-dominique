@@ -124,7 +124,7 @@ function gainAttackSkill() {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 60, 60, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"), 1)
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getResource("imgBattleImpactIcon"), 1)
         ];
     });
     return attackSkill;
@@ -152,7 +152,7 @@ function gainChargeSkill() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 80, 80, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 30,
-                getImageResource("imgBattleImpactIcon"), 1.5)
+                getResource("imgBattleImpactIcon"), 1.5)
         ];
     });
     return chargeSkill;
@@ -167,7 +167,7 @@ function gainJabSkill() {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 30, 30, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 1, 0.5, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"), 0.5)
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getResource("imgBattleImpactIcon"), 0.5)
         ];
     });
     return jabSkill;
@@ -186,7 +186,7 @@ function gainCounterattackSkill() {
                 60, 0, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.5, 0, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 0, 80, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 1, 0.5, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"), 0.75)
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getResource("imgBattleImpactIcon"), 0.75)
         ];
     });
     return counterattackSkill;
@@ -205,7 +205,7 @@ function gainGuardedStrikeSkill() {
                 80, 0, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 1, 0.6, 0, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 0, 80, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.7, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"), 0.75)
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getResource("imgBattleImpactIcon"), 0.75)
         ];
     });
     return guardedStrikeSkill;
@@ -227,11 +227,11 @@ function gainRatRiderDanceSkill() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position) + 30,
                 0, 40, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.5, 0, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 30,
-                getImageResource("imgBattleImpactIcon"), 0.7),
+                getResource("imgBattleImpactIcon"), 0.7),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position),
-                getImageResource("imgBattleImpactIcon"), 0.7),
+                getResource("imgBattleImpactIcon"), 0.7),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 30,
-                getImageResource("imgBattleImpactIcon"), 0.7)
+                getResource("imgBattleImpactIcon"), 0.7)
         ];
     });
     return ratRiderDanceSkill;
@@ -249,7 +249,7 @@ function gainAceOfSpadesSkill() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 100, 100, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.5, 0, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 60,
-                [getImageResource("imgBattleAuraImpact1Icon"), getImageResource("imgBattleAuraImpact2Icon")],
+                [getResource("imgBattleAuraImpact1Icon"), getResource("imgBattleAuraImpact2Icon")],
                 5, false, false)
         ];
     });
@@ -299,7 +299,7 @@ function gainNetCasSkill() {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 60, 60, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 30, getImageResource("imgBattleItemTrap"),
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 30, getResource("imgBattleItemTrap"),
                 0, true, false, acquireTrappedStatus(1.1, 2000, 1.3))
         ];
     });
@@ -316,8 +316,8 @@ function gainDoubleStrikeSkill() {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 80, 80, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 30, getImageResource("imgBattleImpactIcon"), 0.7),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 30, getImageResource("imgBattleImpactIcon"), 0.7)
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 30, getResource("imgBattleImpactIcon"), 0.7),
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 30, getResource("imgBattleImpactIcon"), 0.7)
         ];
     });
     return doubleStrikeSkill;
@@ -337,23 +337,23 @@ function gainOmnislashSkill() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position) + 120,
                 0, 40, BGL_COLOR, "#3C78FF", ATTR_DEFENSE, 1, 1.7, 0, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 120,
-                getImageResource("imgBattleImpactIcon"), 0.8),
+                getResource("imgBattleImpactIcon"), 0.8),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 90,
-                getImageResource("imgBattleImpactIcon"), 0.8),
+                getResource("imgBattleImpactIcon"), 0.8),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 60,
-                getImageResource("imgBattleImpactIcon"), 0.8),
+                getResource("imgBattleImpactIcon"), 0.8),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 30,
-                getImageResource("imgBattleImpactIcon"), 0.8),
+                getResource("imgBattleImpactIcon"), 0.8),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position),
-                getImageResource("imgBattleImpactIcon"), 0.8),
+                getResource("imgBattleImpactIcon"), 0.8),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 30,
-                getImageResource("imgBattleImpactIcon"), 0.8),
+                getResource("imgBattleImpactIcon"), 0.8),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 60,
-                getImageResource("imgBattleImpactIcon"), 0.8),
+                getResource("imgBattleImpactIcon"), 0.8),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 90,
-                getImageResource("imgBattleImpactIcon"), 0.8),
+                getResource("imgBattleImpactIcon"), 0.8),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 120,
-                getImageResource("imgBattleImpactIcon"), 0.8)
+                getResource("imgBattleImpactIcon"), 0.8)
         ];
     });
     return omnislashSkill;
@@ -423,7 +423,7 @@ function gainEnemyAttackSkill(width, vulnerability, power) {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 width, width, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 1, vulnerability, 0, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position),
-                getImageResource("imgBattleImpactIcon"), power)
+                getResource("imgBattleImpactIcon"), power)
         ];
     });
     return fumbledAttackSkill;
@@ -446,7 +446,7 @@ function gainFumbledAttackSkill(width, vulnerability) {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 width, width * (1 + Math.random()), BGL_COLOR, "#FF4C4C", ATTR_DEFENSE, 1, vulnerability, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"),
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getResource("imgBattleWeakImpactIcon"),
                 vulnerability)
         ];
     });
@@ -462,7 +462,7 @@ function gainPowerAttackSkill(width, vulnerability, power) {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 width, width, BGL_COLOR, BGL_COLOR, ATTR_AGILITY, 1, vulnerability, 0, true),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position),
-                getImageResource("imgBattleImpactIcon"), power)
+                getResource("imgBattleImpactIcon"), power)
         ];
     });
     return fumbledAttackSkill;
@@ -487,7 +487,7 @@ function gainStatusAttackSkill(width, weakness, statusFunction, defenseThreshold
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 width, width, BGL_COLOR, BGL_COLOR, ATTR_EVASION, 1, 2 - weakness / 2, 0, true),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position),
-                [getImageResource("imgBattleInflictImpact1Icon"), getImageResource("imgBattleInflictImpact2Icon")],
+                [getResource("imgBattleInflictImpact1Icon"), getResource("imgBattleInflictImpact2Icon")],
                 weakness, true, true, statusFunction(defenseThreshold, duration, power))
         ];
     });
@@ -500,7 +500,7 @@ function gainFullguardAttackSkill(width, armor) {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 width / 2, width / 2, BGL_COLOR, "#AA40F0", ATTR_DEFENSE, 1, armor, 0, false),
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"), 1.2)
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getResource("imgBattleImpactIcon"), 1.2)
         ];
     });
     return fullguardAttackSkill;
@@ -518,7 +518,7 @@ function gainLieInWaitSkill(width, defenseFluct, agilityFluct) {
                 0, width, BGL_COLOR, "#FF4C4C", ATTR_DEFENSE, 1, defenseFluct, 0, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 0, width * 2, BGL_COLOR, BGL_COLOR, ATTR_AGILITY, 1, 1 + agilityFluct, 0, true),
-            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleImpactIcon"))
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getResource("imgBattleImpactIcon"))
         ];
     });
     return lieInWaitSkill;
@@ -532,7 +532,7 @@ function obtainOintmentItem() {
         ["A common curative ointment that is useful when working on flesh wounds. "
             + "Restores 25% HP over a long period of time.", "Обычная целебная мазь, полезна при обработке "
             + "поверхностных ран. Восстанавливает 25% ОЖ за длительный период времени."],
-        getImageResource("imgItemOintment1"), 20, 2, true);
+        getResource("imgItemOintment1"), 20, 2, true);
     ointmentItem.defineGetFieldEffect(function () {
         hero.restoreHp(hero.attrMaxHp * 0.25);
         return true;
@@ -543,7 +543,7 @@ function obtainOintmentItem() {
                 60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
             acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
                 0, 100, BGL_COLOR, "#3CFF3C", ATTR_HP, hero.attrMaxHp * 0.25, hero.attrMaxHp * 0.25, 0, false),
-            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getResource("imgBattleItemIcon"))
         ];
     });
     return ointmentItem;
@@ -555,7 +555,7 @@ function obtainSpineappleJuiceItem() {
         ["An energizing spineapple juice. A few draughts will make weariness go away, "
             + "restoring 25% SP over a long period of time", "Тонизирующий сок спинанаса. Несколько глотков прогонят "
             + "усталость, восстанавливая 25% ОВ за длительный период времени."],
-        getImageResource("imgItemPotion1"), 15, 2, true);
+        getResource("imgItemPotion1"), 15, 2, true);
     spineappleJuiceItem.defineGetFieldEffect(function () {
         hero.restoreSp(hero.attrMaxSp * 0.25);
         return true;
@@ -566,7 +566,7 @@ function obtainSpineappleJuiceItem() {
                 60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
             acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
                 0, 100, BGL_COLOR, "#3CFF3C", ATTR_SP, hero.attrMaxSp * 0.25, hero.attrMaxSp * 0.25, 0, false),
-            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getResource("imgBattleItemIcon"))
         ];
     });
     return spineappleJuiceItem;
@@ -579,10 +579,10 @@ function obtainMagineticPowderCutItem() {
             + "When applied, it raises effective attack by 20%. Medium duration.",
             "Мешочек с зачарованной пылью, которая располагает себя на режущей кромке оружия для увеличения его "
                 + "силы. При применении увеличивает эффективную атаку на 20%. Средняя длительность."],
-        getImageResource("imgItemPowder1"), 20, 2, true);
+        getResource("imgItemPowder1"), 20, 2, true);
     magneticPowderCutItem.defineGetFieldEffect(function () {
         var status = acquireEmpoweredStatus(0, 3000, 1.2);
-        registerObject(GUI_COMMON, procureHeroTextAction("white",
+        registerObject(GUI_COMMON, procureHeroTextAction(TEXT_COLOR_INK,
             [TXT_ACTIVATED[LANG_ENG] + status.statusName[LANG_ENG],
                 TXT_ACTIVATED[LANG_RUS] + status.statusName[LANG_RUS]]));
         hero.inflict(status.statusArtifacts);
@@ -592,7 +592,7 @@ function obtainMagineticPowderCutItem() {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
-            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getImageResource("imgBattleItemIcon"),
+            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getResource("imgBattleItemIcon"),
                 acquireEmpoweredStatus(0, 3000, 1.2))
         ];
     });
@@ -606,10 +606,10 @@ function obtainMagineticPowderPadItem() {
             + "its protective properties. When applied, it raises effective defense by 20%. Medium duration.",
             "Мешочек с зачарованной пылью, которая располагает себя на доспехе, прикрывая уязвимые места и увеличивая "
                 + "защитные свойства. При применении увеличивает эффективную защиту на 20%. Средняя длительность."],
-        getImageResource("imgItemPowder2"), 20, 2, true);
+        getResource("imgItemPowder2"), 20, 2, true);
     magneticPowderPadItem.defineGetFieldEffect(function () {
         var status = acquireShieldedStatus(0, 3000, 1.2);
-        registerObject(GUI_COMMON, procureHeroTextAction("white",
+        registerObject(GUI_COMMON, procureHeroTextAction(TEXT_COLOR_INK,
             [TXT_ACTIVATED[LANG_ENG] + status.statusName[LANG_ENG],
                 TXT_ACTIVATED[LANG_RUS] + status.statusName[LANG_RUS]]));
         hero.inflict(status.statusArtifacts);
@@ -619,7 +619,7 @@ function obtainMagineticPowderPadItem() {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
-            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getImageResource("imgBattleItemIcon"),
+            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getResource("imgBattleItemIcon"),
                 acquireShieldedStatus(0, 3000, 1.2))
         ];
     });
@@ -634,10 +634,10 @@ function obtainMuscleflexItem() {
             "Стебель мышцегиба, часто используемого в приготовлении всяческих алхимических зелий ингредиента. Делает "
                 + "тело ловким и гибким. При пережёвывании увеличивает эффективную ловкость на 20%. "
                 + "Средняя длительность."],
-        getImageResource("imgItemPlant1"), 20, 2, true);
+        getResource("imgItemPlant1"), 20, 2, true);
     muscleflexItem.defineGetFieldEffect(function () {
         var status = acquireNimbleStatus(0, 3000, 1.2);
-        registerObject(GUI_COMMON, procureHeroTextAction("white",
+        registerObject(GUI_COMMON, procureHeroTextAction(TEXT_COLOR_INK,
             [TXT_ACTIVATED[LANG_ENG] + status.statusName[LANG_ENG],
                 TXT_ACTIVATED[LANG_RUS] + status.statusName[LANG_RUS]]));
         hero.inflict(status.statusArtifacts);
@@ -647,7 +647,7 @@ function obtainMuscleflexItem() {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
-            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getImageResource("imgBattleItemIcon"),
+            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getResource("imgBattleItemIcon"),
                 acquireNimbleStatus(0, 3000, 1.2))
         ];
     });
@@ -664,10 +664,10 @@ function obtainWedgewingItem() {
                 + "приправу или просто вдохнуть как порошок или разжевать для повышения концентрации. Говорят, "
                 + "что он вызывает привыкание, но эти доводы не доказаны. При употреблении увеличивает "
                 + "эффективную реакцию на 20%. Средняя длительность."],
-        getImageResource("imgItemPlant2"), 20, 2, true);
+        getResource("imgItemPlant2"), 20, 2, true);
     wedgewingItem.defineGetFieldEffect(function () {
         var status = acquireConcentratedStatus(0, 3000, 1.2);
-        registerObject(GUI_COMMON, procureHeroTextAction("white",
+        registerObject(GUI_COMMON, procureHeroTextAction(TEXT_COLOR_INK,
             [TXT_ACTIVATED[LANG_ENG] + status.statusName[LANG_ENG],
                 TXT_ACTIVATED[LANG_RUS] + status.statusName[LANG_RUS]]));
         hero.inflict(status.statusArtifacts);
@@ -677,7 +677,7 @@ function obtainWedgewingItem() {
         return [
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 60, 0, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
-            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getImageResource("imgBattleItemIcon"),
+            acquireSelfInflictArtifact(getAbsoluteArtifactPosition(position), 5, getResource("imgBattleItemIcon"),
                 acquireConcentratedStatus(0, 3000, 1.2))
         ];
     });
@@ -689,11 +689,11 @@ function obtainFlyingDaggerItem() {
     var flyingDaggerItem = new UsableItem(["Flying dagger", "Летающий кинжал"],
         ["An enchanted dagger that seeks the target on its own. Just throw it into the air. 50% attack power impact.",
             "Заколдованный кинжал, который самостоятельно ищет цель. Просто подбросьте его в воздух. "
-                + "Воздействие 50% силы атаки."], getImageResource("imgItemDagger1"), 30, 3, false);
+                + "Воздействие 50% силы атаки."], getResource("imgItemDagger1"), 30, 3, false);
     flyingDaggerItem.defineGetFieldEffect(function () { return false; });
     flyingDaggerItem.defineGetArtifacts(function (position) {
         return [
-            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getImageResource("imgBattleImpactIcon"), 0.5)
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position), getResource("imgBattleImpactIcon"), 0.5)
         ];
     });
     return flyingDaggerItem;
@@ -705,7 +705,7 @@ function obtainBucklerItem() {
         ["A small round shield that protects from particularly nasty blows. Medium guard up by 30~80% period.",
             "Небольшой круглый щит, который защитит от особо коварных ударов. "
                 + "Средних размеров зона повышенной на 30~80% защиты."],
-        getImageResource("imgItemShield1"), 25, 5, false);
+        getResource("imgItemShield1"), 25, 5, false);
     bucklerItem.defineGetFieldEffect(function () { return false; });
     bucklerItem.defineGetArtifacts(function (position) {
         return [acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
@@ -723,7 +723,7 @@ function obtainLuckyCharmItem() {
             "Медный талисман, носимый на шее; существует поверье, что он приносит удачу. Смешение разных символов "
                 + "удачи вытравлено на его поверхности. Его можно подарить случайному прохожему за 10 ед. кармы или "
                 + "надеть в битве, чтобы раскрыть его потенциал и накопить с течением времени 20 ед. кармы."],
-        getImageResource("imgItemTalisman1"), 10, 1, true);
+        getResource("imgItemTalisman1"), 10, 1, true);
     luckyCharmItem.defineGetFieldEffect(function () {
         hero.addKarma(10);
         return true;
@@ -739,7 +739,7 @@ function obtainDebugCube1Item() {
     var cubeItem = new UsableItem(["Mystic Cube: HP", "Мистический Куб: ОЖ"],
         ["A mystic debug cube which heals Dominiqe's wounds instantly.",
             "Мистический отладочный куб, который полностью вылечивает раны Доминика."],
-        getImageResource("imgItemCube1"), 10000, 50, true);
+        getResource("imgItemCube1"), 10000, 50, true);
     cubeItem.defineGetFieldEffect(function () {
         hero.restoreHp(hero.attrMaxHp);
         return true;
@@ -748,7 +748,7 @@ function obtainDebugCube1Item() {
         return [
             acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
                 0, 10, BGL_COLOR, "#3CFF3C", ATTR_HP, hero.attrMaxHp, hero.attrMaxHp, 0, false),
-            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getResource("imgBattleItemIcon"))
         ];
     });
     return cubeItem;
@@ -759,7 +759,7 @@ function obtainDebugCube2Item() {
     var cubeItem = new UsableItem(["Mystic Cube: SP/AP", "Мистический Куб: ОВ/ОА"],
         ["A mystic debug cube which reenergizes Dominique instantly.",
             "Мистический отладочный куб, который мгновенно заряжает Доминика энергией."],
-        getImageResource("imgItemCube2"), 10000, 50, true);
+        getResource("imgItemCube2"), 10000, 50, true);
     cubeItem.defineGetFieldEffect(function () {
         hero.restoreSp(hero.attrMaxSp);
         hero.restoreAp(1);
@@ -771,7 +771,7 @@ function obtainDebugCube2Item() {
                 0, 5, BGL_COLOR, "#3CFF3C", ATTR_SP, hero.attrMaxHp, hero.attrMaxHp, 0, false),
             acquireGradualChangeArtifact(getAbsoluteArtifactPosition(position),
                 0, 5, BGL_COLOR, "#3CFF3C", ATTR_AP, 1, 1, 0, false),
-            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getResource("imgBattleItemIcon"))
         ];
     });
     return cubeItem;
@@ -782,7 +782,7 @@ function obtainDebugCube3Item() {
     var cubeItem = new UsableItem(["Mystic Cube: Karma", "Мистический Куб: Карма"],
         ["A mystic debug cube which enriches Dominique with Karma.",
             "Мистический отладочный куб, который обогащает Доминика кармой."],
-        getImageResource("imgItemCube3"), 10000, 50, true);
+        getResource("imgItemCube3"), 10000, 50, true);
     cubeItem.defineGetFieldEffect(function () {
         hero.addKarma(200);
         return true;
@@ -790,7 +790,7 @@ function obtainDebugCube3Item() {
     cubeItem.defineGetArtifacts(function (position) {
         return [
             acquireTriggerArtifact(function () { hero.addKarma(200); },
-                getAbsoluteArtifactPosition(position), 0, getImageResource("imgBattleItemIcon"))
+                getAbsoluteArtifactPosition(position), 0, getResource("imgBattleItemIcon"))
         ];
     });
     return cubeItem;

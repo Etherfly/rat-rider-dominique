@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Rat Rider Dominique v.0.65 ALPHA</title>
+    <title>Rat Rider Dominique v.0.87 ALPHA</title>
     <meta charset="utf-8">
 </head>
 <body style="background-color: black; empty-cells: show; width: 100%; height: 100%; margin: 0;">
@@ -31,12 +31,14 @@
             <img id="imgIconAttrReflexes" src="resources/other/icons/attrReflexes.png">
             <img id="imgKarma" src="resources/other/karma.png">
             <img id="imgBattleGauges" src="resources/other/battleGauges.png">
+            <img id="imgFlashLabel" src="resources/other/flashLabel.png">
             <img id="imgQuestMark" src="resources/other/quest-mark.png">
             <img id="imgDangerMark" src="resources/other/danger-mark.png">
 
             <img id="imgBattleLabelLeft" src="resources/other/battlegauge/bgLabelLeft.png">
             <img id="imgBattleLabelRight" src="resources/other/battlegauge/bgLabelRight.png">
             <img id="imgBattleImpactIcon" src="resources/other/battlegauge/iconImpact.png">
+            <img id="imgBattleWeakImpactIcon" src="resources/other/battlegauge/iconWeakImpact.png">
             <img id="imgBattleInflictImpact1Icon" src="resources/other/battlegauge/iconInflictImpact1.png">
             <img id="imgBattleInflictImpact2Icon" src="resources/other/battlegauge/iconInflictImpact2.png">
             <img id="imgBattleAuraImpact1Icon" src="resources/other/battlegauge/iconAuraImpact1.png">
@@ -47,6 +49,7 @@
 
             <img id="imgPortraitDominique" src="resources/portraits/dominique.png">
             <img id="imgPortraitSallinger" src="resources/portraits/sallinger.png">
+            <img id="imgPortraitBandit" src="resources/portraits/bandit.png">
 
             <img id="imgDecGrassBackground" src="resources/decorations/grasslands/bg.png">
             <img id="imgDecGrassTree1" src="resources/decorations/grasslands/tree1.png">
@@ -120,6 +123,35 @@
             <img id="imgEnemyArmadillo2Attack" src="resources/enemies/armadillo2attack.png">
             <img id="imgEnemySerpent1Stand" src="resources/enemies/serpent1.png">
             <img id="imgEnemySerpent1Attack" src="resources/enemies/serpent1attack.png">
+        </td>
+        <td style="display: none;">
+            <audio id="sndLandscapeMusic">
+                <source src="sound/music/02-grasslands-theme.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndBattleMusic">
+                <source src="sound/music/03-battle-theme-1.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndEventMusic">
+                <source src="sound/music/01-title-theme.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndGuiTink1">
+                <source src="sound/sfx/gui-tink.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndGuiTink2">
+                <source src="sound/sfx/gui-tink.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndGuiThuck1">
+                <source src="sound/sfx/gui-thuck.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndGuiThuck2">
+                <source src="sound/sfx/gui-thuck.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndHeroBattleSfx">
+                <source src="sound/sfx/hit.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndEnemyBattleSfx">
+                <source src="sound/sfx/hit.ogg" type="audio/ogg">
+            </audio>
         </td>
         <td style="display: none;">
             <span id="txtIntro1Eng">
@@ -198,17 +230,45 @@
 <script type="text/javascript">
 
     /* ================================ */
+    /* ========== SOUNDTRACK ========== */
+    /* ================================ */
+
+    var MUS_TITLE_THEME = {
+        src: "sound/music/01-title-theme.ogg",
+        loopStart: 76,
+        loopEnd: 152.5,
+        ending: 0
+    };
+    var MUS_GRASSLANDS_THEME = {
+        src: "sound/music/02-grasslands-theme.ogg",
+        loopStart: 1.15,
+        loopEnd: 108.65,
+        ending: 0
+    };
+    var MUS_BATTLE_THEME = {
+        src: "sound/music/03-battle-theme-1.ogg",
+        loopStart: 3.34,
+        loopEnd: 83.2,
+        ending: 146.6
+    };
+
+    /* ================================ */
     /* ======== CHARACTER DATA ======== */
     /* ================================ */
 
     var CHR_DOMINIQUE = {
         name: ["Dominique", "Доминик"],
-        portrait: getImageResource("imgPortraitDominique")
+        portrait: getResource("imgPortraitDominique")
     };
 
     var CHR_SALLINGER = {
         name: ["Sallinger", "Сэллинджер"],
-        portrait: getImageResource("imgPortraitSallinger")
+        portrait: getResource("imgPortraitSallinger")
+    };
+
+    var CHR_BANDIT = {
+        name: ["Bandit", "Бандит"],
+        portrait: getResource("imgPortraitBandit")
     };
 
     /* ================================== */
@@ -253,6 +313,7 @@
     var TXT_MENU_STATS = ["Statistics", "Статистика"];
     var TXT_MENU_SKILLS = ["Skills", "Навыки"];
     var TXT_MENU_ITEMS = ["Items", "Предметы"];
+    var TXT_MENU_CODEX = ["Codex", "Кодекс"];
     var TXT_MENU_QUIT = ["Quit", "Выйти"];
 
     var TXT_MENU_AVAILABLE_SKILLS = ["Available skills", "Доступные навыки"];
@@ -348,10 +409,10 @@
     /* ========= INITIALIZATION ========= */
     /* ================================== */
 
-    CURSOR_DOWN = getImageResource("imgCursorDown");
-    CURSOR_RIGHT = getImageResource("imgCursorRight");
-    CURSOR_UP = getImageResource("imgCursorUp");
-    CURSOR_LEFT = getImageResource("imgCursorLeft");
+    CURSOR_DOWN = getResource("imgCursorDown");
+    CURSOR_RIGHT = getResource("imgCursorRight");
+    CURSOR_UP = getResource("imgCursorUp");
+    CURSOR_LEFT = getResource("imgCursorLeft");
 
     resetGame();
     registerObject(GUI_EVENT, procureTitleSequence());

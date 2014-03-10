@@ -61,6 +61,7 @@ var CLOUD_HEIGHT = 120;
 var reaches = [];               // farthest terrain chunks (corresponding to paths FAR, MID and NEAR)
 var upperReaches;               // farthest upper decoration
 var moving = true;              // terrain movement
+var maneuvering = true;         // movement between paths
 var movementCoefficient = 3;    // movement speed
 
 // control keys
@@ -93,6 +94,8 @@ var globalFrame = 0;    // global frame counter up to 100 for technical purposes
 
 var reboundFrame = 0;       // karmic rebound frame counter
 var reboundTargetFrame = 0; // karmic rebound current target frame
+
+var currentSyncCoefficient = 0; // current agility difference coefficient used in syncing
 
 // karmic rebound period bounds
 var KARMIC_REBOUND_PERIOD_LOW = 100;
@@ -169,6 +172,26 @@ var CURSOR_RIGHT;
 var CURSOR_UP;
 var CURSOR_LEFT;
 
+// music control
+
+var eventMusic = null;
+var specialBattleMusic = null;
+
+var musicFade = [];     // fade in and out volume factors
+var musicFadeOut = [];  // fade direction - true if out
+
+var MPS_LANDSCAPE = 0;
+var MPS_BATTLE = 1;
+var MPS_EVENT = 2;
+var MPS_BATTLE_END = 3;
+
+var musicPlayState = 0;
+
+var SFX_GUI_TINK = "sndGuiTink";
+var SFX_GUI_THUCK = "sndGuiThuck";
+var SFX_BATTLE_HERO = "sndHeroBattleSfx";
+var SFX_BATTLE_ENEMY = "sndEnemyBattleSfx";
+
 var LANG_ENG = 0;       // English language
 var LANG_RUS = 1;       // Русский язык
 
@@ -229,7 +252,7 @@ function clearObjectType(type) {
     }
 }
 
-function getImageResource(id) {
+function getResource(id) {
     return document.getElementById(id);
 }
 
@@ -245,7 +268,7 @@ function getRandomObject(objectSet) {
 function initializeChapterData(chapterId) {
     switch (chapterId) {
         case CH00:
-            for (var i = 0; i < 7; i++) {
+            for (var i = 0; i < 17; i++) {
                 gst[chapterId][i] = 0;
             }
             break;
@@ -259,6 +282,9 @@ function initializeChapterData(chapterId) {
 function loadLandscape(id) {
     landscapeId = id;
     landscape = createLandscape(landscapeId);
+    setEventMusic(null);
+    setMusicPlayState(MPS_LANDSCAPE);
+    setLandscapeMusic();
     singletonIds.length = 0;
     landscape.actualize();
 }
@@ -266,7 +292,6 @@ function loadLandscape(id) {
 function resetGame() {
     layers.length = 23;
     for (var i = 0; i < layers.length; i++) {
-        // Yeah, javascript, you're the best.
         layers[i] = [];
     }
     gst.length = 8;
@@ -274,12 +299,19 @@ function resetGame() {
         gst[i] = [];
         initializeChapterData(i);
     }
+    for (i = 0; i < 3; i++) {
+        musicFade[i] = 0;
+        musicFadeOut[i] = true;
+    }
     setControlMode(CM_EVENT);
     initializeGui();
-    loadLandscape(0);
+    loadLandscape(LSC_TITLE);
     landscape.resetTerrain();
     moving = true;
     registerObject(GUI_EVENT, landscape);
+
+    setEventMusic(MUS_TITLE_THEME);
+    setMusicPlayState(MPS_EVENT);
 }
 
 function saveGame() {
@@ -359,6 +391,64 @@ function loadGame() {
 
 function setControlMode(newControlMode) {
     controlMode = newControlMode;
+}
+
+function setMusicPlayState(newMPS) {
+    if (musicPlayState != newMPS) {
+        if (newMPS != MPS_BATTLE_END) {
+            musicFadeOut[musicPlayState] = true;
+            musicFadeOut[newMPS] = false;
+        } else {
+            getResource("sndBattleMusic").currentTime = specialBattleMusic != null
+                ? specialBattleMusic.ending : landscape.battleTheme.ending;
+        }
+        musicPlayState = newMPS;
+    }
+}
+
+function setLandscapeMusic() {
+    getResource("sndLandscapeMusic").src = landscape.mainTheme.src;
+    getResource("sndBattleMusic").src = landscape.battleTheme.src;
+}
+
+function setBattleMusic(newBattleMusic) {
+    if (newBattleMusic != null) {
+        getResource("sndBattleMusic").src = newBattleMusic.src;
+        specialBattleMusic = newBattleMusic;
+    } else {
+        getResource("sndBattleMusic").src = landscape.battleTheme.src;
+        specialBattleMusic = null;
+    }
+}
+
+function setEventMusic(newEventMusic) {
+    if (newEventMusic != null) {
+        getResource("sndEventMusic").src = newEventMusic.src;
+        eventMusic = newEventMusic;
+    } else {
+        eventMusic = null;
+    }
+}
+
+function playSfx(sfx) {
+    if ((sfx == SFX_GUI_TINK) || (sfx == SFX_GUI_THUCK)) {
+        if (!getResource(sfx + "1").paused) {
+            sfx += "2";
+        } else {
+            sfx += "1";
+        }
+    }
+    var sfxElement = getResource(sfx);
+    if (sfxElement.paused) {
+        sfxElement.play();
+        sfxElement.currentTime = 0;
+    }
+}
+
+function playBattleSfx(character, src) {
+    var sfxElement = character == hero ? getResource(SFX_BATTLE_HERO) : getResource(SFX_BATTLE_ENEMY);
+    sfxElement.src = src;
+    sfxElement.play();
 }
 
 document.onkeydown = function (event) {
@@ -573,8 +663,23 @@ function getGlobalBattleGaugeShiftCoefficient() {
 
 function getAgilityDifferenceCoefficient() {
     var adc = Math.sqrt(enemy.attrAgility / hero.attrAgility) * enemy.effAgility / hero.effAgility;
-    if (keyShift && (adc < 1)) {
-        adc = 1;
+    if (adc < 1) {
+        if (keyShift) {
+            if (currentSyncCoefficient > 1) {
+                currentSyncCoefficient -= 0.005;
+            } else {
+                currentSyncCoefficient += 0.005;
+            }
+            if (Math.abs(currentSyncCoefficient - 1) <= 0.01) { currentSyncCoefficient = 1; }
+        } else {
+            if (currentSyncCoefficient > adc) {
+                currentSyncCoefficient -= 0.005;
+            } else {
+                currentSyncCoefficient += 0.005;
+            }
+            if (Math.abs(currentSyncCoefficient - adc) <= 0.01) { currentSyncCoefficient = adc; }
+        }
+        adc = currentSyncCoefficient;
     }
     return adc;
 }
@@ -628,9 +733,10 @@ function handleBattleEnd() {
     hero.skillSet.length = 0;
     hero.battleGaugeArtifacts.length = 0;
     enemy.battleGaugeArtifacts.length = 0;
+    setMusicPlayState(MPS_BATTLE_END);
     var battleGuiDisappearAction = new Action();
     battleGuiDisappearAction.definePlayFrame(function (frame) {
-        var imgGuiBattleGauges = getImageResource("imgBattleGauges");
+        var imgGuiBattleGauges = getResource("imgBattleGauges");
         var reverseFrame = (22 + imgGuiBattleGauges.height) / 8 - frame;
         var x = (W - imgGuiBattleGauges.width) / 2;
         var y = reverseFrame * 8 - imgGuiBattleGauges.height;
@@ -640,7 +746,7 @@ function handleBattleEnd() {
         var scale = (reverseFrame * 16) >= (22 + imgGuiBattleGauges.height)
             ? 1 : (reverseFrame * 16) / (22 + imgGuiBattleGauges.height);
 
-        var imgEnemyHpGauge = getImageResource("imgGuiEnemyHpGauge");
+        var imgEnemyHpGauge = getResource("imgGuiEnemyHpGauge");
         x = -imgEnemyHpGauge.width + scale * (imgEnemyHpGauge.width + 18);
         fc.drawImage(imgEnemyHpGauge, x, 185);
 
@@ -758,7 +864,7 @@ function deliverImpacts() {
             if (impacts[i].attackPower > 0) {
 
                 if (Math.floor(dmg) <= 0) {
-                    registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", "0"));
+                    registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, TEXT_COLOR_INK, "0"));
                 } else {
                     impacts[i].target.expendHp(dmg);
                 }
@@ -780,10 +886,10 @@ function deliverImpacts() {
             /* STATUS EFFECTS */
             if ((impacts[i].defenseThreshold != null) && (impacts[i].statusArtifacts != null)) {
                 if (impacts[i].target.effDefense > impacts[i].defenseThreshold) {
-                    registerObject(GUI_COMMON, procureStatusTextAction(impacts[i].attacker, "white", TXT_RESISTED));
+                    registerObject(GUI_COMMON, procureStatusTextAction(impacts[i].attacker, TEXT_COLOR_INK, TXT_RESISTED));
                 } else {
                     impacts[i].target.inflict(impacts[i].statusArtifacts);
-                    registerObject(GUI_COMMON, procureStatusTextAction(impacts[i].attacker, "white",
+                    registerObject(GUI_COMMON, procureStatusTextAction(impacts[i].attacker, TEXT_COLOR_INK,
                         [TXT_INFLICTED[LANG_ENG] + impacts[i].statusName[LANG_ENG],
                             TXT_INFLICTED[LANG_RUS] + impacts[i].statusName[LANG_RUS]]));
                 }
@@ -791,9 +897,9 @@ function deliverImpacts() {
 
             registerObject(pathToObjectFrontLayer(impacts[i].target.path),
                 impacts[i].target.getEffectAction([
-                    getImageResource("imgEffectHit1-1"),
-                    getImageResource("imgEffectHit1-2"),
-                    getImageResource("imgEffectHit1-3")], 3, 35, 35));
+                    getResource("imgEffectHit1-1"),
+                    getResource("imgEffectHit1-2"),
+                    getResource("imgEffectHit1-3")], 3, 35, 35));
 
             /*
              * ATTRIBUTE INCREASE:
@@ -817,7 +923,7 @@ function deliverImpacts() {
                 attrIncrease[ATTR_REFLEXES] += enemyReflexesModifier * impacts[i].target.effDefense * AIB_REFLEXES;
             }
         } else {
-            registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, "white", TXT_MISS));
+            registerObject(GUI_COMMON, procureHpGaugeTextAction(impacts[i].target, TEXT_COLOR_INK, TXT_MISS));
             if (impacts[i].attacker != hero) {
                 enemyReflexesModifier = impacts[i].target.attrReflexes / impacts[i].attacker.attrReflexes;
                 attrIncrease[ATTR_AGILITY] += enemyAgilityModifier * AIB_AGILITY;
@@ -882,7 +988,80 @@ function performKarmaRebound() {
     if (statusEffect != null) {
         hero.inflict(statusEffect.statusArtifacts);
     }
-    registerObject(GUI_COMMON, procureHeroTextAction("white", reboundText));
+    registerObject(GUI_COMMON, procureHeroTextAction(TEXT_COLOR_RED, reboundText));
+}
+
+function manageMusic() {
+    var lscMusicElement = getResource("sndLandscapeMusic");
+    var btlMusicElement = getResource("sndBattleMusic");
+    var evtMusicElement = getResource("sndEventMusic");
+
+    switch (musicPlayState) {
+        case MPS_LANDSCAPE:
+            musicFadeOut[MPS_LANDSCAPE] = false;
+            musicFadeOut[MPS_EVENT] = true;
+            if (lscMusicElement.paused) {
+                lscMusicElement.play();
+            }
+            if (lscMusicElement.currentTime > landscape.mainTheme.loopEnd) {
+                lscMusicElement.currentTime = landscape.mainTheme.loopStart;
+            }
+            break;
+        case MPS_BATTLE:
+            musicFadeOut[MPS_LANDSCAPE] = true;
+            musicFadeOut[MPS_BATTLE] = !musicFadeOut[MPS_EVENT];
+            var battleTheme = specialBattleMusic != null ? specialBattleMusic : landscape.battleTheme;
+            if (btlMusicElement.paused) {
+                btlMusicElement.play();
+            }
+            if (btlMusicElement.currentTime > battleTheme.loopEnd) {
+                btlMusicElement.currentTime = battleTheme.loopStart;
+            }
+            break;
+        case MPS_EVENT:
+            musicFadeOut[MPS_LANDSCAPE] = true;
+            musicFadeOut[MPS_BATTLE] = true;
+            musicFadeOut[MPS_EVENT] = false;
+            if (evtMusicElement.paused) {
+                evtMusicElement.play();
+            }
+            if (evtMusicElement.currentTime > eventMusic.loopEnd) {
+                evtMusicElement.currentTime = eventMusic.loopStart;
+            }
+            break;
+        case MPS_BATTLE_END:
+            if (btlMusicElement.ended) {
+                if (eventMusic == null) {
+                    musicFade[MPS_LANDSCAPE] = 0;
+                    musicPlayState = MPS_LANDSCAPE;
+                } else {
+                    musicFade[MPS_EVENT] = 0;
+                    musicPlayState = MPS_EVENT;
+                }
+            }
+            break;
+    }
+
+    for (var i = 0; i < 3; i++) {
+        if (musicFadeOut[i]) {
+            if (musicFade[i] > 0) {
+                musicFade[i] -= 0.01;
+            }
+            if (musicFade[i] < 0) {
+                musicFade[i] = 0;
+            }
+        } else {
+            if (musicFade[i] < 1) {
+                musicFade[i] += 0.01;
+            }
+            if (musicFade[i] > 1) {
+                musicFade[i] = 1;
+            }
+        }
+    }
+    lscMusicElement.volume = musicFade[MPS_LANDSCAPE];
+    btlMusicElement.volume = musicFade[MPS_BATTLE];
+    evtMusicElement.volume = musicFade[MPS_EVENT];
 }
 
 function tick() {
@@ -970,6 +1149,7 @@ function tick() {
     }
 
     if (displayGui && (menuState == MS_NONE) && (controlMode != CM_BATTLE) && (keyPressed == KEY_ESC)) {
+        playSfx(SFX_GUI_THUCK);
         menuState = MS_OPENING;
         registerObject(GUI_EVENT, procureEscapeMenuSequence());
     }
@@ -995,13 +1175,15 @@ function tick() {
                 reboundTargetFrame = 0;
             }
 
-            switch (keyPressed) {
-                case KEY_UP:
-                    hero.moveFarther();
-                    break;
-                case KEY_DOWN:
-                    hero.moveNearer();
-                    break;
+            if (maneuvering) {
+                switch (keyPressed) {
+                    case KEY_UP:
+                        hero.moveFarther();
+                        break;
+                    case KEY_DOWN:
+                        hero.moveNearer();
+                        break;
+                }
             }
         } else if (controlMode == CM_BATTLE) {
             if ((hero.hp > 0) && (enemy.hp > 0)) {
@@ -1033,6 +1215,8 @@ function tick() {
     }
 
     keyPressed = KEY_NONE;
+
+    manageMusic();
 
     lagFactor = (Date.now() - timerNick) / 20;
     if (lagFactor > 1) {

@@ -26,7 +26,9 @@ var MENU_SKILLS_COLUMN_WIDTH = 350;
 var AURA_ANIMATION_Y = 200;
 var AURA_ANIMATION_H = 300;
 
+var TEXT_COLOR_INK = "#101030";
 var TEXT_COLOR_GOLD = "#f0f040";
+var TEXT_COLOR_RED = "#702020";
 
 var heroBGNicksPosition = 0;
 var enemyBGNicksPosition = 0;
@@ -56,7 +58,8 @@ var itemChoice = 0;     // selected item
 var scrollOffset = 0;   // skill or item list scrolling offset
 var objectChoice = [];    // menu item choice in the multi-column layouts
 
-var menuState = 0;  // global menu state
+var menuState = 0;          // global menu state
+var previousMenuState = 0;  // previous menu state value when displaying a message
 
 // menu states
 var MS_NONE = 0;
@@ -74,8 +77,12 @@ var MS_ITEMS_BROWSE_2 = 11;
 var MS_ITEMS_BROWSE_3 = 12;
 var MS_ITEMS_EXCHANGE_1 = 13;
 var MS_ITEMS_EXCHANGE_2 = 14;
+var MS_CODEX_ROOT = 15;
+var MS_CODEX_CATEGORY = 16;
+var MS_CODEX_ENTRY = 17;
 var MS_SKILL_GAINED = 20;
 var MS_ITEM_OBTAINED = 21;
+var MS_MENU_MESSAGE = 22;
 
 /*
  * Universal text processor
@@ -134,6 +141,23 @@ function drawTextbox(xPos, yPos, width, height) {
 
 function drawInfoWindow() {
     drawTextbox(INFO_WINDOW_X, INFO_WINDOW_Y, INFO_WINDOW_W, INFO_WINDOW_H);
+}
+
+function drawLabel(x, y, text) {
+    var leftEdge = getResource("imgBattleLabelLeft");
+    var rightEdge = getResource("imgBattleLabelRight");
+    fc.beginPath();
+    fc.font = DEFAULT_FONT;
+    var displayText = (typeof text === "string") ? text : text[lang];
+    var lineWidth = fc.measureText(displayText).width + 8;
+    fc.drawImage(leftEdge, x - (lineWidth + leftEdge.width + rightEdge.width) / 2, y - 18);
+    fc.drawImage(rightEdge, x + (lineWidth + leftEdge.width - rightEdge.width) / 2, y - 18);
+    fc.fillStyle = "#F1ECAD";
+    fc.fillRect(x - lineWidth / 2 - 1, y - 14, lineWidth + 2, 19);
+    fc.fillStyle = "#111133";
+    fc.textAlign = "center";
+    fc.fillText(displayText, x, y);
+    fc.textAlign = "left";
 }
 
 function hexToRgb(hex) {
@@ -219,7 +243,7 @@ function drawLimitedGradient(xStart, yStart, xEnd, yEnd, startColorHex, endColor
 /* GUI initialization */
 
 function initializeGui() {
-    var imgGuiHpSpGauge = getImageResource("imgGuiHpSpGauge");
+    var imgGuiHpSpGauge = getResource("imgGuiHpSpGauge");
     var hpSpGauge = new GuiElement(null, HP_GAUGE_X, HP_GAUGE_Y);
     hpSpGauge.defineReflect(function() {
         var shakeXOffset = 0;
@@ -256,11 +280,11 @@ function initializeGui() {
         }
     });
     registerObject(GUI_COMMON, hpSpGauge);
-    var imgGuiAttributeGrowthGauge = getImageResource("imgGuiAttributeGrowthGauge");
-    var imgIconAttrAttack = getImageResource("imgIconAttrAttack");
-    var imgIconAttrDefense = getImageResource("imgIconAttrDefense");
-    var imgIconAttrAgility = getImageResource("imgIconAttrAgility");
-    var imgIconAttrReflexes = getImageResource("imgIconAttrReflexes");
+    var imgGuiAttributeGrowthGauge = getResource("imgGuiAttributeGrowthGauge");
+    var imgIconAttrAttack = getResource("imgIconAttrAttack");
+    var imgIconAttrDefense = getResource("imgIconAttrDefense");
+    var imgIconAttrAgility = getResource("imgIconAttrAgility");
+    var imgIconAttrReflexes = getResource("imgIconAttrReflexes");
     var attributeBox = new GuiElement(null, 10, INFO_WINDOW_Y);
     attributeBox.defineReflect(function() {
         function displayAttribute(icon, attrName, attribute, offset) {
@@ -314,7 +338,7 @@ function initializeGui() {
         }
     });
     registerObject(GUI_COMMON, attributeBox);
-    var imgKarma = getImageResource("imgKarma");
+    var imgKarma = getResource("imgKarma");
     var karmaDisplay = new GuiElement(null, 10, H - 55);
     karmaDisplay.defineReflect(function() {
         if (hero != null) {
@@ -330,7 +354,7 @@ function initializeGui() {
         }
     });
     registerObject(GUI_COMMON, karmaDisplay);
-    var imgEnemyHpGauge = getImageResource("imgGuiEnemyHpGauge");
+    var imgEnemyHpGauge = getResource("imgGuiEnemyHpGauge");
     var enemyHpGauge = new GuiElement(null, 18, 185);
     enemyHpGauge.defineReflect(function() {
         if ((battleFrame > 0) && (enemy != null)) {
@@ -354,12 +378,14 @@ function initializeGui() {
         }
     });
     registerObject(GUI_COMMON, enemyHpGauge);
-    var imgGuiBattleGauges = getImageResource("imgBattleGauges");
+    var imgGuiBattleGauges = getResource("imgBattleGauges");
     var battleGauges = new GuiElement(null, (W - imgGuiBattleGauges.width) / 2 - 20, 22);
-    battleGauges.defineReflect(function() {
+    battleGauges.defineReflect(function () {
         if ((battleFrame > 0) && (hero != null) && (enemy != null)) {
-            heroBGNicksPosition = (heroBGNicksPosition + BATTLEGAUGE_SHIFT_BASIS
-                * getGlobalBattleGaugeShiftCoefficient()) % 40;
+            if (controlMode == CM_BATTLE) {
+                heroBGNicksPosition = (heroBGNicksPosition + BATTLEGAUGE_SHIFT_BASIS
+                    * getGlobalBattleGaugeShiftCoefficient()) % 40;
+            }
             for (var i = 0; i < 57; i++) {
                 fc.beginPath();
                 fc.strokeStyle = "black";
@@ -370,8 +396,10 @@ function initializeGui() {
                     getBattleGaugeOffset(hero) - (i % 4 == 0 ? 18 : 12));
                 fc.stroke();
             }
-            enemyBGNicksPosition = (enemyBGNicksPosition + BATTLEGAUGE_SHIFT_BASIS
-                * getGlobalBattleGaugeShiftCoefficient() * getAgilityDifferenceCoefficient()) % 40;
+            if (controlMode == CM_BATTLE) {
+                enemyBGNicksPosition = (enemyBGNicksPosition + BATTLEGAUGE_SHIFT_BASIS
+                    * getGlobalBattleGaugeShiftCoefficient() * getAgilityDifferenceCoefficient()) % 40;
+            }
             for (i = 0; i < 57; i++) {
                 fc.beginPath();
                 fc.strokeStyle = "black";
@@ -416,6 +444,7 @@ function initializeGui() {
             }
             drawTextbox(W - 350, 54, 330, 50 + 30 * lineCount);
             if (keyPressed == KEY_UP) {
+                playSfx(SFX_GUI_TINK);
                 skillChoice--;
                 while (hero.skillSet[skillChoice] == null) {
                     if (skillChoice > 0) {
@@ -425,6 +454,7 @@ function initializeGui() {
                     }
                 }
             } else if (keyPressed == KEY_DOWN) {
+                playSfx(SFX_GUI_TINK);
                 skillChoice++;
                 while (hero.skillSet[skillChoice] == null) {
                     if (skillChoice < hero.skillSet.length - 1) {
@@ -481,6 +511,7 @@ function initializeGui() {
             }
             if (activeItemsNumber > 0) {
                 if (keyPressed == KEY_LEFT) {
+                    playSfx(SFX_GUI_TINK);
                     itemChoice--;
                     while (hero.activeItems[itemChoice] == null) {
                         if (itemChoice > 0) {
@@ -490,6 +521,7 @@ function initializeGui() {
                         }
                     }
                 } else if (keyPressed == KEY_RIGHT) {
+                    playSfx(SFX_GUI_TINK);
                     itemChoice++;
                     while (hero.activeItems[itemChoice] == null) {
                         if (itemChoice < hero.activeItems.length - 1) {
@@ -612,6 +644,26 @@ function procureDisplayItemMessageAction(itemRecord) {
 
 /* ESCAPE MENU LOGIC */
 
+function processTutorialMessages(chId, varId, message1, message2) {
+    if (gst[chId][varId] < 1) {
+        gst[chId][varId] = 1;
+        previousMenuState = menuState;
+        menuState = MS_MENU_MESSAGE;
+        var tutorialMessageSequence = new Sequence();
+        tutorialMessageSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM,
+            message1, true).authorizeMenuPlay());
+        if (message2 != null) {
+            tutorialMessageSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM,
+                message2, true).authorizeMenuPlay());
+        }
+        tutorialMessageSequence.addAction(procureCodeFragmentAction(function () {
+            menuState = previousMenuState;
+        }).authorizeMenuPlay());
+        registerObject(GUI_EVENT, tutorialMessageSequence);
+    }
+}
+
+
 function procureEscapeMenuSequence() {
     var escMenuSequence = new Sequence();
     escMenuSequence.addAction(procureMaskAction().authorizeMenuPlay(), DECORATIONS_NEAR);
@@ -626,7 +678,7 @@ function procureEscapeMenuSequence() {
 function procureDisplayMenuRootAction() {
     var displayMenuRootAction = new Action();
     displayMenuRootAction.choices = [
-        TXT_MENU_STATS, TXT_MENU_SKILLS, TXT_MENU_ITEMS, TXT_LOAD_GAME, TXT_MENU_QUIT
+        TXT_MENU_STATS, TXT_MENU_SKILLS, TXT_MENU_ITEMS, TXT_MENU_CODEX, TXT_LOAD_GAME, TXT_MENU_QUIT
     ];
     displayMenuRootAction.definePlayFrame(function (frame) {
         function writeLine(line, lineCount, offset) {
@@ -649,22 +701,27 @@ function procureDisplayMenuRootAction() {
             drawTextbox(HP_GAUGE_X - 8, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, 300, MENU_ROOT_HEIGHT);
             drawInfoWindow();
 
+            processTutorialMessages(CH00, CH00_TUTORIAL_MENU_ROOT, CH00_TUTORIAL_MENU_ROOT_TXT);
+
             var i;
             var lineCount = 0;
             if (menuState == MS_ROOT) {
                 if (keyPressed == KEY_UP) {
+                    playSfx(SFX_GUI_TINK);
                     if (menuChoice > 0) {
                         menuChoice--;
                     } else {
                         menuChoice = displayMenuRootAction.choices.length - 1;
                     }
                 } else if (keyPressed == KEY_DOWN) {
+                    playSfx(SFX_GUI_TINK);
                     if (menuChoice < displayMenuRootAction.choices.length - 1) {
                         menuChoice++;
                     } else {
                         menuChoice = 0;
                     }
                 } else if (keyPressed == KEY_ACTION) {
+                    playSfx(SFX_GUI_THUCK);
                     switch (menuChoice) {
                         case 0:
                             var escMenuStatsSequence = new Sequence();
@@ -694,9 +751,18 @@ function procureDisplayMenuRootAction() {
                             registerObject(GUI_EVENT, escMenuItemsSequence);
                             break;
                         case 3:
-                            loadGame();
+                            var escMenuCodexSequence = new Sequence();
+                            escMenuCodexSequence.addAction(procureDisplayMenuCodexAction().authorizeMenuPlay());
+                            escMenuCodexSequence.addAction(procureCodeFragmentAction(function () {
+                                menuState = MS_ROOT;
+                                menuChoice = 3;
+                            }).authorizeMenuPlay());
+                            registerObject(GUI_EVENT, escMenuCodexSequence);
                             break;
                         case 4:
+                            loadGame();
+                            break;
+                        case 5:
                             resetGame();
                             registerObject(GUI_EVENT, procureTitleSequence());
                             break;
@@ -728,6 +794,10 @@ function procureDisplayMenuRootAction() {
                 }
             }
 
+            if ((keyPressed == KEY_ESC) && (menuState == MS_ROOT)) {
+                playSfx(SFX_GUI_THUCK);
+            }
+
             return (keyPressed == KEY_ESC) && (menuState == MS_ROOT);
         }
         return false;
@@ -757,6 +827,8 @@ function procureDisplayMenuStatsAction() {
         } else {
             drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, W - HP_GAUGE_X - 320,
                 INFO_WINDOW_Y - HP_GAUGE_Y - MENU_ROOT_Y_OFFSET - 10);
+
+            processTutorialMessages(CH00, CH00_TUTORIAL_MENU_STATS, CH00_TUTORIAL_MENU_STATS_TXT);
 
             var i;
             var lineCount = 0;
@@ -813,6 +885,8 @@ function procureDisplayMenuSkillsAction() {
             drawTextbox(MENU_SKILLS_ACTIVE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
                 MENU_SKILLS_COLUMN_WIDTH, MENU_ROOT_HEIGHT);
 
+            processTutorialMessages(CH00, CH00_TUTORIAL_MENU_SKILLS, CH00_TUTORIAL_MENU_SKILLS_TXT);
+
             function getItemSetByMenuState(ms) {
                 if (menuState < MS_SKILLS_EXCHANGE_1) {
                     return menuState - MS_SKILLS_BROWSE_1;
@@ -842,6 +916,7 @@ function procureDisplayMenuSkillsAction() {
             var x;
             var i = getItemSetByMenuState(menuState);
             if (keyPressed == KEY_UP) {
+                playSfx(SFX_GUI_TINK);
                 if ((menuState < MS_SKILLS_EXCHANGE_1) || (menuState == MS_SKILLS_EXCHANGE_3)) {
                     objectChoice[i]--;
                     if (objectChoice[i] < 0) {
@@ -866,6 +941,7 @@ function procureDisplayMenuSkillsAction() {
                     }
                 }
             } else if (keyPressed == KEY_DOWN) {
+                playSfx(SFX_GUI_TINK);
                 if ((menuState < MS_SKILLS_EXCHANGE_1) || (menuState == MS_SKILLS_EXCHANGE_3)) {
                     objectChoice[i]++;
                     if (objectChoice[i] > getLengthByColumn(i)) {
@@ -890,6 +966,7 @@ function procureDisplayMenuSkillsAction() {
                     }
                 }
             } else if (keyPressed == KEY_RIGHT) {
+                playSfx(SFX_GUI_TINK);
                 if (menuState < MS_SKILLS_EXCHANGE_1) {
                     menuState++;
                     if (menuState > MS_SKILLS_BROWSE_3) {
@@ -897,6 +974,7 @@ function procureDisplayMenuSkillsAction() {
                     }
                 }
             } else if (keyPressed == KEY_LEFT) {
+                playSfx(SFX_GUI_TINK);
                 if (menuState < MS_SKILLS_EXCHANGE_1) {
                     menuState--;
                     if (menuState < MS_SKILLS_BROWSE_1) {
@@ -904,52 +982,50 @@ function procureDisplayMenuSkillsAction() {
                     }
                 }
             } else if (keyPressed == KEY_ACTION) {
+                playSfx(SFX_GUI_THUCK);
                 switch (menuState) {
                     case MS_SKILLS_BROWSE_1:
                         menuState = MS_SKILLS_EXCHANGE_1;
-                        objectChoice[2] = 2;
+                        objectChoice[2] = 0;
                         break;
                     case MS_SKILLS_BROWSE_2:
                         menuState = MS_SKILLS_EXCHANGE_2;
                         objectChoice[2] = 7;
                         break;
                     case MS_SKILLS_BROWSE_3:
-                        if (objectChoice[2] >= 2) {   // cannot unequip attack and defend
-                            menuState = MS_SKILLS_EXCHANGE_3;
-                        }
+                        menuState = MS_SKILLS_EXCHANGE_3;
                         break;
                     case MS_SKILLS_EXCHANGE_1:
-                        if (objectChoice[2] >= 2) {   // cannot unequip attack and defend
-                            x = hero.availableSkills[objectChoice[0]];
-                            hero.availableSkills[objectChoice[0]] = hero.activeSkills[objectChoice[2]];
-                            hero.activeSkills[objectChoice[2]] = x;
-                            menuState = MS_SKILLS_BROWSE_1;
-                            hero.availableSkills = hero.availableSkills.filter(function (x) {return x;});
-                        }
+                        x = hero.availableSkills[objectChoice[0]];
+                        hero.availableSkills[objectChoice[0]] = hero.activeSkills[objectChoice[2]];
+                        hero.activeSkills[objectChoice[2]] = x;
+                        menuState = MS_SKILLS_BROWSE_1;
+                        hero.availableSkills = hero.availableSkills.filter(function (x) { return x; });
                         break;
                     case MS_SKILLS_EXCHANGE_2:
                         x = hero.availableAuraSkills[objectChoice[1]];
                         hero.availableAuraSkills[objectChoice[1]] = hero.activeAuraSkills[objectChoice[2] - 7];
                         hero.activeAuraSkills[objectChoice[2] - 7] = x;
                         menuState = MS_SKILLS_BROWSE_2;
-                        hero.availableAuraSkills = hero.availableAuraSkills.filter(function (x) {return x;});
+                        hero.availableAuraSkills = hero.availableAuraSkills.filter(function (x) {return x; });
                         break;
                     case MS_SKILLS_EXCHANGE_3:
                         if (objectChoice[2] < 7) {
                             x = hero.availableSkills[objectChoice[0]];
                             hero.availableSkills[objectChoice[0]] = hero.activeSkills[objectChoice[2]];
                             hero.activeSkills[objectChoice[2]] = x;
-                            hero.availableSkills = hero.availableSkills.filter(function (x) {return x;});
+                            hero.availableSkills = hero.availableSkills.filter(function (x) {return x; });
                         } else {
                             x = hero.availableAuraSkills[objectChoice[1]];
                             hero.availableAuraSkills[objectChoice[1]] = hero.activeAuraSkills[objectChoice[2] - 7];
                             hero.activeAuraSkills[objectChoice[2] - 7] = x;
-                            hero.availableAuraSkills = hero.availableAuraSkills.filter(function (x) {return x;});
+                            hero.availableAuraSkills = hero.availableAuraSkills.filter(function (x) {return x; });
                         }
                         menuState = MS_SKILLS_BROWSE_3;
                         break;
                 }
             } else if (keyPressed == KEY_ESC) {
+                playSfx(SFX_GUI_THUCK);
                 if (menuState >= MS_SKILLS_EXCHANGE_1) {
                     menuState -= 3;
                     keyPressed = KEY_NONE;
@@ -1058,7 +1134,7 @@ function procureDisplayMenuSkillsAction() {
                         MENU_SKILLS_ACTIVE_X + 45);
                 } else {
                     writeLine((i + 1).toString() + ": " + gainSkill(hero.activeSkills[i]).name[lang],
-                        (i < 2) ? "gray" : "white", DEFAULT_FONT, lineCount, MENU_SKILLS_ACTIVE_X + 45);
+                        "white", DEFAULT_FONT, lineCount, MENU_SKILLS_ACTIVE_X + 45);
                 }
                 if (i == objectChoice[2]) {
                     if ((menuState == MS_SKILLS_BROWSE_3) || (menuState == MS_SKILLS_EXCHANGE_1)) {
@@ -1164,6 +1240,9 @@ function procureDisplayMenuItemsAction() {
             drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
                 INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10, MENU_ROOT_HEIGHT);
 
+            processTutorialMessages(CH00, CH00_TUTORIAL_MENU_ITEMS, CH00_TUTORIAL_MENU_ITEMS_TXT_01,
+                CH00_TUTORIAL_MENU_ITEMS_TXT_02);
+
             function getItemSetByMenuState(ms) {
                 if (ms < MS_ITEMS_EXCHANGE_1) {
                     return menuState - MS_ITEMS_BROWSE_1;
@@ -1192,6 +1271,7 @@ function procureDisplayMenuItemsAction() {
             var x;
             var i = getItemSetByMenuState(menuState);
             if (keyPressed == KEY_UP) {
+                playSfx(SFX_GUI_TINK);
                 if ((menuState == MS_ITEMS_BROWSE_2) && (objectChoice[i] == 0)) {
                     menuState = MS_ITEMS_BROWSE_3;
                     objectChoice[2] = 2;
@@ -1212,6 +1292,7 @@ function procureDisplayMenuItemsAction() {
                     }
                 }
             } else if (keyPressed == KEY_DOWN) {
+                playSfx(SFX_GUI_TINK);
                 if ((menuState == MS_ITEMS_BROWSE_2) && (objectChoice[i] == 4)) {
                     menuState = MS_ITEMS_BROWSE_3;
                     objectChoice[2] = 0;
@@ -1232,12 +1313,14 @@ function procureDisplayMenuItemsAction() {
                     }
                 }
             } else if ((keyPressed == KEY_RIGHT) || (keyPressed == KEY_LEFT)) {
+                playSfx(SFX_GUI_TINK);
                 if (menuState == MS_ITEMS_BROWSE_1) {
                     menuState = MS_ITEMS_BROWSE_2;
                 } else if ((menuState == MS_ITEMS_BROWSE_2) || (menuState == MS_ITEMS_BROWSE_3)) {
                     menuState = MS_ITEMS_BROWSE_1;
                 }
             } else if (keyPressed == KEY_ACTION) {
+                playSfx(SFX_GUI_THUCK);
                 switch (menuState) {
                     case MS_ITEMS_BROWSE_1:
                         if (keyCtrl) {
@@ -1268,6 +1351,7 @@ function procureDisplayMenuItemsAction() {
                         break;
                 }
             } else if (keyPressed == KEY_ESC) {
+                playSfx(SFX_GUI_THUCK);
                 if (menuState >= MS_ITEMS_EXCHANGE_1) {
                     menuState -= 3;
                     keyPressed = KEY_NONE;
@@ -1379,15 +1463,290 @@ function procureDisplayMenuItemsAction() {
                 lineCount++;
                 writeLine(equipName[lang], "gray", DEFAULT_FONT, lineCount, MENU_SKILLS_AURA_X + 45);
                 if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == choiceId)) {
+                    fc.beginPath();
+                    cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                    fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + cursorOffset,
+                        HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                    itemInfo = [
+                        equipName[LANG_ENG] + " <br> <br> " + equipDesc[LANG_ENG],
+                        equipName[LANG_RUS] + " <br> <br> " + equipDesc[LANG_RUS]
+                    ];
+                    processInfoText(itemInfo);
+                }
+            }
+
+            displayEquipmentInfo(TXT_MENU_QUEEN_OF_SPADES, TXT_MENU_QUEEN_OF_SPADES_DESC, 0);
+            displayEquipmentInfo(TXT_MENU_WHITE_STEEL_ARMOR, TXT_MENU_WHITE_STEEL_ARMOR_DESC, 1);
+            displayEquipmentInfo(TXT_MENU_RAT_RIDER_PELERINE, TXT_MENU_RAT_RIDER_PELERINE_DESC, 2);
+
+            return (keyPressed == KEY_ESC) && (menuState >= MS_ITEMS_BROWSE_1) && (menuState <= MS_ITEMS_BROWSE_3);
+        }
+        return false;
+    });
+    return displayMenuItemsAction;
+}
+
+function procureDisplayMenuCodexAction() {
+    var displayMenuItemsAction = new Action();
+    displayMenuItemsAction.definePlayFrame(function (frame) {
+        function writeLine(line, color, font, lineCount, offset) {
+            fc.beginPath();
+            fc.fillStyle = color;
+            fc.font = font;
+            fc.fillText(line, offset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 12 + DEFAULT_LINE_HEIGHT * (lineCount + 1));
+        }
+
+        if ((frame == 0)) {
+            menuState = MS_CODEX_ROOT;
+            menuChoice = 0;
+            scrollOffset = 0;
+            objectChoice[0] = 0;
+            objectChoice[1] = 0;
+            objectChoice[2] = 0;
+        }
+
+        if (frame < 10) {
+            drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                MENU_SKILLS_COLUMN_WIDTH * frame / 10, MENU_ROOT_HEIGHT * frame / 10);
+            drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                (INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10) * frame / 10, MENU_ROOT_HEIGHT * frame / 10);
+        } else {
+            drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                MENU_SKILLS_COLUMN_WIDTH, MENU_ROOT_HEIGHT);
+            drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10, MENU_ROOT_HEIGHT);
+
+            processTutorialMessages(CH00, CH00_TUTORIAL_MENU_CODEX, CH00_TUTORIAL_MENU_CODEX_TXT);
+
+            function getItemSetByMenuState(ms) {
+                if (ms < MS_ITEMS_EXCHANGE_1) {
+                    return menuState - MS_ITEMS_BROWSE_1;
+                } else if (ms == MS_ITEMS_EXCHANGE_1) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+
+            function getLengthByColumn(col) {
+                switch (col) {
+                    case 0:
+                        return hero.availableItems.length;
+                    case 1:
+                        return 4;
+                    case 2:
+                        return 2;
+                    default:
+                        return null;
+                }
+            }
+
+            var currentItem;
+            var itemInfo;
+            var x;
+            var i = getItemSetByMenuState(menuState);
+            if (keyPressed == KEY_UP) {
+                playSfx(SFX_GUI_TINK);
+                if ((menuState == MS_ITEMS_BROWSE_2) && (objectChoice[i] == 0)) {
+                    menuState = MS_ITEMS_BROWSE_3;
+                    objectChoice[2] = 2;
+                } else if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == 0)) {
+                    menuState = MS_ITEMS_BROWSE_2;
+                    objectChoice[1] = 4;
+                } else {
+                    objectChoice[i]--;
+                    if (objectChoice[i] < 0) {
+                        objectChoice[i] = getLengthByColumn(i);
+                    }
+                    if (i == 0) {
+                        if (objectChoice[i] < scrollOffset) {
+                            scrollOffset--;
+                        } else if ((scrollOffset == 0) && (objectChoice[i] > 12)) {
+                            scrollOffset = objectChoice[i] - 12;
+                        }
+                    }
+                }
+            } else if (keyPressed == KEY_DOWN) {
+                playSfx(SFX_GUI_TINK);
+                if ((menuState == MS_ITEMS_BROWSE_2) && (objectChoice[i] == 4)) {
+                    menuState = MS_ITEMS_BROWSE_3;
+                    objectChoice[2] = 0;
+                } else if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == 2)) {
+                    menuState = MS_ITEMS_BROWSE_2;
+                    objectChoice[1] = 0;
+                } else {
+                    objectChoice[i]++;
+                    if (objectChoice[i] > getLengthByColumn(i)) {
+                        objectChoice[i] = 0;
+                    }
+                    if (i == 0) {
+                        if (objectChoice[i] > 12) {
+                            scrollOffset = objectChoice[i] - 12;
+                        } else {
+                            scrollOffset = 0;
+                        }
+                    }
+                }
+            } else if ((keyPressed == KEY_RIGHT) || (keyPressed == KEY_LEFT)) {
+                playSfx(SFX_GUI_TINK);
+                if (menuState == MS_ITEMS_BROWSE_1) {
+                    menuState = MS_ITEMS_BROWSE_2;
+                } else if ((menuState == MS_ITEMS_BROWSE_2) || (menuState == MS_ITEMS_BROWSE_3)) {
+                    menuState = MS_ITEMS_BROWSE_1;
+                }
+            } else if (keyPressed == KEY_ACTION) {
+                playSfx(SFX_GUI_THUCK);
+                switch (menuState) {
+                    case MS_ITEMS_BROWSE_1:
+                        if (keyCtrl) {
+                            hero.useItemInField(false, objectChoice[0]);
+                        } else {
+                            menuState = MS_ITEMS_EXCHANGE_1;
+                        }
+                        break;
+                    case MS_ITEMS_BROWSE_2:
+                        if (keyCtrl) {
+                            hero.useItemInField(true, objectChoice[1]);
+                        } else {
+                            menuState = MS_ITEMS_EXCHANGE_2;
+                        }
+                        break;
+                    case MS_ITEMS_BROWSE_3:
+                        // cannot change equipment at this time
+                        break;
+                    case MS_ITEMS_EXCHANGE_1:
+                    case MS_ITEMS_EXCHANGE_2:
+                        x = hero.availableItems[objectChoice[0]];
+                        hero.availableItems[objectChoice[0]] = hero.activeItems[objectChoice[1]];
+                        hero.activeItems[objectChoice[1]] = x;
+                        menuState -= 3;
+                        hero.availableItems = hero.availableItems.filter(function (x) {
+                            return x;
+                        });
+                        break;
+                }
+            } else if (keyPressed == KEY_ESC) {
+                playSfx(SFX_GUI_THUCK);
+                if (menuState >= MS_ITEMS_EXCHANGE_1) {
+                    menuState -= 3;
+                    keyPressed = KEY_NONE;
+                }
+            }
+
+            // AVAILABLE ITEMS COLUMN
+            var lineCount = 0;
+            var xOffset = MENU_SKILLS_AVAILABLE_X + 30;
+            writeLine(TXT_MENU_AVAILABLE_ITEMS[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
+            lineCount++;
+            if (scrollOffset > 0) {
+                fc.beginPath();
+                var cursorOffset = (frame % 20 < 10) ? 40 : 45;
+                fc.drawImage(CURSOR_UP, MENU_SKILLS_AVAILABLE_X + MENU_SKILLS_COLUMN_WIDTH / 2,
+                    HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
+            }
+            for (i = scrollOffset; (i < hero.availableItems.length + 1) && (i - scrollOffset < 13); i++) {
+                lineCount++;
+                if (hero.availableItems[i] != null) {
+                    currentItem = obtainItem(hero.availableItems[i].id);
+                    writeLine(currentItem.name[lang]
+                        + (hero.availableItems[i].charges > 1 ?" x" + hero.availableItems[i].charges : ""),
+                        "white", DEFAULT_FONT, lineCount, MENU_SKILLS_AVAILABLE_X + 45);
+                }
+                if (i == objectChoice[0]) {
+                    if ((menuState == MS_ITEMS_BROWSE_1) || (menuState == MS_ITEMS_EXCHANGE_2)) {
+                        fc.beginPath();
+                        cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AVAILABLE_X + cursorOffset,
+                            HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                        if (hero.availableItems[i] != null) {
+                            itemInfo = [
+                                currentItem.name[LANG_ENG] + " <br> <br> " + currentItem.description[LANG_ENG]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.availableItems[i].charges
+                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
+                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
+                                currentItem.name[LANG_RUS] + " <br> <br> " + currentItem.description[LANG_RUS]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.availableItems[i].charges
+                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
+                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
+                            ];
+                            processInfoText(itemInfo);
+                        }
+                    } else if ((menuState == MS_ITEMS_EXCHANGE_1) && (frame % 8 > 3)) {
+                        // blinks
+                        fc.beginPath();
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AVAILABLE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                            + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                    }
+                }
+            }
+            if ((i < hero.availableItems.length)) {
+                fc.beginPath();
+                cursorOffset = (frame % 20 < 10) ? 360 : 355;
+                fc.drawImage(CURSOR_DOWN, MENU_SKILLS_AVAILABLE_X + MENU_SKILLS_COLUMN_WIDTH / 2,
+                    HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
+            }
+
+            // ACTIVE ITEMS COLUMN
+            lineCount = 0;
+            xOffset = MENU_SKILLS_AURA_X + 30;
+            writeLine(TXT_MENU_ACTIVE_ITEMS[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
+            lineCount++;
+            for (i = 0; i < 5; i++) {
+                lineCount++;
+                if (hero.activeItems[i] == null) {
+                    writeLine((i + 1).toString() + ": --------", "white", DEFAULT_FONT, lineCount,
+                        MENU_SKILLS_AURA_X + 45);
+                } else {
+                    currentItem = obtainItem(hero.activeItems[i].id);
+                    writeLine((i + 1).toString() + ": " + currentItem.name[lang]
+                        + (hero.activeItems[i].charges > 1 ?" x" + hero.activeItems[i].charges : ""),
+                        "white", DEFAULT_FONT, lineCount, MENU_SKILLS_AURA_X + 45);
+                }
+                if (i == objectChoice[1]) {
+                    if ((menuState == MS_ITEMS_BROWSE_2) || (menuState == MS_ITEMS_EXCHANGE_1)) {
                         fc.beginPath();
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
                         fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + cursorOffset,
                             HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
-                        itemInfo = [
-                            equipName[LANG_ENG] + " <br> <br> " + equipDesc[LANG_ENG],
-                            equipName[LANG_RUS] + " <br> <br> " + equipDesc[LANG_RUS]
-                        ];
-                        processInfoText(itemInfo);
+                        if (hero.activeItems[i] != null) {
+                            itemInfo = [
+                                currentItem.name[LANG_ENG] + " <br> <br> " + currentItem.description[LANG_ENG]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.activeItems[i].charges
+                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
+                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
+                                currentItem.name[LANG_RUS] + " <br> <br> " + currentItem.description[LANG_RUS]
+                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.activeItems[i].charges
+                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
+                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
+                            ];
+                            processInfoText(itemInfo);
+                        }
+                    } else if ((menuState == MS_ITEMS_EXCHANGE_2) && (frame % 8 > 3)) {
+                        // blinks
+                        fc.beginPath();
+                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                            + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                    }
+                }
+            }
+
+            // EQUIPMENT INFO
+            lineCount += 2;
+            writeLine(TXT_MENU_EQUIPMENT[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
+            lineCount++;
+            function displayEquipmentInfo(equipName, equipDesc, choiceId) {
+                lineCount++;
+                writeLine(equipName[lang], "gray", DEFAULT_FONT, lineCount, MENU_SKILLS_AURA_X + 45);
+                if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == choiceId)) {
+                    fc.beginPath();
+                    cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                    fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + cursorOffset,
+                        HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                    itemInfo = [
+                        equipName[LANG_ENG] + " <br> <br> " + equipDesc[LANG_ENG],
+                        equipName[LANG_RUS] + " <br> <br> " + equipDesc[LANG_RUS]
+                    ];
+                    processInfoText(itemInfo);
                 }
             }
 

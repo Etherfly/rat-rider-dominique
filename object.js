@@ -6,11 +6,15 @@
 
 /* OBJECT STRUCTURES */
 
-function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNear, objectFrequency) {
+function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNear,
+                   mainTheme, battleTheme, objectFrequency) {
     this.background = background;
     this.terrainColorFar = terrainColorFar;
     this.terrainColorMid = terrainColorMid;
     this.terrainColorNear = terrainColorNear;
+
+    this.mainTheme = mainTheme;
+    this.battleTheme = battleTheme;
 
     this.objectFrequency = objectFrequency;     // average pixel difference between objects
     this.objectTypes = [];                      // object type generation data
@@ -296,12 +300,12 @@ function GuiElement(carcassImage, xPos, yPos) {
 }
 
 function Hero() {
-    this.imgHeroStand = getImageResource("imgHeroStand");
-    this.imgHeroMove1 = getImageResource("imgHeroMove1");
-    this.imgHeroMove2 = getImageResource("imgHeroMove2");
-    this.imgHeroPrepare = getImageResource("imgHeroPrepare");
-    this.imgHeroAttack = getImageResource("imgHeroAttack");
-    this.imgHeroDefend = getImageResource("imgHeroDefend");
+    this.imgHeroStand = getResource("imgHeroStand");
+    this.imgHeroMove1 = getResource("imgHeroMove1");
+    this.imgHeroMove2 = getResource("imgHeroMove2");
+    this.imgHeroPrepare = getResource("imgHeroPrepare");
+    this.imgHeroAttack = getResource("imgHeroAttack");
+    this.imgHeroDefend = getResource("imgHeroDefend");
 
     this.attrAttack = 15;
     this.attrDefense = 15;
@@ -325,6 +329,7 @@ function Hero() {
     this.position = 500;
     this.path = MID;
     this.height = getOptimalHeight(this.path, this.position);
+    this.offset = 0;
 
     this.animationState = AN_STAND;
     this.animationFrame = 0;
@@ -340,7 +345,7 @@ function Hero() {
         {id: ITM_DEBUG_KARMA, charges: 50}, {id: ITM_SPRES1, charges: 3}, {id: ITM_ATKUP1, charges: 3},
         {id: ITM_DEFUP1, charges: 3}, {id: ITM_AGIUP1, charges: 3}, {id: ITM_RFXUP1, charges: 3},
         {id: ITM_DMG1, charges: 3}, {id: ITM_GUARD1, charges: 5}, {id: ITM_TALISMAN1, charges: 1}];
-    this.activeItems = [{id: ITM_HPRES1, charges: 5}, {id: ITM_HPRES1, charges: 3}];
+    this.activeItems = [];
 
     this.skillSet = [];
     this.battleGaugeArtifacts = [];
@@ -455,7 +460,7 @@ function Hero() {
             this.expendSp(skill.spCost);
             this.expendAp(1);
             registerObject(GUI_EVENT,
-                procureAuraSkillSequence(this, getImageResource("imgAuraDominique"), skill.name));
+                procureAuraSkillSequence(this, getResource("imgAuraDominique"), skill.name));
             var artifactData = skill.getArtifacts(position);
             for (var i = 0; i < artifactData.length; i++) {
                 // Fuck you, Javascript!
@@ -549,7 +554,7 @@ function Hero() {
     this.expendHp = function (hp) {
         if (Math.floor(hp) > 0) {
             heroHpShake = 20;
-            registerObject(GUI_COMMON, procureHpGaugeTextAction(this, "red", Math.floor(hp).toString()));
+            registerObject(GUI_COMMON, procureHpGaugeTextAction(this, TEXT_COLOR_RED, Math.floor(hp).toString()));
         }
         this.hp -= hp;
         if (this.hp < 0) {
@@ -593,12 +598,12 @@ function Hero() {
     };
 
     this.addKarma = function (karma) {
-        registerObject(GUI_COMMON, procureKarmaTextAction(TEXT_COLOR_GOLD, "+" + karma).authorizeMenuPlay());
+        registerObject(GUI_EVENT, procureKarmaTextAction(TEXT_COLOR_INK, "+" + karma).authorizeMenuPlay());
         this.karma += karma;
     };
 
     this.expendKarma = function (karma) {
-        registerObject(GUI_COMMON, procureKarmaTextAction("red", "-" + karma).authorizeMenuPlay());
+        registerObject(GUI_EVENT, procureKarmaTextAction(TEXT_COLOR_RED, "-" + karma).authorizeMenuPlay());
         this.karma -= karma;
     };
 
@@ -862,7 +867,7 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
     this.expendHp = function (hp) {
         if (Math.floor(hp) > 0) {
             enemyHpShake = 20;
-            registerObject(GUI_COMMON, procureHpGaugeTextAction(this, "red", Math.floor(hp).toString()));
+            registerObject(GUI_COMMON, procureHpGaugeTextAction(this, TEXT_COLOR_RED, Math.floor(hp).toString()));
         }
         this.hp -= hp;
         if (this.hp < 0) {
@@ -1076,7 +1081,7 @@ function FieldObject(path, position, offset, defaultImage) {
                 fc.drawImage(this.attackImage, this.position
                     - this.attackImage.width * getPathScale(this.path) / 2, height,
                     this.attackImage.width * this.scale, this.attackImage.height * this.scale);
-                if (this.animationFrame > 8) {
+                if (this.animationFrame > 10) {
                     this.animationState = AN_STAND;
                     this.animationFrame = 0;
                 }
@@ -1090,7 +1095,7 @@ function FieldObject(path, position, offset, defaultImage) {
                 break;
         }
         this.animationFrame++;
-        if (this.animationFrame > 10) {
+        if (this.animationFrame > 12) {
             this.animationFrame = 0;
         }
 

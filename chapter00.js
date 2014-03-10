@@ -26,16 +26,81 @@ var houseTasks = [
 ];
 
 var CH00_PHASE = 0;                     // phase
-var CH00_TUTORIAL_FIELD = 1;            // tutorial message: basic field control
-var CH00_TUTORIAL_SAVING = 2;           // tutorial message: saving game
-var CH00_TUTORIAL_BATTLE = 3;           // tutorial message: combat basics
-var CH00_TUTORIAL_MINI_BOSS = 4;        // tutorial message: mini bosses
-var CH00_LIBRARY_VISIT = 5;             // library visit count
-var CH00_BANDIT_RINGLEADER_BEATEN = 6;  // bandit ringleader beaten flag
+var CH00_TUTORIAL_COMBAT = 1;           // tutorial message: combat basics
+var CH00_TUTORIAL_KARMA = 2;            // tutorial message: karma
+var CH00_TUTORIAL_BANDIT = 3;           // tutorial message: escape menu
+var CH00_TUTORIAL_WOLF = 4;             // tutorial message: wolf battle
+var CH00_TUTORIAL_WASP = 5;             // tutorial message: wasp battle
+var CH00_TUTORIAL_BRIGAND = 6;          // tutorial message: brigand battle
+var CH00_TUTORIAL_RED_WOLF = 7;         // tutorial message: red wolf battle
+var CH00_TUTORIAL_POISON_WASP = 8;      // tutorial message: poison wasp battle
+var CH00_TUTORIAL_DANGER = 9;           // tutorial message: danger encounters
+var CH00_TUTORIAL_ARMADILLO = 10;       // tutorial message: armadillo battle
+var CH00_TUTORIAL_MENU_ROOT = 11;       // tutorial message: escape menu root
+var CH00_TUTORIAL_MENU_STATS = 12;      // tutorial message: escape menu - stats
+var CH00_TUTORIAL_MENU_SKILLS = 13;     // tutorial message: escape menu - skills
+var CH00_TUTORIAL_MENU_ITEMS = 14;      // tutorial message: escape menu - items
+var CH00_TUTORIAL_MENU_CODEX = 15;      // tutorial message: escape menu - codex
+var CH00_LIBRARY_VISIT = 16;            // library visit count
+var CH00_BANDIT_RINGLEADER_BEATEN = 17; // bandit ringleader beaten flag
 
 /* TEXT DATA */
 
 var CH00_TITLE = ["Prologue: Hero's Karma <br> ", "Пролог: Карма Героя <br> "];
+
+var CH00_TUTORIAL_MENU_ROOT_TXT = [
+    "This is the pause menu. Here you can manage Dominique's skills and items, view statistics data "
+        + "and codex entries. <br> <br> You can access the pause menu anytime outside of battle.",
+    "Это меню паузы. Здесь Вы можете настраивать навыки и предметы Доминика, просматривать статистику и "
+        + "записи в кодексе. <br> <br> Вы можете заходить в меню паузы в любой момент вне боя."
+];
+
+var CH00_TUTORIAL_MENU_STATS_TXT = [
+    "On this screem you can view your character stats and game statistics and browse through your "
+        + "destinies. Not that there is ANYTHING on the screen now...",
+    "На этом экране Вы можете увидеть информацию о персонаже и игровую статистику, а также просмотреть "
+        + "Ваши судьбы. Не то, что бы сейчас на экране ВООБЩЕ что-либо отображалось..."
+];
+
+var CH00_TUTORIAL_MENU_SKILLS_TXT = [
+    "This is the skills menu where you can set up Dominique's skills. Use directional keys and ACTION button "
+        + "to navigate the menu and move skills between the panels. The rightmost panel is where Dominique's current "
+        + "skills lineup is displayed, along with hotkeys they are bound to. For now, Dominique does not have "
+        + "any aura skills. <br> <br> Make sure to always have an attack skill ready. Otherwise, Dominique will not be "
+        + "able to fight enemies!",
+    "Перед Вами меню навыков, где Вы можете управлять навыками Доминика. Используйте клавиши направления и кнопку "
+        + "ДЕЙСТВИЕ, чтобы перемещаться по меню и перемещать навыки между панелями. Крайняя правая панель - "
+        + "текущий состав навыков Доминика вместе с горячими клавишами, к которым они привязаны. На данный момент, "
+        + "у Доминика нет аура-навыков. <br> <br> Следите за тем, чтобы всегда был установлен атакующий навык, иначе "
+        + "Доминик не сможет сражаться с врагами!"
+];
+
+var CH00_TUTORIAL_MENU_ITEMS_TXT_01 = [
+    "This is the items menu where you can set up Dominique's items. Use directional keys and ACTION button "
+        + "to navigate the menu and move items between the panels. The right panel is where Dominique's current "
+        + "items lineup is displayed, along with hotkeys they are bound to. Dominique's basic equipment cannot be "
+        + "changed.",
+    "Перед Вами меню предметов, где Вы можете управлять предметами Доминика. Используйте клавиши направления и кнопку "
+        + "ДЕЙСТВИЕ, чтобы перемещаться по меню и перемещать предметы между панелями. Правая панель - "
+        + "текущий состав предметов Доминика вместе с горячими клавишами, к которым они привязаны. Базовое снаряжение "
+        + "Доминика изменять нельзя."
+];
+
+var CH00_TUTORIAL_MENU_ITEMS_TXT_02 = [
+    "To access items in battle by hotkeys, hold 'Ctrl' key and press the corresponding digit "
+        + "key. <br> <br> Most items can be used in the field by highlighting it in the menu, holding 'Ctrl' key and "
+        + "pressing ACTION.",
+    "Чтобы пользоваться горячими клавишами для предметов в бою, удерживайте "
+        + "клавишу 'Ctrl' и нажимайте соответствующие клавиши цифр. <br> <br> Большинство предметов можно использовать "
+        + "вне боя, выделяя их в меню, удерживая клавишу 'Ctrl' и нажимая ДЕЙСТВИЕ."
+];
+
+var CH00_TUTORIAL_MENU_CODEX_TXT = [
+    "Codex is a record of things known to you about this world. Each entry provides information about an object, "
+        + "an enemy, your quest or a lore topic. Entries are organized into categories for your convenience.",
+    "Кодекс - это летопись всего, что Вам известно об этом мире. Каждая запись даёт информацию об объекте, "
+        + "враге, Ваших поисках или некие отвлечённые знания. Записи организованы в категории для Вашего удобства."
+];
 
 var CH00_CHRONICLER_01 = [
     "Dominique comes upon a tranquil pavilion where chronicler ",
@@ -308,16 +373,13 @@ var CH00_TRADING_POST_02 =
 
 var CH00_TRADING_POST_03 = [" <br> <br> Would you like to trade?", " <br> <br> Желаете поторговать?"];
 
-var CH00_TRADING_POST_04 = ["Dominique takes the item with him, offering his gratitude and karma as payment.",
-    "Доминик берёт товар с собой, отдавая свою благодарность и карму в качестве платы."];
-
 var CH00_COMMON_CHEST_01 = [
     "Dominique spots a dirty iron-banded chest. Would you like to open it?",
     "Доминик замечает грязный обитый железными пластинами сундук. Желаете открыть его?"
 ];
 
 var CH00_COMMON_CHEST_02_1 = [
-    "Nothing is inside, except for a few dried leaves.", "Внутри пусто, за исключением нескольких высохших листьев."
+    "Nothing is inside, except for a few dried leaves.", "Внутри пусто, за исключением вороха высохших листьев."
 ];
 
 var CH00_COMMON_CHEST_02_2 = [
@@ -349,6 +411,62 @@ var CH00_MILESTONE_01 = [
 var CH00_MILESTONE_02 = [
     "Dominique chooses to advance. The landscape around him begins to change.",
     "Доминик решает идти вперёд. Местность вокруг него начинает меняться."
+];
+
+var CH00_TUTORIAL_BANDIT_TXT = [
+    "Are you aware that you can open the pause menu anytime you are not in battle? Press 'Esc' key to "
+        + "do so. You can manage skills from there. Do you remember the combat breathing technique I taught "
+        + "you a while ago? Why don't you try readying it?",
+    "Знаешь ли ты, что ты можешь открыть меню паузы в любое время, когда ты находишься вне боя? Для этого нажми "
+        + "клавишу 'Esc'. В нём производится управление навыками. Помнишь технику дыхания в бою, которой я тебя научил "
+        + "некоторое время тому назад? Почему бы тебе не подготовить её к бою?"
+];
+
+var CH00_TUTORIAL_WOLF_TXT = [
+    "Wolves are more agile than bandits. Instead of providing you with an opening, they tend to have a weak attack, "
+        + "that you can use as a vulnerability.",
+    "Волки более ловкие, нежели бандиты. Вместо того, чтобы открывать вам свои уязвимые места, они используют "
+        + "слабую атаку, которой можно воспользоваться как уязвимостью."
+];
+
+var CH00_TUTORIAL_RED_WOLF_TXT = [
+    "Red wolves are a type of enemy that reacts to what you do in a dangerous manner. Whenever you hit them, "
+        + "they become more aggravated and move faster as a result. On top of that, the less health they have "
+        + "the more they focus on offense.",
+    "Бурые волки из тех врагов, что опасным образом реагируют на твои действия. Когда ты попадаешь "
+        + "по ним, они злятся и начинают двигаться быстрее. Кроме того, чем меньше у них здоровья, тем больше они "
+        + "сосредоточены на нападении."
+];
+
+var CH00_TUTORIAL_WASP_TXT = [
+    "Giant wasps have a weakening poison to render their victims harmless. However, when they try to sting you, "
+        + "they are easier to hit. <br> To defend yourself against negative statuses you simply have to block them.",
+    "Гигантские осы используют ослабляющий яд, чтобы обезвредить своих жертв. Однако, когда они пытаются "
+        + "ужалить тебя, попасть по ним легче. <br> Чтобы защититься от статусных атак, тебе просто нужно "
+        + "блокировать их."
+];
+
+var CH00_TUTORIAL_POISON_WASP_TXT = [
+    "These wasps are more dangerous than their kin, since their poison actually kills you. Take extra care "
+        + "to defend when they try to sting you.",
+    "Эти осы более опасны, чем их родня, так как их яд смертелен. Будь особенно осторожен, "
+        + "и старайся защищаться, когда они пытаются тебя ужалить."
+];
+
+var CH00_TUTORIAL_BRIGAND_TXT = [
+    "Brigands are all about muscle and power, so while their actions can be tardy, they can pack a punch. "
+        + "Be very careful about their power attack. They slow down when they execute it, but if they catch you when "
+        + "you are vulnerable, you'll receive some serious damage.",
+    "Разбойники - это грубая сила, так что в то время, как их действия могут быть небыстрыми, они могут вломить "
+        + "от души. Остерегайся их силовой атаки. Они замедляются, когда исполняют её, но если они поймают тебя, "
+        + "когда ты уязвим, ты получишь серьёзные повреждения."
+];
+
+var CH00_TUTORIAL_ARMADILLO_TXT = [
+    "Armadillo knights are an armored type of enemy, and their attack does not leave them open at all. "
+        + "Keep an eye out for a vulnerability and do not waste stamina trying to bash through their plates.",
+    "Броненосцы-рыцари - это пример бронированного врага, и их атака не оставляет их открытыми твоим атакам. "
+        + "Ищи уявзимости и не трать попусту выносливость, пытаясь пробить их броню."
 ];
 
 /* LANDSCAPE */
@@ -405,6 +523,9 @@ function createPrologueLandscape() {
 /* SEQUENCES */
 
 function procureStartPrologueSequence() {
+    var enemyObject = new FieldObject(MID, 620, 50, getResource("imgEnemyBandit1Stand"));
+    enemyObject.setAttackImage(getResource("imgEnemyBandit1Attack"));
+    var tutorialEnemy = enlistTutorialBandit(enemyObject);
     var startPrologue = new Sequence();
     startPrologue.addAction(procureMaskAction());
     startPrologue.addAction(procureDisplayFreeTextAction(500, 200, W - 1100, CH00_TITLE, true));
@@ -417,15 +538,20 @@ function procureStartPrologueSequence() {
     }));
     startPrologue.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
         ["And here we are, at last. This is where all we have learned up until now will be put to the test. "
-            + "How do you feel, Dominique? Do you need a refresher on heroics basics?",
+            + "How do you feel, Dominique? Do you need a refresher on the basics of heroics?",
             "Вот мы и прибыли, наконец. Здесь всё, чему мы научились до этого момента, будет проверено на практике. "
                 + "Как себя чувствуешь, Доминик? Тебе нужно напомнить основы геройского ремесла?"]));
     startPrologue.addAction(procureCodeFragmentAction(function () {
         if (eventChoice == 1) {
-            gst[CH00][CH00_TUTORIAL_FIELD] = 2;
-            gst[CH00][CH00_TUTORIAL_SAVING] = 1;
-            gst[CH00][CH00_TUTORIAL_BATTLE] = 2;
-            gst[CH00][CH00_TUTORIAL_MINI_BOSS] = 1;
+            gst[CH00][CH00_TUTORIAL_COMBAT] = 1;
+            gst[CH00][CH00_TUTORIAL_BANDIT] = 1;
+            gst[CH00][CH00_TUTORIAL_WOLF] = 1;
+            gst[CH00][CH00_TUTORIAL_WASP] = 1;
+            gst[CH00][CH00_TUTORIAL_BRIGAND] = 1;
+            gst[CH00][CH00_TUTORIAL_RED_WOLF] = 1;
+            gst[CH00][CH00_TUTORIAL_POISON_WASP] = 1;
+            gst[CH00][CH00_TUTORIAL_ARMADILLO] = 1;
+            gst[CH00][CH00_TUTORIAL_DANGER] = 1;
         }
     }));
     startPrologue.addAction(procureCodeFragmentAction(function () {
@@ -441,37 +567,140 @@ function procureStartPrologueSequence() {
         landscape.resetTerrain();
         registerObject(GUI_EVENT, landscape);
         setControlMode(CM_FIELD);
+
+        setEventMusic(null);
+        setMusicPlayState(MPS_LANDSCAPE);
+
+        if (gst[CH00][CH00_TUTORIAL_COMBAT] < 1) {
+            maneuvering = false;
+            enemyObject.finished = true;
+            registerObject(OBJECTS_MID_FRONT, enemyObject);
+        }
     }));
     startPrologue.addAction(procureResumeAction());
     startPrologue.addAction(procureUnmaskAction());
     startPrologue.addAction(procureCodeFragmentAction(function () {
         displayGui = true;
-        if (gst[CH00][CH00_TUTORIAL_FIELD] < 1) {
-            startPrologue.addAction(procureStopAction());
+        maneuvering = true;
+        startPrologue.addAction(procureStopAction());
+        if (gst[CH00][CH00_TUTORIAL_COMBAT] < 1) {
+            gst[CH00][CH00_TUTORIAL_COMBAT] = 1;
             startPrologue.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
-                ["Alright. First things first, we should discuss movement around the field.",
-                    "Ну, что ж. Перво-наперво, нам следует обсудить перемещение."]));
+                ["Alright. First things first, we should discuss...",
+                    "Ну, что ж. Перво-наперво, нам следует обсудить..."]));
+            startPrologue.addAction(procureDisplaySpeechMessageAction(CHR_BANDIT.name, CHR_BANDIT.portrait,
+                [
+                    "Now stop right there! Oh... Isn't that a blessing? A rat rider. I'll make you plead for mercy!",
+                    "А ну-ка стоять! О... Ну, разве это не подарок? Крысиный всадник. Я заставлю тебя молить о пощаде!"
+                ]));
             startPrologue.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["How untimely...", "Как не вовремя..."]));
+            startPrologue.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["On the contrary, this is an excellent chance to review what we know about combat. Prepare yourself!",
+                    "Наоборот, это отличный шанс повторить, что мы знаем о поединках. Готовься!"]));
+            var afterbattleSequence = new Sequence();
+            afterbattleSequence.addAction(procureCodeFragmentAction(function () {
+                hero.restoreHp(hero.attrMaxHp * 0.6);
+                hero.restoreSp(hero.attrMaxSp * 0.6);
+            }));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Well, that does it. After each battle your combat prowess will grow depending on how you performed "
+                    + "and how strong your opponent was. You also earn karma this way. <br> Alternatively, most "
+                    + "encounters can be avoided at the cost of your own karma.",
+                    "Ну, вот и всё. После каждой битвы твои боевые умения будут расти в зависимости от того, как "
+                        + "ты сражался и насколько силён был твой противник. Таким же образом ты получаешь карму. <br> "
+                        + "Ты также можешь избежать большинства стычек ценой собственной кармы."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Now then, where were we?.. Ah, yes - we should discuss movement around the field.",
+                    "Так, о чём мы с тобой говорили?.. Ах да - нам следует обсудить перемещение."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
                 ["I have decided, Sallinger, that we are never to go back. We move only forward towards our destiny. "
                     + "What's left behind should stay behind unless we happen across it again.",
-                    "Я решил, Сэллинджер, что мы никогда не будем идти назад. Мы движемся только вперёд, навстречу нашей судьбе. "
-                        + "Что позади - то позади, если, конечно, наш путь не приведёт нас обратно."]));
-            startPrologue.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
-                ["Err, right. That and the fact that your wayfinding skills are lacking. "
+                    "Я решил, Сэллинджер, что мы никогда не будем идти назад. Мы движемся только вперёд, навстречу "
+                        + "нашей судьбе. Что позади - то позади, если, конечно, наш путь не приведёт нас обратно."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Err, right. That and the fact that you barely have any sense of direction. "
                     + "So, the only immediate choice of movement we can make is balancing across three paths, "
                     + "conventionally named the far, the middle and the near.",
-                    "Эмм, верно. Это и тот факт, что твои навыки ориентирования оставляют желать лучшего. "
-                        + "Итак, единственный прямой выбор направления для нас - это балансирование между тремя тропами, "
-                        + "условно называемыми дальней, средней и ближней."]));
+                    "Эмм, верно. Это и тот факт, что твоё умение ориентироваться оставляет желать лучшего. "
+                        + "Итак, единственный прямой выбор направления для нас - это балансирование между тремя "
+                        + "тропами, условно называемыми дальней, средней и ближней."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["To travel towards the farther path, press the 'W' key or the 'Up' key. To travel towards the nearer "
+                    + "path, press the 'S' key or the 'Down' key. But be cautious: such movement expends your stamina, "
+                    + "so too much of it and you will get tired very quickly.",
+                    "Чтобы путешествовать дальше, следует нажать 'W' или 'Вверх'. Чтобы путешествовать ближе, следует "
+                        + "нажать 'S' или 'Вниз'. Но будь осторожен: такие перемещения тратят твою выносливость, так "
+                        + "что если будешь много петлять, быстро устанешь."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Let's have a look around and see if someone has a task for a hero like you. "
+                    + "Keep an eye out for an exclamation mark over an object - such marks denote places of "
+                    + "special interest for us.",
+                    "Давай осмотримся, нет ли здесь кого-нибудь, нуждающегося в помощи героя, вроде тебя. "
+                        + "Обращай внимание на восклицательные знаки над объектами - такие знаки отмечают особо "
+                        + "интересные для нас места."]));
+            afterbattleSequence.addAction(procureResumeAction());
+            startPrologue.addAction(procureInitiateBattleAction(tutorialEnemy, afterbattleSequence));
+        } else {
             startPrologue.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
-                ["To travel towards the farther path, press the 'W' key or the 'Up' key. To travel towards the nearer path, press the 'S' key or the 'Down' key. "
-                    + "But be cautious: such movement expends your stamina, so too much of it and you will get tired very quickly.",
-                    "Чтобы путешествовать дальше, следует нажать 'W' или 'Вверх'. Чтобы путешествовать ближе, следует нажать 'S' или 'Вниз'. "
-                        + "Но будь осторожен: такие перемещения тратят твою выносливость, так что если будешь много петлять, быстро устанешь."]));
+                ["Let's have a look around and see if someone has a task for a hero like you.",
+                    "Давай осмотримся, нет ли здесь кого-нибудь, нуждающегося в помощи героя, вроде тебя."]));
             startPrologue.addAction(procureResumeAction());
         }
     }));
     return startPrologue;
+}
+
+function processKarmaTutorial() {
+    if (gst[CH00][CH00_TUTORIAL_KARMA] < 1) {
+        var karmaTutorialSequence = new Sequence();
+        karmaTutorialSequence.addAction(procureDistanceTimeoutAction(100));
+        karmaTutorialSequence.addAction(procureStopAction());
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+            ["Dominique, do you know karma is?", "Доминик, ты знаешь, что такое карма?"]));
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+            ["I have a few wild guesses that it's some sort of invisible coins like what humans use. Or that it's "
+                + "an eternal river frozen in the last rays of the sunset between the now and forever... whatever "
+                + "that means. So no. I don't know.",
+                "У меня есть парочка догадок, что это может быть некой невидимой монетой, похожей на ту, что люди "
+                    + "используют. Или что это вечная река, застывшая в последних лучах заката между сейчас и "
+                    + "навеки... чтобы это ни значило. Так что нет. Не знаю."]));
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+            ["Truth be told, no one does. But there are many practical teachings about karma. One of them states that "
+                + "Natural Order - a.k.a. Law of Karma Distribution - controls the amount of happiness and grief "
+                + "everyone receives.",
+                "На самом деле, никто не знает. Но есть множество практических учений о карме. Одно из них гласит, что "
+                    + "Естественный Порядок - он же Закон Распределения Кармы - управляет тем, кому сколько достаётся "
+                    + "счастья и горя."]));
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+            ["Oh, I know that one. It says that karma flows from the weak-willed and lost to the strong and worthy. "
+                + "And that worthiness is determined by how you treat the world and what you give of yourself.",
+                "О, я знаю его. Согласно ему, карма течёт от слабовольных и заблудших к сильным и достойным. А "
+                    + "достоинство определяется тем, как ты относишься к миру и что отдаёшь."]));
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+            ["Right. Keep that in mind when you accept and decline challenges or when you give and take. But there "
+                + "is one particularly interesting thing about karma according to that theory. Natural Order does "
+                + "not tolerate the void.",
+                "Верно. Помни об этом, когда принимаешь или отвергаешь вызов и когда отдаёшь или берёшь. Но есть в "
+                    + "этой теории одно интересное утверждение о карме. Естественный Порядок не терпит пустоты."]));
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+            ["The void? Do you mean the absence of karma?", "Пустоты? Ты имеешь ввиду отсутствие кармы?"]));
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+            ["Yes. When you take and not give, when you deny yourself a path, when you run away from the "
+                + "consequences of your choices, you get closer to that void.",
+                "Да. Когда ты берёшь и не отдаёшь, когда ты отказыаешь себе в наличии стези, когда ты убегаешь от "
+                    + "последствий своего выбора, ты приближаешься к этой пустоте."]));
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+            ["If your karma gets negative, Natural Order will proceed to fill that void and deal out an extra dose of "
+                + "misfortunes to you. It's called karma rebound. Don't let it come to that.",
+                "Если твоя карма окажется отрицательной, Естественный Порядок устремится заполнить пустоту и выдать "
+                    + "дополнительную порцию бед на твою голову. Это называется отдачей кармы. Не доводи до этого."]));
+        karmaTutorialSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+            ["Not planning, really. Let's go.", "Честно, не собираюсь. Пойдём."]));
+        karmaTutorialSequence.addAction(procureResumeAction());
+        registerObject(GUI_EVENT, karmaTutorialSequence);
+        gst[CH00][CH00_TUTORIAL_KARMA] = 1;
+    }
 }
 
 /* FIELD OBJECTS */
@@ -479,7 +708,7 @@ function procureStartPrologueSequence() {
 function describeChroniclersPavilionType(chance) {
     var chroniclersPavilionType = new ObjectType(chance);
     chroniclersPavilionType.defineGenerateObject(function (path, position) {
-        var chroniclersPavilion = new FieldObject(path, position, 50, getImageResource("imgObjArbor"));
+        var chroniclersPavilion = new FieldObject(path, position, 50, getResource("imgObjArbor"));
         chroniclersPavilion.defineTrigger(function () {
             var pavilionSequence = new Sequence();
             pavilionSequence.addAction(procureStopAction());
@@ -522,7 +751,7 @@ function describeChroniclersPavilionType(chance) {
 function describeHotspringType(chance) {
     var hotspringType = new ObjectType(chance);
     hotspringType.defineGenerateObject(function (path, position) {
-        var hotspring = new FieldObject(path, position, 60, getImageResource("imgObjHotspring"));
+        var hotspring = new FieldObject(path, position, 60, getResource("imgObjHotspring"));
         hotspring.defineTrigger(function () {
             var hotspringSequence = new Sequence();
             hotspringSequence.addAction(procureStopAction());
@@ -558,6 +787,7 @@ function describeHotspringType(chance) {
                         hero.restoreHp(hero.attrMaxHp * (restoreAmount * 2 / 100));
                         hero.restoreSp(hero.attrMaxSp * (restoreAmount / 100));
                         hero.expendKarma(karmaCost);
+                        processKarmaTutorial();
                     }));
                 } else {
                     hotspringSequence.addAction(
@@ -575,7 +805,7 @@ function describeHotspringType(chance) {
 function describeInnType(chance) {
     var innType = new ObjectType(chance);
     innType.defineGenerateObject(function (path, position) {
-        var inn = new FieldObject(path, position, 50, getImageResource("imgObjInn"));
+        var inn = new FieldObject(path, position, 50, getResource("imgObjInn"));
         inn.defineTrigger(function () {
             var innSequence = new Sequence();
             innSequence.addAction(procureStopAction());
@@ -611,6 +841,7 @@ function describeInnType(chance) {
                         hero.restoreHp(hero.attrMaxHp * (restoreAmount / 100));
                         hero.restoreSp(hero.attrMaxSp * (restoreAmount * 2 / 100));
                         hero.expendKarma(karmaCost);
+                        processKarmaTutorial();
                     }));
                 } else {
                     innSequence.addAction(
@@ -630,7 +861,7 @@ function describeTrainerType(chance) {
     trainerType.defineGenerateObject(function (path, position) {
         var attribute = Math.floor(Math.random() * 4);
         var trainer = new FieldObject(path, position, 50,
-            attribute < 2 ? getImageResource("imgObjSmith") : getImageResource("imgObjDojo"));
+            attribute < 2 ? getResource("imgObjSmith") : getResource("imgObjDojo"));
         trainer.defineTrigger(function () {
             var trainerSequence = new Sequence();
             trainerSequence.addAction(procureStopAction());
@@ -731,6 +962,7 @@ function describeTrainerType(chance) {
                         trainerSequence.addAction(procureCodeFragmentAction(function () {
                             hero.increaseAttribute(attribute, growth);
                             hero.expendKarma(karmaCostIncrease);
+                            processKarmaTutorial();
                         }));
                         break;
                     case 1:
@@ -739,6 +971,7 @@ function describeTrainerType(chance) {
                         trainerSequence.addAction(procureCodeFragmentAction(function () {
                             hero.obtainItem(itemId);
                             hero.expendKarma(karmaCostItem);
+                            processKarmaTutorial();
                         }));
                         break;
                     case 2:
@@ -748,6 +981,7 @@ function describeTrainerType(chance) {
                             hero.increaseAttribute(attribute, growth);
                             hero.obtainItem(itemId);
                             hero.expendKarma(Math.floor((karmaCostIncrease + karmaCostItem) * 0.75));
+                            processKarmaTutorial();
                         }));
                         break;
                     default:
@@ -767,7 +1001,7 @@ function describeHouseRestType(chance) {
     var houseRestType = new ObjectType(chance);
     houseRestType.defineGenerateObject(function (path, position) {
         var houseRest = new FieldObject(path, position, 50,
-            getRandomObject([getImageResource("imgObjHouse1"), getImageResource("imgObjHouse2")]));
+            getRandomObject([getResource("imgObjHouse1"), getResource("imgObjHouse2")]));
         houseRest.defineTrigger(function () {
             var houseRestSequence = new Sequence();
             houseRestSequence.addAction(procureStopAction());
@@ -808,7 +1042,7 @@ function describeHouseWorkType(chance) {
     var houseWorkType = new ObjectType(chance);
     houseWorkType.defineGenerateObject(function (path, position) {
         var houseWork = new FieldObject(path, position, 50,
-            getRandomObject([getImageResource("imgObjHouse1"), getImageResource("imgObjHouse2")]));
+            getRandomObject([getResource("imgObjHouse1"), getResource("imgObjHouse2")]));
         houseWork.defineTrigger(function () {
             var houseWorkSequence = new Sequence();
             houseWorkSequence.addAction(procureStopAction());
@@ -871,7 +1105,7 @@ function describeHouseWorkType(chance) {
 function describeTradingPostType(chance) {
     var objectType = new ObjectType(chance);
     objectType.defineGenerateObject(function (path, position) {
-        var object = new FieldObject(path, position, 50, getImageResource("imgObjTradingPost"));
+        var object = new FieldObject(path, position, 50, getResource("imgObjTradingPost"));
         object.defineTrigger(function () {
             var objectSequence = new Sequence();
             objectSequence.addAction(procureStopAction());
@@ -895,11 +1129,10 @@ function describeTradingPostType(chance) {
                 .addChoice(answerTrade).addChoice(TXT_NO));
             objectSequence.addAction(procureCodeFragmentAction(function () {
                 if (eventChoice == 0) {
-                    objectSequence.addAction(
-                        procureDisplayCenteredMessageAction(WW_SMALL, CH00_TRADING_POST_04, true));
                     objectSequence.addAction(procureCodeFragmentAction(function () {
                         hero.obtainItem(itemId);
                         hero.expendKarma(karmaCost);
+                        processKarmaTutorial();
                     }));
                 } else {
                     objectSequence.addAction(
@@ -917,7 +1150,7 @@ function describeTradingPostType(chance) {
 function describeCommonChestType(chance) {
     var objectType = new ObjectType(chance);
     objectType.defineGenerateObject(function (path, position) {
-        var object = new FieldObject(path, position, 50, getImageResource("imgObjChest1"));
+        var object = new FieldObject(path, position, 50, getResource("imgObjChest1"));
         object.layerOffset = -2;
         object.defineTrigger(function () {
             var objectSequence = new Sequence();
@@ -967,7 +1200,7 @@ function describeCommonChestType(chance) {
                                 procureDisplayCenteredMessageAction(WW_SMALL, CH00_COMMON_CHEST_02_3, true));
                             objectSequence.addAction(procureCodeFragmentAction(function () {
                                 hero.inflict(statusEffect.statusArtifacts);
-                                registerObject(GUI_COMMON, procureHeroTextAction("white",
+                                registerObject(GUI_COMMON, procureHeroTextAction(TEXT_COLOR_RED,
                                     [
                                         TXT_INFLICTED[LANG_ENG] + statusEffect.statusName[LANG_ENG],
                                         TXT_INFLICTED[LANG_RUS] + statusEffect.statusName[LANG_RUS]
@@ -997,9 +1230,9 @@ function describeDestroyedHouseType(chance) {
     var objectType = new ObjectType(chance);
     objectType.singletonId = "singleton: ch00_phase01";
     objectType.defineGenerateObject(function (path, position) {
-        var object = new FieldObject(path, position, 50, getImageResource("imgObjDestroyedHouse"));
+        var object = new FieldObject(path, position, 50, getResource("imgObjDestroyedHouse"));
         var triggered = false;
-        registerObject(pathToObjectLayer(path), procureFloatingImageAction(object, getImageResource("imgQuestMark"),
+        registerObject(pathToObjectLayer(path), procureFloatingImageAction(object, getResource("imgQuestMark"),
             function () {
                 return triggered;
             }));
@@ -1024,9 +1257,9 @@ function describeMilestoneType(chance) {
     var objectType = new ObjectType(chance);
     objectType.singletonId = "singleton: ch00_milestone";
     objectType.defineGenerateObject(function (path, position) {
-        var object = new FieldObject(path, position, 50, getImageResource("imgObjMilestone"));
+        var object = new FieldObject(path, position, 50, getResource("imgObjMilestone"));
         var triggered = false;
-        registerObject(pathToObjectLayer(path), procureFloatingImageAction(object, getImageResource("imgQuestMark"),
+        registerObject(pathToObjectLayer(path), procureFloatingImageAction(object, getResource("imgQuestMark"),
             function () {
                 return triggered;
             }));
@@ -1037,10 +1270,61 @@ function describeMilestoneType(chance) {
                 .addChoice(TXT_YES).addChoice(TXT_NO));
             objectSequence.addAction(procureCodeFragmentAction(function () {
                 if (eventChoice == 0) {
-                    triggered = true;
+                    terminated = true;
                     gst[CH00][CH00_PHASE]++;
                     landscape.actualize();
                     objectSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, CH00_MILESTONE_02, true));
+
+                    if (gst[CH00][CH00_TUTORIAL_DANGER] < 2) {
+                        if (gst[CH00][CH00_PHASE] >= 5) {
+                            var dangerTutorialSequence = new Sequence();
+                            dangerTutorialSequence.addAction(procureDistanceTimeoutAction(200));
+                            dangerTutorialSequence.addAction(procureStopAction());
+                            dangerTutorialSequence.addAction(procureDisplaySpeechMessageAction(
+                                CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                                ["Hold on a second. I'm sure you've realized this by now, of course, but just in "
+                                    + "case... Memento mori. If you fall in battle it's all over. So be careful and "
+                                    + "talk to chroniclers often.",
+                                    "Погоди секунду. Я уверен, что ты это, конечно, уже осознал, но на всякий случай..."
+                                        + "Мементо мори. Если ты падёшь в битве, всё кончено. Так что будь осторожен и "
+                                        + "почаще общайся с летописцами."]));
+                            dangerTutorialSequence.addAction(procureDisplaySpeechMessageAction(
+                                CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                                ["I sure know that. Even though most enemies we've encountered yet are not exactly "
+                                    + "formidable. But yes, I've felt it too.",
+                                    "Да знаю я. Даже не взирая на то, что большинство встреченных нами врагов не были "
+                                        + "особо грозными. Но да, я тоже это почувствовал."]));
+                            if (gst[CH00][CH00_TUTORIAL_DANGER] == 0) {
+                                var terminated = false;
+                                dangerTutorialSequence.addAction(procureCodeFragmentAction(function () {
+                                    registerObject(GUI_EVENT, procureFloatingImageAction(hero,
+                                        getResource("imgDangerMark"), function () {
+                                            return terminated;
+                                        }));
+                                }));
+                                dangerTutorialSequence.addAction(procureDisplaySpeechMessageAction(
+                                    CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                                    ["Exactly. We should expect mortal danger ahead, so better safe than sorry. "
+                                        + "If you see a danger sign floating over an enemy, beware: it's going "
+                                        + "to be a tough battle.",
+                                        "Именно. Впереди нас ждут смертельные опасности, так что бережёного бог "
+                                            + "бережёт. Если увидишь знак опасности над врагом, берегись: "
+                                            + "битва будет трудной."]));
+                                dangerTutorialSequence.addAction(procureCodeFragmentAction(function () {
+                                    terminated = true;
+                                }));
+                            } else {
+                                dangerTutorialSequence.addAction(procureDisplaySpeechMessageAction(
+                                    CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                                    ["Exactly. We should expect mortal danger ahead, so better safe than sorry.",
+                                        "Именно. Впереди нас ждут смертельные опасности, так что бережёного бог "
+                                            + "бережёт."]));
+                            }
+                            dangerTutorialSequence.addAction(procureResumeAction());
+                            registerObject(GUI_EVENT, dangerTutorialSequence);
+                            gst[CH00][CH00_TUTORIAL_DANGER] = 2;
+                        }
+                    }
                 }
                 objectSequence.addAction(procureResumeAction());
             }));
@@ -1054,68 +1338,75 @@ function describeMilestoneType(chance) {
 
 function describeBanditType(chance) {
     return describeCommonEncounter(chance, ["Bandit", "Разбойник"],
-        getImageResource("imgEnemyBandit1Stand"), getImageResource("imgEnemyBandit1Attack"),
-        enlistBandit, HS_BASE, HS_CH00);
+        getResource("imgEnemyBandit1Stand"), getResource("imgEnemyBandit1Attack"),
+        enlistBandit, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_BANDIT,
+        procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_BANDIT_TXT));
 }
 
 function describeBrigandType(chance) {
     return describeCommonEncounter(chance, ["Brigand", "Разбойник"],
-        getImageResource("imgEnemyBandit2Stand"), getImageResource("imgEnemyBandit2Attack"),
-        enlistBrigand, HS_BASE, HS_CH00);
+        getResource("imgEnemyBandit2Stand"), getResource("imgEnemyBandit2Attack"),
+        enlistBrigand, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_BRIGAND,
+        procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_BRIGAND_TXT));
 }
 
 function describeWolfType(chance) {
     return describeCommonEncounter(chance, ["Wolf", "Волк"],
-        getImageResource("imgEnemyWolf1Stand"), getImageResource("imgEnemyWolf1Attack"),
-        enlistWolf, HS_BASE, HS_CH00);
+        getResource("imgEnemyWolf1Stand"), getResource("imgEnemyWolf1Attack"),
+        enlistWolf, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_WOLF,
+        procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_WOLF_TXT));
 }
 
 function describeRedWolfType(chance) {
     return describeCommonEncounter(chance, ["Red Wolf", "Бурый Волк"],
-        getImageResource("imgEnemyWolf2Stand"), getImageResource("imgEnemyWolf2Attack"),
-        enlistRedWolf, HS_BASE, HS_CH00);
+        getResource("imgEnemyWolf2Stand"), getResource("imgEnemyWolf2Attack"),
+        enlistRedWolf, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_RED_WOLF,
+        procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_RED_WOLF_TXT));
 }
 
 function describeWaspType(chance) {
-    return describeCommonEncounter(chance, ["Wasp", "Оса"],
-        getImageResource("imgEnemyWasp1Stand"), getImageResource("imgEnemyWasp1Attack"),
-        enlistWasp, HS_BASE, HS_CH00);
+    return describeCommonEncounter(chance, ["Giant Wasp", "Гигантская Оса"],
+        getResource("imgEnemyWasp1Stand"), getResource("imgEnemyWasp1Attack"),
+        enlistWasp, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_WASP,
+        procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_WASP_TXT));
 }
 
 function describePoisonWaspType(chance) {
     return describeCommonEncounter(chance, ["Posion Wasp", "Ядовитая Оса"],
-        getImageResource("imgEnemyWasp2Stand"), getImageResource("imgEnemyWasp2Attack"),
-        enlistPoisonWasp, HS_BASE, HS_CH00);
+        getResource("imgEnemyWasp2Stand"), getResource("imgEnemyWasp2Attack"),
+        enlistPoisonWasp, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_POISON_WASP,
+        procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_POISON_WASP_TXT));
 }
 
 function describeArmadilloKnightType(chance) {
     return describeCommonEncounter(chance, ["Armadillo Knight", "Броненосец-рыцарь"],
-        getImageResource("imgEnemyArmadillo1Stand"), getImageResource("imgEnemyArmadillo1Attack"),
-        enlistArmadilloKnight, HS_BASE, HS_CH00);
+        getResource("imgEnemyArmadillo1Stand"), getResource("imgEnemyArmadillo1Attack"),
+        enlistArmadilloKnight, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_ARMADILLO,
+        procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_ARMADILLO_TXT));
 }
 
 function describeBanditRingleaderType(chance) {
     return describeDangerEncounter(chance, ["Bandit Ringleader", "Главарь банды"],
-        getImageResource("imgEnemyBandit3Stand"), getImageResource("imgEnemyBandit3Attack"),
+        getResource("imgEnemyBandit3Stand"), getResource("imgEnemyBandit3Attack"),
         enlistBanditRingleader, HS_BASE, HS_CH00);
 }
 
 function describeArmadilloVityazType(chance) {
     return describeDangerEncounter(chance, ["Armadillo Vityaz", "Броненосец-витязь"],
-        getImageResource("imgEnemyArmadillo2Stand"), getImageResource("imgEnemyArmadillo2Attack"),
+        getResource("imgEnemyArmadillo2Stand"), getResource("imgEnemyArmadillo2Attack"),
         enlistArmadilloVityaz, HS_BASE, HS_CH00);
 }
 
 function describeGreenSerpentType(chance) {
     return describeDangerEncounter(chance, ["Green Serpent", "Зелёный змей"],
-        getImageResource("imgEnemySerpent1Stand"), getImageResource("imgEnemySerpent1Attack"),
+        getResource("imgEnemySerpent1Stand"), getResource("imgEnemySerpent1Attack"),
         enlistGreenSerpent, HS_BASE, HS_CH00);
 }
 
 /* ENEMIES */
 
-function enlistTutorialBandit(startingHeroStrength, maxHeroStrength, animationObject) {
-    var bandit = new Enemy(4, 15, 10, 8, 240, animationObject);
+function enlistTutorialBandit(animationObject) {
+    var bandit = new Enemy(6, 15, 10, 8, 250, animationObject);
     var attackSkill = gainAttackSkill();
     var defendSkill = gainDefendSkill();
     var opening = gainOpeningSkill(40, 0.5);
@@ -1123,6 +1414,178 @@ function enlistTutorialBandit(startingHeroStrength, maxHeroStrength, animationOb
         var position;
         if (battleFrame == 0) {
             character.useSkill(gainOpenerSkill(200), 0);
+            var battleTutorialPhase1Sequence = new Sequence();
+            battleTutorialPhase1Sequence.addAction(procureStopAction());
+            battleTutorialPhase1Sequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                [
+                    "Remember: the key to defeating your opponents is to read them and respond accordingly. "
+                        + "Not that I need to tell that to you.",
+                    "Помни: ключ к победе над противниками - умение видеть их насквозь, предсказывать их действия "
+                        + "и соответствующим образом реагировать. Хотя кому я это говорю - ты и так всё прекрасно знаешь."
+                ]));
+            battleTutorialPhase1Sequence.addAction(procureDisplayCenteredMessageAction(WW_LARGE,
+                [
+                    "Welcome to the battle tutorial of Rat Rider Dominique! <br> <br> Dominique and Sallinger will fight their opponents "
+                        + "in the so-called \"precision-timing battles\". You can see two battle gauges at the top of the screen. "
+                        + "Every action that you or your opponent take is reflected on the respective battle gauge, the upper belonging to you "
+                        + "and the lower - to your foe. Whenever something reaches the left end of the gauge, it is performed by the character. "
+                        + "<br> <br> Dominique, being the skilled warrior able to read through his opponents, can see what the character "
+                        + "is going to do in advance, and, given enough time to react, can respond with appropriate actions of his own.",
+                    "Добро пожаловать на обучение поединкам игры \"Доминик, крысиный всадник\"! <br> <br> Доминик и Сэллинджер будут "
+                        + "сражаться со своими противниками в так называемых \"битвах точного тайминга\". Вы можете видеть две шкалы боя в верхней "
+                        + "части экрана. Каждое Ваше действие или действие Вашего противника отражается на соответствующей шкале боя; Вам "
+                        + "принадлежит верхняя, Вашему врагу - нижняя. Когда что-либо достигает левого края шкалы, оно исполняется персонажем. "
+                        + "<br> <br> Доминик, будучи опытным воином, способным \"читать\" своих противников, может видеть, что персонаж "
+                        + "собирается сделать, и при наличии времени может ответить необходимыми действиями со своей стороны."
+                ], true));
+            battleTutorialPhase1Sequence.addAction(procureCodeFragmentAction(function () {
+                registerObject(GUI_EVENT, procureDisplayLabelAction(HP_GAUGE_X + 200, HP_GAUGE_Y + 20, ["HP gauge", "Шкала ОЖ"]));
+                registerObject(GUI_EVENT, procureDisplayLabelAction(HP_GAUGE_X + 200, HP_GAUGE_Y + 50,["SP gauge", "Шкала ОВ"]));
+            }));
+            battleTutorialPhase1Sequence.addAction(procureDisplayCenteredMessageAction(WW_LARGE,
+                [
+                    "You can choose what action you perform from the skill menu on the right by pressing 'Up' and 'Down' keys. "
+                        + "The shape of what will appear on the battle gauge will be sketched, so you can actually time your attacks and blocks. "
+                        + "Pressing 'Space' or 'Enter' key (further referenced by ACTION) will make Dominique use chosen skill if he has "
+                        + "sufficient stamina and if he is not busy performing another action. <br> <br> "
+                        + "You can see Dominique's health (red) and stamina (yellow) gauges in the upper-left corner of the screen. They are measured by "
+                        + "health points (HP) and stamina points (SP), respectively.",
+                    "Вы можете выбирать, какое действие совершить, из меню навыков справа, нажимая кнопки 'Вверх' и 'Вниз'. "
+                        + "Отобразится набросок того, что появится на шкале боя, так что вы сможете рассчитать, когда атаковать и блокировать. "
+                        + "Нажав клавишу 'Пробел' или 'Enter' (далее именуемые клавишами ДЕЙСТВИЕ), Вы заставите Доминика использовать выбранный "
+                        + "навык, если у него достаточно выносливости и если он не занят выполнением другого действия. <br> <br> "
+                        + "Вы можете видеть шкалы здоровья (красная) и выносливости (жёлтая) Доминика в верхнем-левом углу экрана. "
+                        + "Они измеряются в очках здоровья (ОЖ) и очках выносливости (ОВ), соответственно."
+                ], true));
+            battleTutorialPhase1Sequence.addAction(procureDisplayCenteredMessageAction(WW_LARGE,
+                [
+                    "Time for the actual combat! Bandit's behavior is simple: defend, attack, then make some clumsy action that "
+                        + "leaves him open. Times when a character's defense is up are depicted as BLUE areas on the battle gauge. "
+                        + "Times when a character's defense is down are depicted as RED areas on the battle gauge. Attack impacts are "
+                        + "depicted as swords. Know that when Dominique attacks, he is vulnerable. <br> <br> "
+                        + "What you should try to do now is DEFEND when your opponent attacks and attack when he is open. Press ACTION "
+                        + "to begin the fight.",
+                    "Пришло время для самой битвы! Поведение бандита простое: защититься, атаковать, затем сделать что-нибудь дико неуклюжее, "
+                        + "что оставит его уязвимым. Время, когда защита персонажа повышена, обозначается СИНИМИ зонами на шкале боя. "
+                        + "Время, когда защита персонажа понижена, обозначается КРАСНЫМИ зонами на шкале боя. Нанесения ударов "
+                        + "обозначаются мечами. Помните, что когда Вы атакуете, Вы уязвимы. <br> <br> "
+                        + "Сейчас Вам следует попробовать ЗАЩИЩАТЬСЯ, когда Ваш противник атакует, и атаковать, когда он открыт. "
+                        + "Нажмите ДЕЙСТВИЕ, чтобы начать бой."
+                ], true));
+            battleTutorialPhase1Sequence.addAction(procureResumeAction());
+            registerObject(GUI_EVENT, battleTutorialPhase1Sequence);
+            hero.inflict([acquireResponseArtifact(BGL_LEFT, 1, 1, BGL_COLOR, BGL_COLOR, function (dmg) {
+                if ((hero.hp > 20) && (hero.hp - dmg <= 20)) {
+                    var safeBattleSequence = new Sequence();
+                    safeBattleSequence.addAction(procureStopAction());
+                    safeBattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                        ["Dominique, get a hold of yourself.", "Доминик, возьми себя в руки."]));
+                    safeBattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                        ["I was just getting warmed up. Now I'll show him the prowess of a rat rider!",
+                            "Я просто разогревался. Сейчас я покажу ему мастерство крысиного всадника!"]));
+                    safeBattleSequence.addAction(procureCodeFragmentAction(function () {
+                        hero.restoreHp(hero.attrMaxHp * 0.7);
+                        for (var i = 0; i < 4; i ++) {
+                            attrIncrease[i] = 0;
+                        }
+                    }));
+                    safeBattleSequence.addAction(procureResumeAction());
+                    registerObject(GUI_EVENT, safeBattleSequence);
+                }
+                return dmg >= hero.hp ? hero.hp - 1 : dmg;
+            }, true).perpetuate()]);
+            character.inflict([acquireResponseArtifact(BGL_LEFT, 1, 1, BGL_COLOR, BGL_COLOR, function (dmg) {
+                if ((character.hp > character.attrMaxHp * 0.66) && (character.hp - dmg <= character.attrMaxHp * 0.66)) {
+                    var battleTutorialPhase2Sequence = new Sequence();
+                    battleTutorialPhase2Sequence.addAction(procureStopAction());
+                    battleTutorialPhase2Sequence.addAction(procureCodeFragmentAction(function () {
+                        hero.expendSp(hero.attrMaxSp * 0.6);
+                    }));
+                    battleTutorialPhase2Sequence.addAction(procureDisplaySpeechMessageAction(CHR_BANDIT.name, CHR_BANDIT.portrait,
+                        ["What's wrong? *grinning* Getting tired already?", "Что-то не так? *ухмыляясь* Уже устал?"]));
+                    battleTutorialPhase2Sequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                        ["Nonsense! Don't see any reason to go all out on you.", "Нонсенс! Не вижу причин сражаться с тобой в полную силу."]));
+                    battleTutorialPhase2Sequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                        ["Drop the act, Dominique, and have measures to counter fatigue.",
+                            "Не паясничай, Доминик, а лучше прими меры против усталости."]));
+                    battleTutorialPhase2Sequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                        ["Oh, come on, Sallinger... Get into the festive mood!",
+                            "Ох, да ладно, Сэллинджер... Ощути праздник!"]));
+                    battleTutorialPhase2Sequence.addAction(procureDisplayCenteredMessageAction(WW_LARGE,
+                        [
+                            "Since prolonged combat has been proven to be hazardous for health, you will be prone to incapacitate "
+                                + "your foes as soon as possible. Thus, it will make sense to attack your opponent not only when he is vulnerable "
+                                + "but when he is simply not guarding. However, rapid attacks will deplete Dominique's stamina more quickly. "
+                                + "<br> <br> There are ways to restore your health and stamina, of which items are the most simple.",
+                            "Так как продолжительный бой, как правило, опасен для здоровья, Вы будете склонны разбираться с Вашими врагами "
+                                + "как можно скорее. Таким образом, имеет смысл атаковать Вашего противника не только, когда он уязвим, но "
+                                + "и когда он просто не защищается. Однако частые атаки быстро истощат выносливость Доминика. "
+                                + "<br> <br> Есть способы восстановить здоровье и выносливость, из которых предметы - самый простой."
+                        ], true));
+                    battleTutorialPhase2Sequence.addAction(procureCodeFragmentAction(function () {
+                        if (hero.activeItems[0] == null) {
+                            hero.activeItems[0] = {id: ITM_SPRES1, charges: 2};
+                        } else {
+                            hero.availableItems[hero.availableItems.length] = hero.activeItems[0];
+                            hero.activeItems[0] = {id: ITM_SPRES1, charges: 2};
+                        }
+                    }));
+                    battleTutorialPhase2Sequence.addAction(procureCodeFragmentAction(function () {
+                        registerObject(GUI_EVENT, procureDisplayLabelAction(ITEM_WINDOW_X, INFO_WINDOW_Y + 100,
+                            ["Items menu", "Меню предметов"]));
+                    }));
+                    battleTutorialPhase2Sequence.addAction(procureDisplayCenteredMessageAction(WW_LARGE,
+                        [
+                            "Items function just like skills, except that they do not expend stamina, but have a limited number of uses instead. "
+                                + "Use 'Left' and 'Right' keys to choose an item from the item menu in the lower-right corner of the screen. "
+                                + "Holding 'Ctrl' key will display information on the chosen item and sketch it on the battle gauge. "
+                                + "Pressing ACTION while holding 'Ctrl' will make Dominique use the chosen item. "
+                                + "<br> <br> Dominique realizes he has a bottle of refreshing and invigorating spineapple juice. "
+                                + "It should come in very handy right now. Try to use it. <br> <br> Press ACTION to continue.",
+                            "Предметы работают так же, как и навыки, за исключением того, что они не тратят выносливость, но вместо этого имеют "
+                                + "ограниченное число применений. Используйте клавиши 'Влево' и 'Вправо', чтобы выбирать предметы из меню предметов "
+                                + "в нижнем-правом углу экрана. Если удерживать клавишу 'Ctrl', можно просмотреть информацию о выбранном предмете и "
+                                + "увидеть его набросок на шкале боя. Если нажать ДЕЙСТВИЕ, удерживая 'Ctrl', Доминик воспользуется предметом. "
+                                + "<br> <br> Доминик внезапно понимает, что у него есть бутылка освежающего и бодрящего спинанасового сока. "
+                                + "Сейчас она очень кстати. Попробуйте её использовать. <br> <br> Нажмите ДЕЙСТВИЕ для продолжения."
+                        ], true));
+                    battleTutorialPhase2Sequence.addAction(procureResumeAction());
+                    registerObject(GUI_EVENT, battleTutorialPhase2Sequence);
+                    return character.hp - dmg <= character.attrMaxHp * 0.5 ? character.hp - character.attrMaxHp * 0.5 : dmg;
+                } else if ((character.hp > character.attrMaxHp * 0.33) && (character.hp - dmg <= character.attrMaxHp * 0.33)) {
+                    var battleTutorialPhase3Sequence = new Sequence();
+                    battleTutorialPhase3Sequence.addAction(procureStopAction());
+                    battleTutorialPhase3Sequence.addAction(procureCodeFragmentAction(function () {
+                        character.inflict([acquirePerpetualAttributeModifierArtifact(ATTR_AGILITY, 0.7)]);
+                    }));
+                    battleTutorialPhase3Sequence.addAction(procureDisplaySpeechMessageAction(CHR_BANDIT.name, CHR_BANDIT.portrait,
+                        ["*pants* Now that is just mean... I will get ya! I just need to... catch a breath...",
+                            "*тяжело дышит* Ну, это уже нечестно... Я тебя достану! Только... отдышусь..."]));
+                    battleTutorialPhase3Sequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                        ["Alright, Dominique. Let's finish this.", "Отлично, Доминик. Давай закончим с этим."]));
+                    battleTutorialPhase3Sequence.addAction(procureDisplayCenteredMessageAction(WW_LARGE,
+                        [
+                            "It seems your opponent is out of breath already. Now he will be considerably slower. "
+                                + "Don't expect it to happen very often though. <br> <br> When Dominique is more agile than his opponent, "
+                                + "his battle gauge will move faster. While it offers great advantage, it can be tricky to control the flow "
+                                + "of battle, if Dominique is always fighting at top speed. There is a way to negate this letdown. "
+                                + "<br> <br> If you hold 'Shift' key, Dominique will synchronize his actions with those of his foe. "
+                                + "This, of course, only works if Dominique is initially more nimble. Use the opportunity to finish the bandit. "
+                                + "Press ACTION to continue.",
+                            "Похоже, Ваш противник уже выдохся. Теперь он будет куда более медлителен. "
+                                + "Не рассчитывайте однако, что такое будет происходить часто. <br> <br> Когда Доминик более ловок, чем его "
+                                + "противник, его шкала боя будет двигаться быстрее. В то время, как это даёт огромное преимущество, управлять "
+                                + "течением битвы станет сложнее, если Доминик всегда будет сражаться на полной скорости. Есть способ это "
+                                + "обойти. <br> <br> Если Вы зажмёте клавишу 'Shift', Доминик синхронизирует свои действия с действиями врага. "
+                                + "Это, конечно же, работает только, когда Доминик изначально более ловок. Используйте эту возможность, "
+                                + "чтобы добить бандита. Нажмите ДЕЙСТВИЕ для продолжения."
+                        ], true));
+                    battleTutorialPhase3Sequence.addAction(procureResumeAction());
+                    registerObject(GUI_EVENT, battleTutorialPhase3Sequence);
+                    return character.hp - dmg <= character.attrMaxHp * 0.2 ? character.hp - character.attrMaxHp * 0.2 : dmg;
+                }
+                return dmg;
+            }, true).perpetuate()]);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
             if (behaviorFluctuation == 1) {
@@ -1132,8 +1595,10 @@ function enlistTutorialBandit(startingHeroStrength, maxHeroStrength, animationOb
                     ["Guard up", "Защита"])]);
                 behaviorFluctuation++;
             } else if (behaviorFluctuation == 2) {
-                character.useSkill(attackSkill, getStandardEnemyOffset(attackSkill)
-                    + 30 + Math.floor(70 * Math.random()));
+                position = getStandardEnemyOffset(defendSkill) + 30 +  Math.floor(70 * Math.random());
+                character.useSkill(attackSkill, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Impact", "Удар"])]);
                 behaviorFluctuation++;
             } else if (behaviorFluctuation == 3) {
                 position = getStandardEnemyOffset(opening) + 30 + Math.floor(70 * Math.random());
@@ -1160,10 +1625,8 @@ function enlistBandit(startingHeroStrength, maxHeroStrength, animationObject) {
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
             if (behaviorFluctuation == 1) {
-                position = getStandardEnemyOffset(defendSkill) + 30 +  Math.floor(70 * Math.random());
-                character.useSkill(defendSkill, position);
-                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
-                    ["Guard up", "Защита"])]);
+                character.useSkill(defendSkill, getStandardEnemyOffset(defendSkill)
+                    + 30 +  Math.floor(70 * Math.random()));
                 behaviorFluctuation++;
             } else if (behaviorFluctuation == 2) {
                 character.useSkill(attackSkill, getStandardEnemyOffset(attackSkill)
@@ -1189,13 +1652,16 @@ function enlistBrigand(startingHeroStrength, maxHeroStrength, animationObject) {
     var attackSkill = gainAttackSkill();
     var fumbledAttackSkill = gainFumbledAttackSkill(50, 0.6);
     brigand.defineBehave(function (character, battleFrame) {
+        var position;
         if (battleFrame == 0) {
             character.useSkill(gainOpenerSkill(100), 0);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
             if (behaviorFluctuation == 1) {
-                character.useSkill(powerAttack, getStandardEnemyOffset(powerAttack)
-                    + 20 +  Math.floor(20 * Math.random()));
+                position = getStandardEnemyOffset(powerAttack) + 20 +  Math.floor(20 * Math.random());
+                character.useSkill(powerAttack, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Power attack", "Силовая атака"])]);
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 2) {
                 character.useSkill(defenseSkill,  getStandardEnemyOffset(defenseSkill)
@@ -1231,8 +1697,8 @@ function enlistBanditRingleader(startingHeroStrength, maxHeroStrength, animation
     var defenseSkill = gainEnemyDefenseSkill(200, 2.1);
     var attackSkill = gainAttackSkill();
     var jabSkill = gainJabSkill();
-    var fumbledAttackSkill = gainFumbledAttackSkill(50, 0.6);
     banditRingleader.defineBehave(function (character, battleFrame) {
+        var position;
         if (battleFrame == 0) {
             character.useSkill(gainOpenerSkill(10), 0);
             behaviorFluctuation = 1;
@@ -1242,8 +1708,10 @@ function enlistBanditRingleader(startingHeroStrength, maxHeroStrength, animation
                     + 20 +  Math.floor(20 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 2) {
-                character.useSkill(doubleStrike,  getStandardEnemyOffset(doubleStrike)
-                    + 10 + Math.floor(40 * Math.random()));
+                position = getStandardEnemyOffset(doubleStrike) + 10 + Math.floor(40 * Math.random());
+                character.useSkill(doubleStrike,  position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Double strike", "Двойной удар"])]);
                 behaviorFluctuation += 1 + Math.floor(Math.random() * 2);
             } else if (behaviorFluctuation == 3) {
                 character.useSkill(jabSkill,  getStandardEnemyOffset(jabSkill)
@@ -1274,6 +1742,7 @@ function enlistWolf(startingHeroStrength, maxHeroStrength, animationObject) {
     var defendSkill = gainDefendSkill();
     var fumbledAttackSkill = gainFumbledAttackSkill(40, 0.3);
     wolf.defineBehave(function (character, battleFrame) {
+        var position;
         if (battleFrame == 0) {
             character.useSkill(gainOpenerSkill(100), 0);
             behaviorFluctuation = 1;
@@ -1291,8 +1760,10 @@ function enlistWolf(startingHeroStrength, maxHeroStrength, animationObject) {
                     + 30 + Math.floor(50 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 4) {
-                character.useSkill(fumbledAttackSkill, getStandardEnemyOffset(fumbledAttackSkill)
-                    + 30 + Math.floor(50 * Math.random()));
+                position = getStandardEnemyOffset(fumbledAttackSkill) + 30 + Math.floor(50 * Math.random());
+                character.useSkill(fumbledAttackSkill, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Fumbled attack", "Неудачная атака"])]);
                 behaviorFluctuation = 1;
             }
         }
@@ -1310,7 +1781,7 @@ function enlistRedWolf(startingHeroStrength, maxHeroStrength, animationObject) {
         if (battleFrame == 0) {
             character.inflict([acquireResponseArtifact(BGL_LEFT, 1, 1, BGL_COLOR, BGL_COLOR, function (dmg) {
                 var status = acquireNimbleStatus(0, 1200, 1.2);
-                registerObject(GUI_COMMON, procureStatusTextAction(character, "white",
+                registerObject(GUI_COMMON, procureStatusTextAction(character, TEXT_COLOR_INK,
                     [TXT_ACTIVATED[LANG_ENG] + "Enraged", TXT_ACTIVATED[LANG_RUS] + "Разъярён"]));
                 character.inflict(status.statusArtifacts);
                 return dmg;
@@ -1358,6 +1829,7 @@ function enlistWasp(startingHeroStrength, maxHeroStrength, animationObject) {
     var openingSkill = gainOpeningSkill(50, 0.8);
     var poisonStingSkill = gainStatusAttackSkill(100, 0.7, acquireWeakStatus, 1.1, 1000, 0.7);
     wasp.defineBehave(function (character, battleFrame) {
+        var position;
         if (battleFrame == 0) {
             character.inflict([acquirePerpetualAttributeModifierArtifact(ATTR_EVASION, 0.7)]);
             character.useSkill(gainOpenerSkill(100), 0);
@@ -1372,20 +1844,24 @@ function enlistWasp(startingHeroStrength, maxHeroStrength, animationObject) {
                     + 30 + Math.floor(30 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 3) {
-                character.useSkill(jabSkill,  getStandardEnemyOffset(jabSkill)
+                character.useSkill(jabSkill, getStandardEnemyOffset(jabSkill)
                     + 30 + Math.floor(30 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 4) {
-                character.useSkill(evadeSkill,  getStandardEnemyOffset(evadeSkill)
-                    + 40 + Math.floor(40 * Math.random()));
+                position = getStandardEnemyOffset(evadeSkill) + 40 + Math.floor(40 * Math.random());
+                character.useSkill(evadeSkill, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Evasion", "Уклонение"])]);
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 5) {
                 character.useSkill(openingSkill,  getStandardEnemyOffset(openingSkill)
                     + 20 + Math.floor(20 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 6) {
-                character.useSkill(poisonStingSkill,  getStandardEnemyOffset(poisonStingSkill)
-                    + 40 + Math.floor(40 * Math.random()));
+                position = getStandardEnemyOffset(poisonStingSkill) + 40 + Math.floor(40 * Math.random());
+                character.useSkill(poisonStingSkill, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Poison sting", "Ядовитое жало"])]);
                 behaviorFluctuation = 1;
             }
         }
@@ -1399,41 +1875,43 @@ function enlistPoisonWasp(startingHeroStrength, maxHeroStrength, animationObject
         80 * strScale, animationObject);
     var jabSkill = gainEnemyAttackSkill(40, 0.6, 0.4);
     var evadeSkill = gainEnemyEvadeSkill(100, 0.2);
-    var openingSkill = gainOpeningSkill(50, 0.8);
     var poisonStingSkill = gainStatusAttackSkill(140, 0.7, acquirePoisonedStatus, 1.1, 1000, 30);
     poisonWasp.defineBehave(function (character, battleFrame) {
+        var position;
         if (battleFrame == 0) {
             character.inflict([acquirePerpetualAttributeModifierArtifact(ATTR_EVASION, 0.7)]);
             character.useSkill(gainOpenerSkill(100), 0);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
             if (behaviorFluctuation == 1) {
-                character.useSkill(evadeSkill,  getStandardEnemyOffset(evadeSkill)
+                character.useSkill(evadeSkill, getStandardEnemyOffset(evadeSkill)
                     + 40 + Math.floor(40 * Math.random()));
                 behaviorFluctuation += 1 + Math.floor(Math.random() * 2);
             } else if (behaviorFluctuation == 2) {
-                character.useSkill(jabSkill,  getStandardEnemyOffset(jabSkill)
+                character.useSkill(jabSkill, getStandardEnemyOffset(jabSkill)
                     + 30 + Math.floor(30 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 3) {
-                character.useSkill(jabSkill,  getStandardEnemyOffset(jabSkill)
+                character.useSkill(jabSkill, getStandardEnemyOffset(jabSkill)
                     + 30 + Math.floor(30 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 4) {
-                character.useSkill(evadeSkill,  getStandardEnemyOffset(evadeSkill)
+                character.useSkill(evadeSkill, getStandardEnemyOffset(evadeSkill)
                     + 40 + Math.floor(40 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 5) {
-                character.useSkill(jabSkill,  getStandardEnemyOffset(jabSkill)
+                character.useSkill(jabSkill, getStandardEnemyOffset(jabSkill)
                     + 30 + Math.floor(30 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 6) {
-                character.useSkill(jabSkill,  getStandardEnemyOffset(jabSkill)
+                character.useSkill(jabSkill, getStandardEnemyOffset(jabSkill)
                     + 30 + Math.floor(30 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 7) {
-                character.useSkill(poisonStingSkill,  getStandardEnemyOffset(poisonStingSkill)
-                    + 40 + Math.floor(40 * Math.random()));
+                position = getStandardEnemyOffset(poisonStingSkill) + 40 + Math.floor(40 * Math.random());
+                character.useSkill(poisonStingSkill, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Poison sting", "Ядовитое жало"])]);
                 behaviorFluctuation = 1;
             }
         }
@@ -1447,9 +1925,10 @@ function enlistArmadilloKnight(startingHeroStrength, maxHeroStrength, animationO
         170 * strScale, animationObject);
     var attackSkill = gainAttackSkill();
     var defendSkill = gainDefendSkill();
-    var fullguardStrike = gainFullguardAttackSkill(160, 1.7);
+    var fullguardAttack = gainFullguardAttackSkill(160, 1.7);
     var openingSkill = gainOpeningSkill(50, 0.8);
     armadilloKnight.defineBehave(function (character, battleFrame) {
+        var position;
         if (battleFrame == 0) {
             character.useSkill(gainOpenerSkill(100), 0);
             behaviorFluctuation = 1;
@@ -1459,8 +1938,10 @@ function enlistArmadilloKnight(startingHeroStrength, maxHeroStrength, animationO
                     + 5 +  Math.floor(15 * Math.random()));
                 behaviorFluctuation += 1 + Math.floor(Math.random() * 2);
             } else if (behaviorFluctuation == 2) {
-                character.useSkill(fullguardStrike, getStandardEnemyOffset(fullguardStrike)
-                    + 10 + Math.floor(20 * Math.random()));
+                position = getStandardEnemyOffset(fullguardAttack) + 10 + Math.floor(20 * Math.random());
+                character.useSkill(fullguardAttack, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Fullguard attack", "Защищённая атака"])]);
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 3) {
                 character.useSkill(openingSkill, getStandardEnemyOffset(openingSkill)
@@ -1490,6 +1971,7 @@ function enlistArmadilloVityaz(startingHeroStrength, maxHeroStrength, animationO
     var fullguardStrike = gainFullguardAttackSkill(160, 1.7);
     var openingSkill = gainOpeningSkill(50, 0.8);
     armadilloVityaz.defineBehave(function (character, battleFrame) {
+        var position;
         if (battleFrame == 0) {
             character.useSkill(gainOpenerSkill(10), 0);
             behaviorFluctuation = 1;
@@ -1507,16 +1989,24 @@ function enlistArmadilloVityaz(startingHeroStrength, maxHeroStrength, animationO
                     + 10 + Math.floor(10 * Math.random()));
                 behaviorFluctuation += 1 + Math.floor(Math.random() * 2);
             } else if (behaviorFluctuation == 4) {
-                character.useSkill(guardedStrike, getStandardEnemyOffset(guardedStrike)
-                    + 30 + Math.floor(30 * Math.random()));
-                character.useSkill(counterattack, getStandardEnemyOffset(counterattack)
-                    + 30 + Math.floor(30 * Math.random()));
+                position = getStandardEnemyOffset(guardedStrike) + 30 + Math.floor(30 * Math.random());
+                character.useSkill(guardedStrike, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Guarded strike", "Осторожный удар"])]);
+                position = getStandardEnemyOffset(counterattack) + 30 + Math.floor(30 * Math.random());
+                character.useSkill(counterattack, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Counterattack", "Контратака"])]);
                 behaviorFluctuation = 6;
             } else if (behaviorFluctuation == 5) {
-                character.useSkill(counterattack, getStandardEnemyOffset(counterattack)
-                    + 30 + Math.floor(30 * Math.random()));
-                character.useSkill(guardedStrike, getStandardEnemyOffset(guardedStrike)
-                    + 30 + Math.floor(30 * Math.random()));
+                position = getStandardEnemyOffset(counterattack) + 30 + Math.floor(30 * Math.random());
+                character.useSkill(counterattack, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Counterattack", "Контратака"])]);
+                position = getStandardEnemyOffset(guardedStrike) + 30 + Math.floor(30 * Math.random());
+                character.useSkill(guardedStrike, position);
+                character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                    ["Guarded strike", "Осторожный удар"])]);
                 behaviorFluctuation = 6;
             } else if (behaviorFluctuation == 6) {
                 character.useSkill(defendSkill, getStandardEnemyOffset(defendSkill)
@@ -1541,9 +2031,9 @@ function enlistGreenSerpent(startingHeroStrength, maxHeroStrength, animationObje
     var lieInWait = gainLieInWaitSkill(200, 0.5, 0.8);
     greenSerpent.defineBehave(function (character, battleFrame) {
         if (battleFrame == 0) {
-            character.inflict([acquireResponseArtifact(BGL_LEFT, 1, 1, BGL_COLOR, BGL_COLOR,function (dmg) {
+            character.inflict([acquireResponseArtifact(BGL_LEFT, 1, 1, BGL_COLOR, BGL_COLOR, function (dmg) {
                 if ((character.hp > character.attrMaxHp * 0.7) && (character.hp - dmg <= character.attrMaxHp * 0.7)) {
-                    registerObject(GUI_COMMON, procureStatusTextAction(character, "white",
+                    registerObject(GUI_COMMON, procureStatusTextAction(character, TEXT_COLOR_INK,
                         [TXT_ACTIVATED[LANG_ENG] + "Enraged", TXT_ACTIVATED[LANG_RUS] + "Разъярён"]));
                     behaviorFluctuation = 1;
                 }

@@ -8,7 +8,8 @@
 
 var LSC_TITLE = 0;
 function createTitleLandscape() {
-    var titleLandscape = new Landscape(getImageResource("imgDecGrassBackground"), "#007700", "#009900", "#00AA00", 600);
+    var titleLandscape = new Landscape(getResource("imgDecGrassBackground"), "#007700", "#009900", "#00AA00",
+        MUS_GRASSLANDS_THEME, MUS_BATTLE_THEME, 600);
     titleLandscape.defineGenerateTerrain(function (path) {
         var color = this.pathToColor(path);
         var terrain = generateSurface(path, color);
@@ -16,20 +17,20 @@ function createTitleLandscape() {
 
         var patchSet = [];
         for (var i = 1; i < 3; i++) {
-            patchSet.push(getImageResource("imgDecGrassPatch" + i));
+            patchSet.push(getResource("imgDecGrassPatch" + i));
         }
-        patchSet.push(getImageResource("imgDecGrassFlower1"));
+        patchSet.push(getResource("imgDecGrassFlower1"));
         decorateReaches(path, -3, 4, 0.6, 50, patchSet);
 
         var shrubSet = [];
         for (i = 1; i < 3; i++) {
-            shrubSet.push(getImageResource("imgDecGrassShrub" + i));
+            shrubSet.push(getResource("imgDecGrassShrub" + i));
         }
         decorateReaches(path, 0, 2.5, 0.5, 90, shrubSet);
 
         var treeSet = [];
         for (i = 1; i < 5; i++) {
-            treeSet.push(getImageResource("imgDecGrassTree" + i));
+            treeSet.push(getResource("imgDecGrassTree" + i));
         }
         decorateReaches(path, 0, 2, 1, 10, treeSet);
     });
@@ -75,7 +76,7 @@ function procureTitleSequence() {
     var titleDisplay = new Sequence();
     var logoAppearAction = new Action();
     var titleDisplayAction = new Action();
-    var imgResLogo = getImageResource("imgResLogo");
+    var imgResLogo = getResource("imgResLogo");
     logoAppearAction.definePlayFrame(function (frame) {
         fc.beginPath();
         fc.drawImage(imgResLogo, (W - imgResLogo.width / 2) / 2, -imgResLogo.height / 2 + frame * 4, 700, 471);
@@ -274,12 +275,14 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
             if (displayMessageAction.choices.length > 0) {
                 lineCount++;
                 if (keyPressed == KEY_UP) {
+                    playSfx(SFX_GUI_TINK);
                     if (eventChoice > 0) {
                         eventChoice--;
                     } else {
                         eventChoice = displayMessageAction.choices.length - 1;
                     }
                 } else if (keyPressed == KEY_DOWN) {
+                    playSfx(SFX_GUI_TINK);
                     if (eventChoice < displayMessageAction.choices.length - 1) {
                         eventChoice++;
                     } else {
@@ -305,6 +308,9 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
                     yPos + cursorOffset + DEFAULT_LINE_HEIGHT * lineCount);
             }
 
+            if (keyPressed == KEY_ACTION) {
+                playSfx(SFX_GUI_THUCK);
+            }
             return (keyPressed == KEY_ACTION)
                 && (displayMessageAction.choices.length == 0 || displayMessageAction.choices[eventChoice].active());
         }
@@ -373,11 +379,15 @@ function procureFloatingTextAction(originX, originY, font, color, text, duration
     var floatingTextAction = new Action();
     floatingTextAction.definePlayFrame(function (frame) {
         if ((frame < ((duration === undefined) ? 50 : duration)) && (text != null)) {
+            var flashLabel = getResource("imgFlashLabel");
             fc.beginPath();
             fc.textAlign = "center";
             fc.fillStyle = color;
             fc.font = font;
             var textToFloat = (typeof text === "string") ? text : text[lang];
+            var labelWidth = (fc.measureText(textToFloat).width + 20) * 1.6;
+            var yOffset = font == DEFAULT_FONT ? 28 : 30;
+            fc.drawImage(flashLabel, originX - labelWidth / 2, originY - yOffset - frame, labelWidth, 45);
             fc.fillText(textToFloat, originX, originY - frame);
             fc.textAlign = "left";
             return false;
@@ -421,6 +431,22 @@ function procureAttributeTextAction(attribute, color, text) {
             y = -30;
     }
     return procureFloatingTextAction(40, y, LARGE_FONT, color, text);
+}
+
+function procureDisplayLabelAction(x, y, text, terminationFunction) {
+    var internalFrameCounter = 0;
+    if (terminationFunction === undefined) {
+        terminationFunction = function () {
+            internalFrameCounter++;
+            return (internalFrameCounter >= 10) && (keyPressed == KEY_ACTION);
+        };
+    }
+    var displayLabelAction = new Action();
+    displayLabelAction.definePlayFrame(function (frame) {
+        drawLabel(x, y, text);
+        return terminationFunction();
+    });
+    return displayLabelAction;
 }
 
 function procureKarmaTextAction(color, text) {
@@ -524,14 +550,25 @@ function procureResumeAction() {
     });
 }
 
+function procureDistanceTimeoutAction(movingFrameDistance) {
+    var distanceTimeoutAction = new Action();
+    var movingFrame = 0;
+    distanceTimeoutAction.definePlayFrame(function (frame) {
+        if (moving) { movingFrame++; }
+        return movingFrame >= movingFrameDistance;
+    });
+    return distanceTimeoutAction;
+}
+
 function procureInitiateBattleAction(newEnemy, finishedSequence) {
     return procureCodeFragmentAction(function () {
         hero.setAnimationState(AN_STAND);
         controlMode = CM_EVENT;
         moving = false;
+        setMusicPlayState(MPS_BATTLE);
         var battleGuiAppearAction = new Action();
         battleGuiAppearAction.definePlayFrame(function (frame) {
-            var imgGuiBattleGauges = getImageResource("imgBattleGauges");
+            var imgGuiBattleGauges = getResource("imgBattleGauges");
             var x = (W - imgGuiBattleGauges.width) / 2 - 20;
             var y = frame * 8 - imgGuiBattleGauges.height;
             fc.beginPath();
@@ -540,7 +577,7 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
             var scale = (frame * 16) >= (22 + imgGuiBattleGauges.height)
                 ? 1 : (frame * 16) / (22 + imgGuiBattleGauges.height);
 
-            var imgEnemyHpGauge = getImageResource("imgGuiEnemyHpGauge");
+            var imgEnemyHpGauge = getResource("imgGuiEnemyHpGauge");
             x = -imgEnemyHpGauge.width + scale * (imgEnemyHpGauge.width + 18);
             fc.drawImage(imgEnemyHpGauge, x, 185);
 
@@ -573,6 +610,7 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
                     }
                 }
                 battleFrame = 0;
+                currentSyncCoefficient = 1;
                 heroBGNicksPosition = 0;
                 enemyBGNicksPosition = 0;
                 behaviorFluctuation = 0;
@@ -640,7 +678,7 @@ function procureFloatingImageAction(linkedObject, floatingImage, terminationFunc
 /* OBJECT TYPES */
 
 function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, enemyImageAttack, enlistEnemyFunction,
-                                 startingHeroStrength, maxHeroStrength) {
+                                 startingHeroStrength, maxHeroStrength, chId, varId, firstEncounterMessageAction) {
     var encounterType = new ObjectType(chanceToAppear);
     encounterType.defineGenerateObject(function (path, position) {
         var enemyObject = new FieldObject(path, position, 50, enemyImageStand);
@@ -654,6 +692,12 @@ function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, ene
                 enemyName[LANG_ENG] + TXT_COMMON_ENCOUNTER_1[LANG_ENG] + karmaCost + TXT_COMMON_ENCOUNTER_2[LANG_ENG],
                 enemyName[LANG_RUS] + TXT_COMMON_ENCOUNTER_1[LANG_RUS] + karmaCost + TXT_COMMON_ENCOUNTER_2[LANG_RUS]
             ];
+            if ((chId != null) && (varId != null) && (firstEncounterMessageAction != null)) {
+                if (gst[chId][varId] < 1) {
+                    gst[chId][varId] = 1;
+                    encounterSequence.addAction(firstEncounterMessageAction);
+                }
+            }
             encounterSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, encounterMessage, true)
                 .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_FIGHT)
                 .addChoice(TXT_COMMON_ENCOUNTER_CHOICE_AVOID));
@@ -689,7 +733,7 @@ function describeDangerEncounter(chanceToAppear, enemyName, enemyImageStand, ene
         enemyObject.setAttackImage(enemyImageAttack);
         var triggered = false;
         registerObject(pathToObjectLayer(path),
-            procureFloatingImageAction(enemyObject, getImageResource("imgDangerMark"), function () {
+            procureFloatingImageAction(enemyObject, getResource("imgDangerMark"), function () {
                 return triggered;
             }));
         var enemy = enlistEnemyFunction(startingHeroStrength, maxHeroStrength, enemyObject);
@@ -904,6 +948,7 @@ function acquireImpactArtifact(position, image, power, evadable, apGain, inflict
     var impactArtifact = new BattleGaugeArtifact(position, 10, 10);
     impactArtifact.defineGetEffect(function (position, character) {
         if (position <= BGL_LEFT) {
+            playBattleSfx(character, "sound/sfx/hit.ogg");
             character.strike(power, evadable, apGain, inflictData);
             return true;
         } else {
@@ -939,7 +984,7 @@ function acquireSelfInflictArtifact(position, cooldown, image, inflictData) {
     var selfInflictArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
     selfInflictArtifact.defineGetEffect(function (position, character) {
         if (position <= BGL_LEFT) {
-            registerObject(GUI_COMMON, procureStatusTextAction(character, "white",
+            registerObject(GUI_COMMON, procureStatusTextAction(character, TEXT_COLOR_INK,
                 [TXT_ACTIVATED[LANG_ENG] + inflictData.statusName[LANG_ENG],
                     TXT_ACTIVATED[LANG_RUS] + inflictData.statusName[LANG_RUS]]));
             character.inflict(inflictData.statusArtifacts);
@@ -1112,20 +1157,7 @@ function acquireLabelArtifact(position, text) {
     labelArtifact.defineDraw(function (position, character) {
         var topOffset = getBattleGaugeOffset(character);
         if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
-            var leftEdge = getImageResource("imgBattleLabelLeft");
-            var rightEdge = getImageResource("imgBattleLabelRight");
-            fc.beginPath();
-            fc.font = DEFAULT_FONT;
-            var displayText = (typeof text === "string") ? text : text[lang];
-            var lineWidth = fc.measureText(displayText).width + 8;
-            fc.drawImage(leftEdge, position - (lineWidth + leftEdge.width + rightEdge.width) / 2, topOffset + 30);
-            fc.drawImage(rightEdge, position + (lineWidth + leftEdge.width - rightEdge.width) / 2, topOffset + 30);
-            fc.fillStyle = "#F1ECAD";
-            fc.fillRect(position - lineWidth / 2 - 1, topOffset + 34, lineWidth + 2, 19);
-            fc.fillStyle = "#111133";
-            fc.textAlign = "center";
-            fc.fillText(displayText, position, topOffset + 48);
-            fc.textAlign = "left";
+            drawLabel(position, topOffset + 60, text);
         }
     });
     labelArtifact.defineGetEffect(function (position) {
