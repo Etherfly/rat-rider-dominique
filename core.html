@@ -414,7 +414,10 @@
     CURSOR_UP = getResource("imgCursorUp");
     CURSOR_LEFT = getResource("imgCursorLeft");
 
-    resetGame();
+    layers.length = 23;
+    for (var i = 0; i < layers.length; i++) {
+        layers[i] = [];
+    }
     registerObject(GUI_EVENT, procureDisplayLabelAction(W / 2, H / 2,
             ["Loading the world . . .", "Подождите, идёт загрузка мира . . ."]));
     window.setTimeout(tick, 20);
