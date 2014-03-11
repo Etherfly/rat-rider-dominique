@@ -1506,7 +1506,7 @@ function enlistTutorialBandit(animationObject) {
                     battleTutorialPhase2Sequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
                         ["Nonsense! Don't see any reason to go all out on you.", "Нонсенс! Не вижу причин сражаться с тобой в полную силу."]));
                     battleTutorialPhase2Sequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
-                        ["Drop the act, Dominique, and have measures to counter fatigue.",
+                        ["Drop the act, Dominique, and take measures to counter fatigue.",
                             "Не паясничай, Доминик, а лучше прими меры против усталости."]));
                     battleTutorialPhase2Sequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
                         ["Oh, come on, Sallinger... Get into the festive mood!",
