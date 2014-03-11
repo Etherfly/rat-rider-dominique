@@ -4,7 +4,7 @@
     <title>Rat Rider Dominique v.0.87 ALPHA</title>
     <meta charset="utf-8">
 </head>
-<body style="background-color: black; empty-cells: show; width: 100%; height: 100%; margin: 0;">
+<body style="background-color: black; empty-cells: show; width: 100%; height: 100%; margin: 0;" onload="resetGame(); registerObject(GUI_EVENT, procureTitleSequence());">
 
 <table>
     <tr>
@@ -415,8 +415,8 @@
     CURSOR_LEFT = getResource("imgCursorLeft");
 
     resetGame();
-    registerObject(GUI_EVENT, procureTitleSequence());
-
+    registerObject(GUI_EVENT, procureDisplayLabelAction(W / 2, H / 2,
+            ["Loading the world . . .", "Подождите, идёт загрузка мира . . ."]));
     window.setTimeout(tick, 20);
 
 </script>
