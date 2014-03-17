@@ -82,7 +82,8 @@ var MS_CODEX_CATEGORY = 16;
 var MS_CODEX_ENTRY = 17;
 var MS_SKILL_GAINED = 20;
 var MS_ITEM_OBTAINED = 21;
-var MS_MENU_MESSAGE = 22;
+var MS_NEW_CODEX_ENTRY = 22;
+var MS_MENU_MESSAGE = 23;
 
 /*
  * Universal text processor
@@ -1487,8 +1488,11 @@ function procureDisplayMenuItemsAction() {
 }
 
 function procureDisplayMenuCodexAction() {
-    var displayMenuItemsAction = new Action();
-    displayMenuItemsAction.definePlayFrame(function (frame) {
+    var displayMenuCodexAction = new Action();
+    displayMenuCodexAction.choices = [
+        TXT_CODEX_LANDMARKS, TXT_CODEX_ENEMIES, TXT_CODEX_LORE, TXT_CODEX_JOURNAL
+    ];
+    displayMenuCodexAction.definePlayFrame(function (frame) {
         function writeLine(line, color, font, lineCount, offset) {
             fc.beginPath();
             fc.fillStyle = color;
@@ -1498,265 +1502,286 @@ function procureDisplayMenuCodexAction() {
 
         if ((frame == 0)) {
             menuState = MS_CODEX_ROOT;
-            menuChoice = 0;
             scrollOffset = 0;
             objectChoice[0] = 0;
-            objectChoice[1] = 0;
-            objectChoice[2] = 0;
         }
 
         if (frame < 10) {
             drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
                 MENU_SKILLS_COLUMN_WIDTH * frame / 10, MENU_ROOT_HEIGHT * frame / 10);
-            drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
-                (INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10) * frame / 10, MENU_ROOT_HEIGHT * frame / 10);
         } else {
             drawTextbox(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
                 MENU_SKILLS_COLUMN_WIDTH, MENU_ROOT_HEIGHT);
-            drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
-                INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10, MENU_ROOT_HEIGHT);
 
             processTutorialMessages(CH00, CH00_TUTORIAL_MENU_CODEX, CH00_TUTORIAL_MENU_CODEX_TXT);
 
-            function getItemSetByMenuState(ms) {
-                if (ms < MS_ITEMS_EXCHANGE_1) {
-                    return menuState - MS_ITEMS_BROWSE_1;
-                } else if (ms == MS_ITEMS_EXCHANGE_1) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            }
-
-            function getLengthByColumn(col) {
-                switch (col) {
-                    case 0:
-                        return hero.availableItems.length;
-                    case 1:
-                        return 4;
-                    case 2:
-                        return 2;
-                    default:
-                        return null;
-                }
-            }
-
-            var currentItem;
-            var itemInfo;
-            var x;
-            var i = getItemSetByMenuState(menuState);
-            if (keyPressed == KEY_UP) {
-                playSfx(SFX_GUI_TINK);
-                if ((menuState == MS_ITEMS_BROWSE_2) && (objectChoice[i] == 0)) {
-                    menuState = MS_ITEMS_BROWSE_3;
-                    objectChoice[2] = 2;
-                } else if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == 0)) {
-                    menuState = MS_ITEMS_BROWSE_2;
-                    objectChoice[1] = 4;
-                } else {
-                    objectChoice[i]--;
-                    if (objectChoice[i] < 0) {
-                        objectChoice[i] = getLengthByColumn(i);
-                    }
-                    if (i == 0) {
-                        if (objectChoice[i] < scrollOffset) {
-                            scrollOffset--;
-                        } else if ((scrollOffset == 0) && (objectChoice[i] > 12)) {
-                            scrollOffset = objectChoice[i] - 12;
-                        }
-                    }
-                }
-            } else if (keyPressed == KEY_DOWN) {
-                playSfx(SFX_GUI_TINK);
-                if ((menuState == MS_ITEMS_BROWSE_2) && (objectChoice[i] == 4)) {
-                    menuState = MS_ITEMS_BROWSE_3;
-                    objectChoice[2] = 0;
-                } else if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == 2)) {
-                    menuState = MS_ITEMS_BROWSE_2;
-                    objectChoice[1] = 0;
-                } else {
-                    objectChoice[i]++;
-                    if (objectChoice[i] > getLengthByColumn(i)) {
-                        objectChoice[i] = 0;
-                    }
-                    if (i == 0) {
-                        if (objectChoice[i] > 12) {
-                            scrollOffset = objectChoice[i] - 12;
-                        } else {
-                            scrollOffset = 0;
-                        }
-                    }
-                }
-            } else if ((keyPressed == KEY_RIGHT) || (keyPressed == KEY_LEFT)) {
-                playSfx(SFX_GUI_TINK);
-                if (menuState == MS_ITEMS_BROWSE_1) {
-                    menuState = MS_ITEMS_BROWSE_2;
-                } else if ((menuState == MS_ITEMS_BROWSE_2) || (menuState == MS_ITEMS_BROWSE_3)) {
-                    menuState = MS_ITEMS_BROWSE_1;
-                }
-            } else if (keyPressed == KEY_ACTION) {
-                playSfx(SFX_GUI_THUCK);
-                switch (menuState) {
-                    case MS_ITEMS_BROWSE_1:
-                        if (keyCtrl) {
-                            hero.useItemInField(false, objectChoice[0]);
-                        } else {
-                            menuState = MS_ITEMS_EXCHANGE_1;
-                        }
-                        break;
-                    case MS_ITEMS_BROWSE_2:
-                        if (keyCtrl) {
-                            hero.useItemInField(true, objectChoice[1]);
-                        } else {
-                            menuState = MS_ITEMS_EXCHANGE_2;
-                        }
-                        break;
-                    case MS_ITEMS_BROWSE_3:
-                        // cannot change equipment at this time
-                        break;
-                    case MS_ITEMS_EXCHANGE_1:
-                    case MS_ITEMS_EXCHANGE_2:
-                        x = hero.availableItems[objectChoice[0]];
-                        hero.availableItems[objectChoice[0]] = hero.activeItems[objectChoice[1]];
-                        hero.activeItems[objectChoice[1]] = x;
-                        menuState -= 3;
-                        hero.availableItems = hero.availableItems.filter(function (x) {
-                            return x;
-                        });
-                        break;
-                }
-            } else if (keyPressed == KEY_ESC) {
-                playSfx(SFX_GUI_THUCK);
-                if (menuState >= MS_ITEMS_EXCHANGE_1) {
-                    menuState -= 3;
-                    keyPressed = KEY_NONE;
-                }
-            }
-
-            // AVAILABLE ITEMS COLUMN
+            var i;
             var lineCount = 0;
-            var xOffset = MENU_SKILLS_AVAILABLE_X + 30;
-            writeLine(TXT_MENU_AVAILABLE_ITEMS[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
+            var cursorOffset;
+            var xOffset = MENU_SKILLS_AVAILABLE_X + 45;
+            writeLine(TXT_CODEX_CATEGORIES[lang], "white", LARGE_FONT, lineCount, xOffset - 25);
             lineCount++;
-            if (scrollOffset > 0) {
-                fc.beginPath();
-                var cursorOffset = (frame % 20 < 10) ? 40 : 45;
-                fc.drawImage(CURSOR_UP, MENU_SKILLS_AVAILABLE_X + MENU_SKILLS_COLUMN_WIDTH / 2,
-                    HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
-            }
-            for (i = scrollOffset; (i < hero.availableItems.length + 1) && (i - scrollOffset < 13); i++) {
-                lineCount++;
-                if (hero.availableItems[i] != null) {
-                    currentItem = obtainItem(hero.availableItems[i].id);
-                    writeLine(currentItem.name[lang]
-                        + (hero.availableItems[i].charges > 1 ?" x" + hero.availableItems[i].charges : ""),
-                        "white", DEFAULT_FONT, lineCount, MENU_SKILLS_AVAILABLE_X + 45);
+            if (menuState == MS_CODEX_ROOT) {
+                if (keyPressed == KEY_UP) {
+                    playSfx(SFX_GUI_TINK);
+                    if (objectChoice[0] > 0) {
+                        objectChoice[0]--;
+                    } else {
+                        objectChoice[0] = displayMenuCodexAction.choices.length - 1;
+                    }
+                } else if (keyPressed == KEY_DOWN) {
+                    playSfx(SFX_GUI_TINK);
+                    if (objectChoice[0] < displayMenuCodexAction.choices.length - 1) {
+                        objectChoice[0]++;
+                    } else {
+                        objectChoice[0] = 0;
+                    }
+                } else if (keyPressed == KEY_ACTION) {
+                    playSfx(SFX_GUI_THUCK);
+                    var codexCategorySequence = new Sequence();
+                    codexCategorySequence.addAction(procureDisplayMenuCodexCategoryAction().authorizeMenuPlay());
+                    codexCategorySequence.addAction(procureCodeFragmentAction(function () {
+                        menuState = MS_CODEX_ROOT;
+                    }).authorizeMenuPlay());
+                    registerObject(GUI_EVENT, codexCategorySequence);
                 }
-                if (i == objectChoice[0]) {
-                    if ((menuState == MS_ITEMS_BROWSE_1) || (menuState == MS_ITEMS_EXCHANGE_2)) {
+
+                for (i = 0; i < displayMenuCodexAction.choices.length; i++) {
+                    lineCount++;
+                    writeLine(displayMenuCodexAction.choices[i][lang], "white", DEFAULT_FONT, lineCount, xOffset);
+                    if (i == objectChoice[0]) {
                         fc.beginPath();
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AVAILABLE_X + cursorOffset,
-                            HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
-                        if (hero.availableItems[i] != null) {
-                            itemInfo = [
-                                currentItem.name[LANG_ENG] + " <br> <br> " + currentItem.description[LANG_ENG]
-                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.availableItems[i].charges
-                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
-                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
-                                currentItem.name[LANG_RUS] + " <br> <br> " + currentItem.description[LANG_RUS]
-                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.availableItems[i].charges
-                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
-                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
-                            ];
-                            processInfoText(itemInfo);
-                        }
-                    } else if ((menuState == MS_ITEMS_EXCHANGE_1) && (frame % 8 > 3)) {
-                        // blinks
-                        fc.beginPath();
-                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AVAILABLE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, xOffset - 45 + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                     }
                 }
-            }
-            if ((i < hero.availableItems.length)) {
-                fc.beginPath();
-                cursorOffset = (frame % 20 < 10) ? 360 : 355;
-                fc.drawImage(CURSOR_DOWN, MENU_SKILLS_AVAILABLE_X + MENU_SKILLS_COLUMN_WIDTH / 2,
-                    HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
-            }
-
-            // ACTIVE ITEMS COLUMN
-            lineCount = 0;
-            xOffset = MENU_SKILLS_AURA_X + 30;
-            writeLine(TXT_MENU_ACTIVE_ITEMS[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
-            lineCount++;
-            for (i = 0; i < 5; i++) {
-                lineCount++;
-                if (hero.activeItems[i] == null) {
-                    writeLine((i + 1).toString() + ": --------", "white", DEFAULT_FONT, lineCount,
-                        MENU_SKILLS_AURA_X + 45);
-                } else {
-                    currentItem = obtainItem(hero.activeItems[i].id);
-                    writeLine((i + 1).toString() + ": " + currentItem.name[lang]
-                        + (hero.activeItems[i].charges > 1 ?" x" + hero.activeItems[i].charges : ""),
-                        "white", DEFAULT_FONT, lineCount, MENU_SKILLS_AURA_X + 45);
-                }
-                if (i == objectChoice[1]) {
-                    if ((menuState == MS_ITEMS_BROWSE_2) || (menuState == MS_ITEMS_EXCHANGE_1)) {
+            } else {
+                for (i = 0; i < displayMenuCodexAction.choices.length; i++) {
+                    lineCount++;
+                    writeLine(displayMenuCodexAction.choices[i][lang], "white", DEFAULT_FONT, lineCount, xOffset);
+                    if ((i == objectChoice[0]) && (frame % 14 > 6)) {
                         fc.beginPath();
-                        cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + cursorOffset,
-                            HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
-                        if (hero.activeItems[i] != null) {
-                            itemInfo = [
-                                currentItem.name[LANG_ENG] + " <br> <br> " + currentItem.description[LANG_ENG]
-                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_ENG] + hero.activeItems[i].charges
-                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
-                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_ENG] : ""),
-                                currentItem.name[LANG_RUS] + " <br> <br> " + currentItem.description[LANG_RUS]
-                                    + " <br> <br> " + TXT_USES_REMAINING[LANG_RUS] + hero.activeItems[i].charges
-                                    + (currentItem.usableInField && (menuState < MS_ITEMS_BROWSE_3)
-                                    ? ". " + TXT_USABLE_IN_FIELD[LANG_RUS] : "")
-                            ];
-                            processInfoText(itemInfo);
-                        }
-                    } else if ((menuState == MS_ITEMS_EXCHANGE_2) && (frame % 8 > 3)) {
-                        // blinks
-                        fc.beginPath();
-                        fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                        fc.drawImage(CURSOR_RIGHT, xOffset - 25, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + 20 + DEFAULT_LINE_HEIGHT * lineCount);
                     }
                 }
             }
 
-            // EQUIPMENT INFO
-            lineCount += 2;
-            writeLine(TXT_MENU_EQUIPMENT[lang], "white", LARGE_FONT, lineCount, xOffset - 10);
-            lineCount++;
-            function displayEquipmentInfo(equipName, equipDesc, choiceId) {
-                lineCount++;
-                writeLine(equipName[lang], "gray", DEFAULT_FONT, lineCount, MENU_SKILLS_AURA_X + 45);
-                if ((menuState == MS_ITEMS_BROWSE_3) && (objectChoice[2] == choiceId)) {
-                    fc.beginPath();
-                    cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                    fc.drawImage(CURSOR_RIGHT, MENU_SKILLS_AURA_X + cursorOffset,
-                        HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
-                    itemInfo = [
-                        equipName[LANG_ENG] + " <br> <br> " + equipDesc[LANG_ENG],
-                        equipName[LANG_RUS] + " <br> <br> " + equipDesc[LANG_RUS]
-                    ];
-                    processInfoText(itemInfo);
-                }
+            if ((keyPressed == KEY_ESC) && (menuState == MS_CODEX_ROOT)) {
+                playSfx(SFX_GUI_THUCK);
             }
 
-            displayEquipmentInfo(TXT_MENU_QUEEN_OF_SPADES, TXT_MENU_QUEEN_OF_SPADES_DESC, 0);
-            displayEquipmentInfo(TXT_MENU_WHITE_STEEL_ARMOR, TXT_MENU_WHITE_STEEL_ARMOR_DESC, 1);
-            displayEquipmentInfo(TXT_MENU_RAT_RIDER_PELERINE, TXT_MENU_RAT_RIDER_PELERINE_DESC, 2);
-
-            return (keyPressed == KEY_ESC) && (menuState >= MS_ITEMS_BROWSE_1) && (menuState <= MS_ITEMS_BROWSE_3);
+            return (keyPressed == KEY_ESC) && (menuState == MS_CODEX_ROOT);
         }
         return false;
     });
-    return displayMenuItemsAction;
+    return displayMenuCodexAction;
+}
+
+function procureDisplayMenuCodexCategoryAction() {
+    var displayCodexCategoryAction = new Action();
+    displayCodexCategoryAction.entries = [];
+    for (var e = 0; e < hero.codexEntries.length; e++) {
+        if (inquireCodex(hero.codexEntries[e]).category == objectChoice[0]) {
+            displayCodexCategoryAction.entries.push(hero.codexEntries[e]);
+        }
+    }
+    displayCodexCategoryAction.definePlayFrame(function (frame) {
+        function writeLine(line, color, font, lineCount, offset) {
+            fc.beginPath();
+            fc.fillStyle = color;
+            fc.font = font;
+            fc.fillText(line, offset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 12 + DEFAULT_LINE_HEIGHT * (lineCount + 1));
+        }
+
+        if ((frame == 0)) {
+            menuState = MS_CODEX_CATEGORY;
+            scrollOffset = 0;
+            objectChoice[1] = 0;
+        }
+
+        if (frame < 10) {
+            drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                (INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10) * frame / 10, MENU_ROOT_HEIGHT * frame / 10);
+        } else {
+            drawTextbox(MENU_SKILLS_AURA_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET,
+                (INFO_WINDOW_W - MENU_SKILLS_COLUMN_WIDTH - 10), MENU_ROOT_HEIGHT);
+
+            if (menuState == MS_CODEX_CATEGORY) {
+                if (keyPressed == KEY_UP) {
+                    playSfx(SFX_GUI_TINK);
+                    if (objectChoice[1] > 0) {
+                        objectChoice[1]--;
+                    } else {
+                        objectChoice[1] = displayCodexCategoryAction.entries.length - 1;
+                    }
+                    if (objectChoice[1] < scrollOffset) {
+                        scrollOffset--;
+                    } else if ((scrollOffset == 0) && (objectChoice[1] > 12)) {
+                        scrollOffset = objectChoice[1] - 12;
+                    }
+                } else if (keyPressed == KEY_DOWN) {
+                    playSfx(SFX_GUI_TINK);
+                    if (objectChoice[1] < displayCodexCategoryAction.entries.length - 1) {
+                        objectChoice[1]++;
+                    } else {
+                        objectChoice[1] = 0;
+                    }
+                    if (objectChoice[1] > 12) {
+                        scrollOffset = objectChoice[1] - 12;
+                    } else {
+                        scrollOffset = 0;
+                    }
+                } else if ((keyPressed == KEY_ACTION) && (displayCodexCategoryAction.entries.length > 0)) {
+                    playSfx(SFX_GUI_THUCK);
+                    var codexEntrySequence = new Sequence();
+                    codexEntrySequence.addAction(procureDisplayMenuCodexEntryAction().authorizeMenuPlay());
+                    codexEntrySequence.addAction(procureCodeFragmentAction(function () {
+                        menuState = MS_CODEX_CATEGORY;
+                    }).authorizeMenuPlay());
+                    registerObject(GUI_EVENT, codexEntrySequence);
+                }
+            }
+
+            var i;
+            var lineCount = 0;
+            var cursorOffset;
+            var xOffset = MENU_SKILLS_AURA_X + 45;
+            writeLine(getCategoryNameById(objectChoice[0])[lang], "white", LARGE_FONT, lineCount, xOffset - 25);
+            lineCount++;
+            if (displayCodexCategoryAction.entries.length > 0) {
+                if (scrollOffset > 0) {
+                    fc.beginPath();
+                    cursorOffset = (frame % 20 < 10) ? 40 : 45;
+                    fc.drawImage(CURSOR_UP, xOffset - 45 + MENU_SKILLS_COLUMN_WIDTH / 2,
+                        HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
+                }
+                for (i = scrollOffset; (i < displayCodexCategoryAction.entries.length) && (i - scrollOffset < 13); i++) {
+                    lineCount++;
+                    if (displayCodexCategoryAction.entries) {
+                        writeLine(inquireCodex(displayCodexCategoryAction.entries[i]).title[lang], "white",
+                            DEFAULT_FONT, lineCount, xOffset);
+                    }
+                    if (i == objectChoice[1]) {
+                        fc.beginPath();
+                        cursorOffset = (frame % 20 < 10) ? 20 : 25;
+                        fc.drawImage(CURSOR_RIGHT, xOffset - 45 + cursorOffset,
+                            HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                        var entryInfo = ["Info", "Инфа"];
+                        processInfoText(entryInfo);
+                    }
+                }
+                if ((i < displayCodexCategoryAction.entries.length)) {
+                    fc.beginPath();
+                    cursorOffset = (frame % 20 < 10) ? 360 : 355;
+                    fc.drawImage(CURSOR_DOWN, xOffset - 45 + MENU_SKILLS_COLUMN_WIDTH / 2,
+                        HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + cursorOffset);
+                }
+            } else {
+                lineCount++;
+                if (displayCodexCategoryAction.entries) {
+                    writeLine(TXT_CODEX_NO_ENTRIES_YET[lang], "white", DEFAULT_FONT, lineCount, xOffset);
+                }
+            }
+
+            if ((keyPressed == KEY_ESC) && (menuState == MS_CODEX_CATEGORY)) {
+                playSfx(SFX_GUI_THUCK);
+            }
+
+            return (keyPressed == KEY_ESC) && (menuState == MS_CODEX_CATEGORY);
+        }
+        return false;
+    });
+    return displayCodexCategoryAction;
+}
+
+function procureDisplayMenuCodexEntryAction() {
+    var displayMenuCodexEntryAction = new Action();
+    var scrollTop = getResource("imgScrollTop");
+    var scrollBottom = getResource("imgScrollBottom");
+    displayMenuCodexEntryAction.definePlayFrame(function (frame) {
+        function writeLine(line, color, font, lineCount, offset) {
+            fc.beginPath();
+            fc.fillStyle = color;
+            fc.font = font;
+            fc.fillText(line, offset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 12 + DEFAULT_LINE_HEIGHT * (lineCount + 1));
+        }
+
+        if ((frame == 0)) {
+            menuState = MS_CODEX_ENTRY;
+            objectChoice[2] = 0;
+        }
+
+        fc.beginPath();
+        fc.fillStyle = "black";
+        fc.fillRect(MENU_SKILLS_AVAILABLE_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, INFO_WINDOW_W,
+            MENU_ROOT_HEIGHT + 10 + INFO_WINDOW_H);
+
+        var scrollTopHeight = scrollTop.height * INFO_WINDOW_W / scrollTop.width;
+
+        if (frame < 10) {
+            fc.beginPath();
+            fc.drawImage(scrollTop, INFO_WINDOW_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, INFO_WINDOW_W, scrollTopHeight);
+            fc.fillStyle = "#F1ECAD";
+            fc.fillRect(INFO_WINDOW_X + 1, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight,
+                INFO_WINDOW_W - 33, (MENU_ROOT_HEIGHT + 10 + INFO_WINDOW_H - scrollTopHeight * 2) * frame / 10);
+            fc.drawImage(scrollBottom, INFO_WINDOW_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight
+                + (MENU_ROOT_HEIGHT + 10 + INFO_WINDOW_H - scrollTopHeight * 2) * frame / 10, INFO_WINDOW_W, scrollTopHeight);
+        } else {
+            fc.beginPath();
+            fc.drawImage(scrollTop, INFO_WINDOW_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, INFO_WINDOW_W, scrollTopHeight);
+            fc.fillStyle = "#F1ECAD";
+            fc.fillRect(INFO_WINDOW_X + 1, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight,
+                INFO_WINDOW_W - 33, MENU_ROOT_HEIGHT + 10 + INFO_WINDOW_H - scrollTopHeight * 2);
+            fc.drawImage(scrollBottom, INFO_WINDOW_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight
+                + MENU_ROOT_HEIGHT + 10 + INFO_WINDOW_H - scrollTopHeight * 2, INFO_WINDOW_W, scrollTopHeight);
+
+            processTutorialMessages(CH00, CH00_TUTORIAL_MENU_CODEX, CH00_TUTORIAL_MENU_CODEX_TXT);
+
+            var i;
+            var lineCount = 0;
+            var cursorOffset;
+            var xOffset = MENU_SKILLS_AURA_X + 45;
+            //writeLine(TXT_CODEX_CATEGORIES[lang], "white", LARGE_FONT, lineCount, xOffset - 25);
+            lineCount++;
+            if (menuState == MS_CODEX_CATEGORY) {
+                if (keyPressed == KEY_UP) {
+                    playSfx(SFX_GUI_TINK);
+                    if (objectChoice[1] > 0) {
+                        objectChoice[1]--;
+                    } else {
+                        objectChoice[1] = displayMenuCodexEntryAction.choices.length - 1;
+                    }
+                    if (objectChoice[1] < scrollOffset) {
+                        scrollOffset--;
+                    } else if ((scrollOffset == 0) && (objectChoice[1] > 12)) {
+                        scrollOffset = objectChoice[1] - 12;
+                    }
+                } else if (keyPressed == KEY_DOWN) {
+                    playSfx(SFX_GUI_TINK);
+                    if (objectChoice[1] < displayMenuCodexEntryAction.choices.length - 1) {
+                        objectChoice[1]++;
+                    } else {
+                        objectChoice[1] = 0;
+                    }
+                    if (objectChoice[1] > 12) {
+                        scrollOffset = objectChoice[1] - 12;
+                    } else {
+                        scrollOffset = 0;
+                    }
+                } else if (keyPressed == KEY_ACTION) {
+                    playSfx(SFX_GUI_THUCK);
+                }
+            }
+
+            if ((keyPressed == KEY_ESC) && (menuState == MS_CODEX_ENTRY)) {
+                playSfx(SFX_GUI_THUCK);
+            }
+
+            return (keyPressed == KEY_ESC) && (menuState == MS_CODEX_ENTRY);
+        }
+        return false;
+    });
+    return displayMenuCodexEntryAction;
 }

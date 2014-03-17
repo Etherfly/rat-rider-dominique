@@ -679,9 +679,9 @@ function procureFloatingImageAction(linkedObject, floatingImage, terminationFunc
 
 function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, enemyImageAttack, enlistEnemyFunction,
                                  startingHeroStrength, maxHeroStrength, chId, varId, firstEncounterMessageAction) {
-    var encounterType = new ObjectType(chanceToAppear);
-    encounterType.defineGenerateObject(function (path, position) {
-        var enemyObject = new FieldObject(path, position, 50, enemyImageStand);
+    var encounterType = new LandmarkType(chanceToAppear);
+    encounterType.defineGenerateLandmark(function (path, position) {
+        var enemyObject = new Landmark(path, position, 50, enemyImageStand);
         enemyObject.setAttackImage(enemyImageAttack);
         var enemy = enlistEnemyFunction(startingHeroStrength, maxHeroStrength, enemyObject);
         enemyObject.defineTrigger(function () {
@@ -726,10 +726,10 @@ function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, ene
 
 function describeDangerEncounter(chanceToAppear, enemyName, enemyImageStand, enemyImageAttack, enlistEnemyFunction,
                                  startingHeroStrength, maxHeroStrength) {
-    var encounterType = new ObjectType(chanceToAppear);
+    var encounterType = new LandmarkType(chanceToAppear);
     encounterType.singletonId = "singleton: " + enemyName[LANG_ENG];
-    encounterType.defineGenerateObject(function (path, position) {
-        var enemyObject = new FieldObject(path, position, 50, enemyImageStand);
+    encounterType.defineGenerateLandmark(function (path, position) {
+        var enemyObject = new Landmark(path, position, 50, enemyImageStand);
         enemyObject.setAttackImage(enemyImageAttack);
         var triggered = false;
         registerObject(pathToObjectLayer(path),

@@ -145,13 +145,13 @@ var AIB_DEFENSE = 0.2;
 var AIB_AGILITY = 0.05;
 var AIB_REFLEXES = 0.03;
 
-// objects
+// landmarks
 var landscape = null;
 var landscapeId = 0;
 
-var objectsOnLayer = [0, 0, 0]; // number of objects on layer
-var farthestObjects = [];       // farthest object position on layer
-var singletonIds = [];          // array of singleton object ids present on the field
+var landmarksOnLayer = [0, 0, 0];   // number of landmarks on layer
+var farthestLandmarks = [];         // farthest landmark position on layer
+var singletonIds = [];              // array of singleton landmark ids present on the field
 
 var collisionDistance = 40;
 
@@ -1120,7 +1120,7 @@ function tick() {
                     }
 
                     // check whether hero comes into contact with anything
-                    if (object.type == "FieldObject") {
+                    if (object.type == "Landmark") {
                         if ((object.path == hero.path) && (!object.finished)
                             && (Math.abs(object.position - hero.position) < collisionDistance)
                             && (Math.abs(getOptimalHeight(object.path, object.position) - hero.height)

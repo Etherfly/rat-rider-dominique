@@ -32,6 +32,8 @@
             <img id="imgKarma" src="resources/other/karma.png">
             <img id="imgBattleGauges" src="resources/other/battleGauges.png">
             <img id="imgFlashLabel" src="resources/other/flashLabel.png">
+            <img id="imgScrollTop" src="resources/other/scroll-top.png">
+            <img id="imgScrollBottom" src="resources/other/scroll-bottom.png">
             <img id="imgQuestMark" src="resources/other/quest-mark.png">
             <img id="imgDangerMark" src="resources/other/danger-mark.png">
 
@@ -226,6 +228,7 @@
 <script src="gui.js"></script>
 <script src="common.js"></script>
 <script src="combat.js"></script>
+<script src="codex.js"></script>
 <script src="chapter00.js"></script>
 <script type="text/javascript">
 
@@ -316,6 +319,14 @@
     var TXT_MENU_CODEX = ["Codex", "Кодекс"];
     var TXT_MENU_QUIT = ["Quit", "Выйти"];
 
+    var TXT_CODEX_CATEGORIES = ["Categories", "Категории"];
+    var TXT_CODEX_LANDMARKS = ["Landmarks", "Объекты на местности"];
+    var TXT_CODEX_ENEMIES = ["Enemies", "Враги"];
+    var TXT_CODEX_LORE = ["Lore", "Знания"];
+    var TXT_CODEX_JOURNAL = ["Journal", "Журнал"];
+
+    var TXT_CODEX_NO_ENTRIES_YET = ["This category is empty yet.", "Эта категория пока что пуста."];
+
     var TXT_MENU_AVAILABLE_SKILLS = ["Available skills", "Доступные навыки"];
     var TXT_MENU_AVAILABLE_AURA_SKILLS = ["Available aura skills", "Доступные аура-навыки"];
     var TXT_MENU_ACTIVE_SKILLS = ["Active skills", "Активные навыки"];
@@ -330,7 +341,7 @@
                 + "alloy with a bluish hue and form a likeness of a certain card suit. This weapon symbolizes the "
                 + "eventual ruin for those driven by greed. <br> <br> You cannot change Dominique's basic equipment.",
         "Излюбленное оружие Доминика, эта алебарда - произведение искусства. Секира и наконечник выкованы из "
-                + "неизвестного синеватого сплава и в сочетании являют собой некое подобие карточной масти. Это оружие "
+                + "неизвестного синеватого сплава и в сочетании образуют некое подобие карточной масти. Это оружие "
                 + "символизирует неизбежную расплату, ожидающую тех, кто поддаётся жадности."
                 + " <br> <br> Вы не можете изменять базовое снаряжение Доминика."
     ];

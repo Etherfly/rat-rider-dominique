@@ -7,7 +7,7 @@
 /* OBJECT STRUCTURES */
 
 function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNear,
-                   mainTheme, battleTheme, objectFrequency) {
+                   mainTheme, battleTheme, landmarkFrequency) {
     this.background = background;
     this.terrainColorFar = terrainColorFar;
     this.terrainColorMid = terrainColorMid;
@@ -16,25 +16,25 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     this.mainTheme = mainTheme;
     this.battleTheme = battleTheme;
 
-    this.objectFrequency = objectFrequency;     // average pixel difference between objects
-    this.objectTypes = [];                      // object type generation data
+    this.landmarkFrequency = landmarkFrequency;     // average pixel difference between landmarks
+    this.landmarkTypes = [];                        // landmarks type generation data
 
-    this.objectsMin = 2 * W / objectFrequency;  // objects to be present on the layer simultaneously
+    this.landmarksMin = 2 * W / landmarkFrequency;  // landmarks to be present on the layer simultaneously
 
-    for (var i = 0; i < 3; i++) { objectsOnLayer[i] = 0; }
-    farthestObjects[FAR] = (new FieldObject(FAR, 600, 0, null));
-    farthestObjects[MID] = (new FieldObject(MID, 600, 0, null));
-    farthestObjects[NEAR] = (new FieldObject(NEAR, 600, 0, null));
+    for (var i = 0; i < 3; i++) { landmarksOnLayer[i] = 0; }
+    farthestLandmarks[FAR] = (new Landmark(FAR, 600, 0, null));
+    farthestLandmarks[MID] = (new Landmark(MID, 600, 0, null));
+    farthestLandmarks[NEAR] = (new Landmark(NEAR, 600, 0, null));
 
     this.type = "Landscape";    // type definition
     this.deletable = false;     // universal deletability flag
 
-    this.addObjectType = function(objectType) {
-        this.objectTypes.push(objectType);
+    this.addLandmarkType = function(landmarkType) {
+        this.landmarkTypes.push(landmarkType);
     };
 
-    this.clearObjectTypes = function () {
-        this.objectTypes.length = 0;
+    this.clearLandmarkTypes = function () {
+        this.landmarkTypes.length = 0;
     };
 
     this.defineActualize = function (actualize) {
@@ -42,7 +42,7 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     };
 
     /*
-     * This function is meant to reinstall object type data based on the global variables,
+     * This function is meant to reinstall landmark type data based on the global variables,
      * i.e. actualize landscape state
      */
     this.actualize = function () { };
@@ -96,31 +96,31 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     this.generateUpperDecoration = function () {};
 
     this.manifest = function () {
-        if (this.objectTypes.length > 0) {
+        if (this.landmarkTypes.length > 0) {
             for (var path = 0; path < 3; path++) {
-                while (objectsOnLayer[path] < this.objectsMin) {
-                    var newObjectPosition = farthestObjects[path].position
-                        + this.objectFrequency * (0.5 + Math.random());
+                while (landmarksOnLayer[path] < this.landmarksMin) {
+                    var newLandmarkPosition = farthestLandmarks[path].position
+                        + this.landmarkFrequency * (0.5 + Math.random());
                     var probabilityScale = 0;
-                    for (var i = 0; i < this.objectTypes.length; i++) {
-                        probabilityScale += !this.objectTypes[i].available() ? 0 : this.objectTypes[i].chanceToAppear;
+                    for (var i = 0; i < this.landmarkTypes.length; i++) {
+                        probabilityScale += !this.landmarkTypes[i].available() ? 0 : this.landmarkTypes[i].chanceToAppear;
                     }
                     var chanceRoll = Math.random() * probabilityScale;
-                    var currentObjectTypeId = 0;
-                    var chanceArea = this.objectTypes[currentObjectTypeId].chanceToAppear;
-                    while ((currentObjectTypeId + 1 < this.objectTypes.length) && (chanceArea < chanceRoll)) {
-                        currentObjectTypeId++;
-                        chanceArea += !this.objectTypes[currentObjectTypeId].available()
-                            ? 0 : this.objectTypes[currentObjectTypeId].chanceToAppear;
+                    var currentLandmarkTypeId = 0;
+                    var chanceArea = this.landmarkTypes[currentLandmarkTypeId].chanceToAppear;
+                    while ((currentLandmarkTypeId + 1 < this.landmarkTypes.length) && (chanceArea < chanceRoll)) {
+                        currentLandmarkTypeId++;
+                        chanceArea += !this.landmarkTypes[currentLandmarkTypeId].available()
+                            ? 0 : this.landmarkTypes[currentLandmarkTypeId].chanceToAppear;
                     }
-                    var newObject = this.objectTypes[currentObjectTypeId].generateObject(path, newObjectPosition);
-                    newObject.objectType = this.objectTypes[currentObjectTypeId];
-                    if (this.objectTypes[currentObjectTypeId].singletonId != null) {
-                        singletonIds.push(this.objectTypes[currentObjectTypeId].singletonId);
+                    var newLandmark = this.landmarkTypes[currentLandmarkTypeId].generateLandmark(path, newLandmarkPosition);
+                    newLandmark.landmarkType = this.landmarkTypes[currentLandmarkTypeId];
+                    if (this.landmarkTypes[currentLandmarkTypeId].singletonId != null) {
+                        singletonIds.push(this.landmarkTypes[currentLandmarkTypeId].singletonId);
                     }
-                    registerObject(pathToObjectFrontLayer(path) + newObject.layerOffset, newObject);
-                    objectsOnLayer[path]++;
-                    farthestObjects[path] = newObject;
+                    registerObject(pathToObjectFrontLayer(path) + newLandmark.layerOffset, newLandmark);
+                    landmarksOnLayer[path]++;
+                    farthestLandmarks[path] = newLandmark;
                 }
             }
         }
@@ -138,7 +138,7 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     this.move = function () { };
 
     this.destroy = function() {
-        clearObjectType("FieldObject");
+        clearObjectType("Landmark");
         this.deletable = true;
     };
 }
@@ -346,6 +346,10 @@ function Hero() {
         {id: ITM_DEFUP1, charges: 3}, {id: ITM_AGIUP1, charges: 3}, {id: ITM_RFXUP1, charges: 3},
         {id: ITM_DMG1, charges: 3}, {id: ITM_GUARD1, charges: 5}, {id: ITM_TALISMAN1, charges: 1}];
     this.activeItems = [];
+
+    this.codexEntries = [CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE,
+        CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE,
+        CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE];
 
     this.skillSet = [];
     this.battleGaugeArtifacts = [];
@@ -668,6 +672,12 @@ function Hero() {
         this.availableItems.push(itemRecord);
         menuState = MS_ITEM_OBTAINED;
         registerObject(GUI_EVENT, procureItemObtainedSequence(itemRecord));
+    };
+
+    this.obtainCodexEntry = function (entryId) {
+        this.codexEntries.push(entryId);
+        menuState = MS_NEW_CODEX_ENTRY;
+        //registerObject(GUI_EVENT, procureItemObtainedSequence(itemRecord));
     };
 
     this.setAnimationState = function (animationState) {
@@ -1020,7 +1030,7 @@ function BattleGaugeArtifact(position, leftCooldown, rightCooldown) {
     this.sketch = function (position, character) {};
 }
 
-function ObjectType(chanceToAppear) {
+function LandmarkType(chanceToAppear) {
     this.chanceToAppear = chanceToAppear;
     this.singletonId = null;    // singleton means that this object can only be present single on the field
                                 // singletonId is used to track the object's presence
@@ -1029,20 +1039,20 @@ function ObjectType(chanceToAppear) {
         return (this.singletonId == null) || (singletonIds.indexOf(this.singletonId) < 0);
     };
 
-    this.defineGenerateObject = function(generateObject) {
-        this.generateObject = generateObject;
+    this.defineGenerateLandmark = function(generateLandmark) {
+        this.generateLandmark = generateLandmark;
     };
 
-    this.generateObject = function(path, position) {};
+    this.generateLandmark = function(path, position) {};
 }
 
-function FieldObject(path, position, offset, defaultImage) {
+function Landmark(path, position, offset, defaultImage) {
     this.defaultImage = defaultImage;   // image in a default state
     this.path = path;                   // path layer
     this.layerOffset = 0;               // layer offset
     this.position = position;           // center position
     this.offset = offset;               // offset from the center position
-    this.objectType = null;             // object type that generated this object
+    this.landmarkType = null;           // landmark type that generated this landmark
 
     this.finished = false;              // trigger finish flag
     this.scale = getPathScale(this.path);
@@ -1050,7 +1060,7 @@ function FieldObject(path, position, offset, defaultImage) {
     this.animationState = AN_STAND;
     this.animationFrame = 0;
 
-    this.type = "FieldObject";  // type definition
+    this.type = "Landmark";     // type definition
     this.deletable = false;     // universal deletability flag
 
     this.setAnimationState = function(animationState) {
@@ -1104,14 +1114,26 @@ function FieldObject(path, position, offset, defaultImage) {
     this.move = function() {
         this.position -= movementCoefficient;
         if (this.position < -this.defaultImage.width * this.scale) {
-            objectsOnLayer[this.path]--;
+            landmarksOnLayer[this.path]--;
             this.deletable = true;
-            if (this.objectType != null) {
-                var singletonIdIndex = singletonIds.indexOf(this.objectType.singletonId);
+            if (this.landmarkType != null) {
+                var singletonIdIndex = singletonIds.indexOf(this.landmarkType.singletonId);
                 if (singletonIdIndex >= 0) {
                     singletonIds[singletonIdIndex] = null;
                 }
             }
         }
     };
+}
+
+function CodexEntry(title, category, image) {
+    this.title = title;
+    this.category = category;
+    this.image = image !== undefined ? image : null;
+    this.text = "No text defined.";
+
+    this.defineText = function (text) {
+        this.text = text;
+        return this;
+    }
 }

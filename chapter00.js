@@ -96,9 +96,9 @@ var CH00_TUTORIAL_MENU_ITEMS_TXT_02 = [
 ];
 
 var CH00_TUTORIAL_MENU_CODEX_TXT = [
-    "Codex is a record of things known to you about this world. Each entry provides information about an object, "
+    "Codex is a record of things known to you about this world. Each entry provides information about a landmark, "
         + "an enemy, your quest or a lore topic. Entries are organized into categories for your convenience.",
-    "Кодекс - это летопись всего, что Вам известно об этом мире. Каждая запись даёт информацию об объекте, "
+    "Кодекс - это летопись всего, что Вам известно об этом мире. Каждая запись даёт информацию об объекте на местности, "
         + "враге, Ваших поисках или некие отвлечённые знания. Записи организованы в категории для Вашего удобства."
 ];
 
@@ -265,11 +265,11 @@ var CH00_ARMORSMITH_05 = [
 ];
 
 var CH00_DOJO_01 = [
-    "Dominique stands before one of many training halls around these parts. The doorkeeper greets him with a bow and "
+    "Dominique stands before one of many dojos around these parts. The doorkeeper greets him with a bow and "
         + "seeing that he knows his way around in a fight, invites him to train with the adepts. Being admitted "
         + "into an inner circle of a fighting guild should not be taken lightly, for it takes a toll on the karma. "
         + " <br> <br> Training with these adepts will grant Dominique a ",
-    "Доминик стоит перед одним из многих тренировочных залов этих мест. Дверник приветствует его поклоном и, видя, "
+    "Доминик стоит перед одним из многих додзё этих мест. Дверник приветствует его поклоном и, видя, "
         + "что он не новичок в бою, приглашает потренироваться с адептами. Допуск ко внутреннему кругу "
         + "бойцовской гильдии - серьёзный шаг, который скажется на карме."
         + " <br> <br> Тренировка с этими адептами даст Доминику "
@@ -475,46 +475,46 @@ var LSC_PROLOGUE = 1;
 function createPrologueLandscape() {
     var prologueLandscape = createTitleLandscape();
     prologueLandscape.defineActualize(function () {
-        this.clearObjectTypes();
-        this.addObjectType(describeChroniclersPavilionType(0.1));
-        this.addObjectType(describeHotspringType(0.1));
-        this.addObjectType(describeInnType(0.1));
-        this.addObjectType(describeHouseRestType(0.1));
-        this.addObjectType(describeHouseWorkType(0.1));
-        this.addObjectType(describeTradingPostType(0.1));
-        this.addObjectType(describeCommonChestType(0.1));
-        this.addObjectType(describeTrainerType(0.07));
+        this.clearLandmarkTypes();
+        this.addLandmarkType(describeChroniclersPavilionType(0.1));
+        this.addLandmarkType(describeHotspringType(0.1));
+        this.addLandmarkType(describeInnType(0.1));
+        this.addLandmarkType(describeHouseRestType(0.1));
+        this.addLandmarkType(describeHouseWorkType(0.1));
+        this.addLandmarkType(describeTradingPostType(0.1));
+        this.addLandmarkType(describeCommonChestType(0.1));
+        this.addLandmarkType(describeTrainerType(0.07));
         if (gst[CH00][CH00_PHASE] == 1) {
-            this.addObjectType(describeBanditType(0.15));
-            this.addObjectType(describeWolfType(0.15));
-            this.addObjectType(describeDestroyedHouseType(0.1));
+            this.addLandmarkType(describeBanditType(0.15));
+            this.addLandmarkType(describeWolfType(0.15));
+            this.addLandmarkType(describeDestroyedHouseType(0.1));
         } else if (gst[CH00][CH00_PHASE] == 2) {
-            this.addObjectType(describeBanditType(0.15));
-            this.addObjectType(describeWolfType(0.15));
-            this.addObjectType(describeMilestoneType(0.1));
+            this.addLandmarkType(describeBanditType(0.15));
+            this.addLandmarkType(describeWolfType(0.15));
+            this.addLandmarkType(describeMilestoneType(0.1));
         } else if (gst[CH00][CH00_PHASE] == 3) {
-            this.addObjectType(describeBanditType(0.15));
-            this.addObjectType(describeWolfType(0.15));
-            this.addObjectType(describeBrigandType(0.1));
-            this.addObjectType(describeWaspType(0.1));
-            this.addObjectType(describeMilestoneType(0.1));
+            this.addLandmarkType(describeBanditType(0.15));
+            this.addLandmarkType(describeWolfType(0.15));
+            this.addLandmarkType(describeBrigandType(0.1));
+            this.addLandmarkType(describeWaspType(0.1));
+            this.addLandmarkType(describeMilestoneType(0.1));
         } else if (gst[CH00][CH00_PHASE] == 4) {
-            this.addObjectType(describeBanditType(0.15));
-            this.addObjectType(describeWolfType(0.15));
-            this.addObjectType(describeBrigandType(0.15));
-            this.addObjectType(describeWaspType(0.15));
-            this.addObjectType(describeMilestoneType(0.1));
+            this.addLandmarkType(describeBanditType(0.15));
+            this.addLandmarkType(describeWolfType(0.15));
+            this.addLandmarkType(describeBrigandType(0.15));
+            this.addLandmarkType(describeWaspType(0.15));
+            this.addLandmarkType(describeMilestoneType(0.1));
         } else if (gst[CH00][CH00_PHASE] == 5) {
-            this.addObjectType(describeBanditType(0.1));
-            this.addObjectType(describeWolfType(0.1));
-            this.addObjectType(describeBrigandType(0.15));
-            this.addObjectType(describeWaspType(0.15));
-            this.addObjectType(describeRedWolfType(0.1));
-            this.addObjectType(describePoisonWaspType(0.1));
-            this.addObjectType(describeArmadilloKnightType(0.1));
-            this.addObjectType(describeBanditRingleaderType(0.05));
-            this.addObjectType(describeArmadilloVityazType(0.05));
-            this.addObjectType(describeGreenSerpentType(0.1));
+            this.addLandmarkType(describeBanditType(0.1));
+            this.addLandmarkType(describeWolfType(0.1));
+            this.addLandmarkType(describeBrigandType(0.15));
+            this.addLandmarkType(describeWaspType(0.15));
+            this.addLandmarkType(describeRedWolfType(0.1));
+            this.addLandmarkType(describePoisonWaspType(0.1));
+            this.addLandmarkType(describeArmadilloKnightType(0.1));
+            this.addLandmarkType(describeBanditRingleaderType(0.05));
+            this.addLandmarkType(describeArmadilloVityazType(0.05));
+            this.addLandmarkType(describeGreenSerpentType(0.1));
         }
     });
     return prologueLandscape;
@@ -523,7 +523,7 @@ function createPrologueLandscape() {
 /* SEQUENCES */
 
 function procureStartPrologueSequence() {
-    var enemyObject = new FieldObject(MID, 620, 50, getResource("imgEnemyBandit1Stand"));
+    var enemyObject = new Landmark(MID, 620, 50, getResource("imgEnemyBandit1Stand"));
     enemyObject.setAttackImage(getResource("imgEnemyBandit1Attack"));
     var tutorialEnemy = enlistTutorialBandit(enemyObject);
     var startPrologue = new Sequence();
@@ -552,6 +552,11 @@ function procureStartPrologueSequence() {
             gst[CH00][CH00_TUTORIAL_POISON_WASP] = 1;
             gst[CH00][CH00_TUTORIAL_ARMADILLO] = 1;
             gst[CH00][CH00_TUTORIAL_DANGER] = 1;
+            gst[CH00][CH00_TUTORIAL_MENU_ROOT] = 1;
+            gst[CH00][CH00_TUTORIAL_MENU_STATS] = 1;
+            gst[CH00][CH00_TUTORIAL_MENU_SKILLS] = 1;
+            gst[CH00][CH00_TUTORIAL_MENU_ITEMS] = 1;
+            gst[CH00][CH00_TUTORIAL_MENU_CODEX] = 1;
         }
     }));
     startPrologue.addAction(procureCodeFragmentAction(function () {
@@ -634,7 +639,7 @@ function procureStartPrologueSequence() {
                         + "что если будешь много петлять, быстро устанешь."]));
             afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
                 ["Let's have a look around and see if someone has a task for a hero like you. "
-                    + "Keep an eye out for an exclamation mark over an object - such marks denote places of "
+                    + "Keep an eye out for an exclamation mark over a landmark - such marks denote places of "
                     + "special interest for us.",
                     "Давай осмотримся, нет ли здесь кого-нибудь, нуждающегося в помощи героя, вроде тебя. "
                         + "Обращай внимание на восклицательные знаки над объектами - такие знаки отмечают особо "
@@ -703,12 +708,12 @@ function processKarmaTutorial() {
     }
 }
 
-/* FIELD OBJECTS */
+/* LANDMARKS */
 
 function describeChroniclersPavilionType(chance) {
-    var chroniclersPavilionType = new ObjectType(chance);
-    chroniclersPavilionType.defineGenerateObject(function (path, position) {
-        var chroniclersPavilion = new FieldObject(path, position, 50, getResource("imgObjArbor"));
+    var chroniclersPavilionType = new LandmarkType(chance);
+    chroniclersPavilionType.defineGenerateLandmark(function (path, position) {
+        var chroniclersPavilion = new Landmark(path, position, 50, getResource("imgObjArbor"));
         chroniclersPavilion.defineTrigger(function () {
             var pavilionSequence = new Sequence();
             pavilionSequence.addAction(procureStopAction());
@@ -749,9 +754,9 @@ function describeChroniclersPavilionType(chance) {
 }
 
 function describeHotspringType(chance) {
-    var hotspringType = new ObjectType(chance);
-    hotspringType.defineGenerateObject(function (path, position) {
-        var hotspring = new FieldObject(path, position, 60, getResource("imgObjHotspring"));
+    var hotspringType = new LandmarkType(chance);
+    hotspringType.defineGenerateLandmark(function (path, position) {
+        var hotspring = new Landmark(path, position, 60, getResource("imgObjHotspring"));
         hotspring.defineTrigger(function () {
             var hotspringSequence = new Sequence();
             hotspringSequence.addAction(procureStopAction());
@@ -803,9 +808,9 @@ function describeHotspringType(chance) {
 }
 
 function describeInnType(chance) {
-    var innType = new ObjectType(chance);
-    innType.defineGenerateObject(function (path, position) {
-        var inn = new FieldObject(path, position, 50, getResource("imgObjInn"));
+    var innType = new LandmarkType(chance);
+    innType.defineGenerateLandmark(function (path, position) {
+        var inn = new Landmark(path, position, 50, getResource("imgObjInn"));
         inn.defineTrigger(function () {
             var innSequence = new Sequence();
             innSequence.addAction(procureStopAction());
@@ -857,10 +862,10 @@ function describeInnType(chance) {
 }
 
 function describeTrainerType(chance) {
-    var trainerType = new ObjectType(chance);
-    trainerType.defineGenerateObject(function (path, position) {
+    var trainerType = new LandmarkType(chance);
+    trainerType.defineGenerateLandmark(function (path, position) {
         var attribute = Math.floor(Math.random() * 4);
-        var trainer = new FieldObject(path, position, 50,
+        var trainer = new Landmark(path, position, 50,
             attribute < 2 ? getResource("imgObjSmith") : getResource("imgObjDojo"));
         trainer.defineTrigger(function () {
             var trainerSequence = new Sequence();
@@ -998,9 +1003,9 @@ function describeTrainerType(chance) {
 }
 
 function describeHouseRestType(chance) {
-    var houseRestType = new ObjectType(chance);
-    houseRestType.defineGenerateObject(function (path, position) {
-        var houseRest = new FieldObject(path, position, 50,
+    var houseRestType = new LandmarkType(chance);
+    houseRestType.defineGenerateLandmark(function (path, position) {
+        var houseRest = new Landmark(path, position, 50,
             getRandomObject([getResource("imgObjHouse1"), getResource("imgObjHouse2")]));
         houseRest.defineTrigger(function () {
             var houseRestSequence = new Sequence();
@@ -1039,9 +1044,9 @@ function describeHouseRestType(chance) {
 }
 
 function describeHouseWorkType(chance) {
-    var houseWorkType = new ObjectType(chance);
-    houseWorkType.defineGenerateObject(function (path, position) {
-        var houseWork = new FieldObject(path, position, 50,
+    var houseWorkType = new LandmarkType(chance);
+    houseWorkType.defineGenerateLandmark(function (path, position) {
+        var houseWork = new Landmark(path, position, 50,
             getRandomObject([getResource("imgObjHouse1"), getResource("imgObjHouse2")]));
         houseWork.defineTrigger(function () {
             var houseWorkSequence = new Sequence();
@@ -1103,9 +1108,9 @@ function describeHouseWorkType(chance) {
 }
 
 function describeTradingPostType(chance) {
-    var objectType = new ObjectType(chance);
-    objectType.defineGenerateObject(function (path, position) {
-        var object = new FieldObject(path, position, 50, getResource("imgObjTradingPost"));
+    var objectType = new LandmarkType(chance);
+    objectType.defineGenerateLandmark(function (path, position) {
+        var object = new Landmark(path, position, 50, getResource("imgObjTradingPost"));
         object.defineTrigger(function () {
             var objectSequence = new Sequence();
             objectSequence.addAction(procureStopAction());
@@ -1148,9 +1153,9 @@ function describeTradingPostType(chance) {
 }
 
 function describeCommonChestType(chance) {
-    var objectType = new ObjectType(chance);
-    objectType.defineGenerateObject(function (path, position) {
-        var object = new FieldObject(path, position, 50, getResource("imgObjChest1"));
+    var objectType = new LandmarkType(chance);
+    objectType.defineGenerateLandmark(function (path, position) {
+        var object = new Landmark(path, position, 50, getResource("imgObjChest1"));
         object.layerOffset = -2;
         object.defineTrigger(function () {
             var objectSequence = new Sequence();
@@ -1227,10 +1232,10 @@ function describeCommonChestType(chance) {
 }
 
 function describeDestroyedHouseType(chance) {
-    var objectType = new ObjectType(chance);
+    var objectType = new LandmarkType(chance);
     objectType.singletonId = "singleton: ch00_phase01";
-    objectType.defineGenerateObject(function (path, position) {
-        var object = new FieldObject(path, position, 50, getResource("imgObjDestroyedHouse"));
+    objectType.defineGenerateLandmark(function (path, position) {
+        var object = new Landmark(path, position, 50, getResource("imgObjDestroyedHouse"));
         var triggered = false;
         registerObject(pathToObjectLayer(path), procureFloatingImageAction(object, getResource("imgQuestMark"),
             function () {
@@ -1254,10 +1259,10 @@ function describeDestroyedHouseType(chance) {
 }
 
 function describeMilestoneType(chance) {
-    var objectType = new ObjectType(chance);
+    var objectType = new LandmarkType(chance);
     objectType.singletonId = "singleton: ch00_milestone";
-    objectType.defineGenerateObject(function (path, position) {
-        var object = new FieldObject(path, position, 50, getResource("imgObjMilestone"));
+    objectType.defineGenerateLandmark(function (path, position) {
+        var object = new Landmark(path, position, 50, getResource("imgObjMilestone"));
         var triggered = false;
         registerObject(pathToObjectLayer(path), procureFloatingImageAction(object, getResource("imgQuestMark"),
             function () {
