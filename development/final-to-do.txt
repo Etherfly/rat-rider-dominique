@@ -1,0 +1,17 @@
+1) Gaining codex entries: enemies.
+2) Library.
+3) Gaining skills: library, chest, enemy.
+4) Corresponding dialogs.
+5) Dialogue for destroyed house.
+6) Dialogue for seer's hut.
+7) Transitioning to new area.
+8) Dialogue and complete boss battle with the serpent.
+9) Aftermath.
+10) Smallfixes:
+- SP cost display.
+- denial sound effect.
+- escape should also work on menu messages.
+11) Balancing out.
+12) Writing a good description.
+13) Uploading everything to GitHub and propagating info.
+14) Resting...

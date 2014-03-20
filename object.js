@@ -347,9 +347,15 @@ function Hero() {
         {id: ITM_DMG1, charges: 3}, {id: ITM_GUARD1, charges: 5}, {id: ITM_TALISMAN1, charges: 1}];
     this.activeItems = [];
 
-    this.codexEntries = [CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE,
-        CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE,
-        CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE, CDX_CH00HOUSE];
+    this.codexEntries = [{id: CDX_CH00HOUSE, read: false}, {id: CDX_CH00HOTSPRING, read: false}, {id: CDX_CH00INN, read: false},
+        {id: CDX_CH00SMITHY, read: false}, {id: CDX_CH00DOJO, read: false}, {id: CDX_CH00CHRONICLER, read: false},
+        {id: CDX_CH00LIBRARY, read: false}, {id: CDX_CH00TRADINGPOST, read: false}, {id: CDX_CH00MILESTONE, read: false},
+        {id: CDX_CH00ENM_BANDIT, read: false}, {id: CDX_CH00ENM_WOLF, read: false}, {id: CDX_CH00ENM_WASP, read: false},
+        {id: CDX_CH00ENM_BRIGAND, read: false}, {id: CDX_CH00ENM_POISONWASP, read: false}, {id: CDX_CH00ENM_REDWOLF, read: false},
+        {id: CDX_CH00ENM_ARMADILLOKNIGHT, read: false}, {id: CDX_CH00ENM_BANDITRINGLEADER, read: false},
+        {id: CDX_CH00ENM_ARMADILLOVITYAZ, read: false}, {id: CDX_CH00ENM_GREENSERPENT, read: false},
+        {id: CDX_LORE001_NATURALORDER, read: false}, {id: CDX_LORE002_SOURCESOFKARMA, read: true}, {id: CDX_LORE003_ROBBERSANDDEALERS, read: false},
+        {id: CDX_LORE004_ONDEITIES, read: false}, {id: CDX_LORE005_HUMANSOCIETY, read: false}];
 
     this.skillSet = [];
     this.battleGaugeArtifacts = [];

@@ -713,7 +713,7 @@ function processKarmaTutorial() {
 function describeChroniclersPavilionType(chance) {
     var chroniclersPavilionType = new LandmarkType(chance);
     chroniclersPavilionType.defineGenerateLandmark(function (path, position) {
-        var chroniclersPavilion = new Landmark(path, position, 50, getResource("imgObjArbor"));
+        var chroniclersPavilion = new Landmark(path, position, 50, getResource("imgObjChronicler"));
         chroniclersPavilion.defineTrigger(function () {
             var pavilionSequence = new Sequence();
             pavilionSequence.addAction(procureStopAction());
@@ -1363,21 +1363,21 @@ function describeWolfType(chance) {
 }
 
 function describeRedWolfType(chance) {
-    return describeCommonEncounter(chance, ["Red Wolf", "Бурый Волк"],
+    return describeCommonEncounter(chance, ["Red Wolf", "Бурый волк"],
         getResource("imgEnemyWolf2Stand"), getResource("imgEnemyWolf2Attack"),
         enlistRedWolf, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_RED_WOLF,
         procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_RED_WOLF_TXT));
 }
 
 function describeWaspType(chance) {
-    return describeCommonEncounter(chance, ["Giant Wasp", "Гигантская Оса"],
+    return describeCommonEncounter(chance, ["Giant Wasp", "Гигантская оса"],
         getResource("imgEnemyWasp1Stand"), getResource("imgEnemyWasp1Attack"),
         enlistWasp, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_WASP,
         procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_WASP_TXT));
 }
 
 function describePoisonWaspType(chance) {
-    return describeCommonEncounter(chance, ["Posion Wasp", "Ядовитая Оса"],
+    return describeCommonEncounter(chance, ["Posion Wasp", "Ядовитая оса"],
         getResource("imgEnemyWasp2Stand"), getResource("imgEnemyWasp2Attack"),
         enlistPoisonWasp, HS_BASE, HS_CH00, CH00, CH00_TUTORIAL_POISON_WASP,
         procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait, CH00_TUTORIAL_POISON_WASP_TXT));

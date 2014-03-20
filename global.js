@@ -331,6 +331,7 @@ function saveGame() {
         heroActiveAuraSkills: hero.activeAuraSkills,
         heroAvailableItems: hero.availableItems,
         heroActiveItems: hero.activeItems,
+        heroCodexEntries: hero.codexEntries,
         heroKarma: hero.karma,
 
         gameState: gst,
@@ -366,6 +367,7 @@ function loadGame() {
         hero.activeAuraSkills = save.heroActiveAuraSkills != null ? save.heroActiveAuraSkills : [];
         hero.availableItems = save.heroAvailableItems != null ? save.heroAvailableItems : [];
         hero.activeItems = save.heroActiveItems != null ? save.heroActiveItems : [];
+        hero.codexEntries = save.heroCodexEntries != null ? save.heroCodexEntries : [];
         hero.karma = save.heroKarma;
         registerObject(OBJECTS_MID, hero);
 

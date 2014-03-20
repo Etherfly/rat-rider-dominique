@@ -229,7 +229,7 @@ function procureDisplayFreeTextAction(xPos, yPos, width, text, displayCursor) {
 
         var translatedText = (typeof text === "string") ? text : text[lang];
         var printedText = frame * 3 >= translatedText.length ? translatedText : translatedText.substr(0, frame * 3);
-        var lineCount = processText(printedText, xPos + 30, yPos, width);
+        var lineCount = processText(printedText, width, xPos + 30, yPos).lineCount;
 
         if (displayCursor && (frame * 3 >= text.length)) {
             fc.beginPath();
@@ -270,7 +270,7 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
             drawTextbox(xPos, yPos, width * frame / 10, height * frame / 10);
         } else {
             drawTextbox(xPos, yPos, width, height);
-            var lineCount = processText(text, xPos + 30, yPos, width);
+            var lineCount = processText(text, width, xPos + 30, yPos).lineCount;
 
             if (displayMessageAction.choices.length > 0) {
                 lineCount++;
@@ -356,10 +356,10 @@ function procureDisplaySpeechMessageAction(name, portrait, text) {
             drawInfoWindow();
             fc.beginPath();
             fc.drawImage(portrait, INFO_WINDOW_X + 12, INFO_WINDOW_Y + 12, 196, 196);
-            processText(name, INFO_WINDOW_X + 220, INFO_WINDOW_Y, INFO_WINDOW_W - 220, LARGE_FONT);
+            processText(name, INFO_WINDOW_W - 220, INFO_WINDOW_X + 220, INFO_WINDOW_Y, LARGE_FONT);
             var translatedText = (typeof text === "string") ? text : text[lang];
             var printedText = frame * 3 >= translatedText.length ? translatedText : translatedText.substr(0, (frame - 10) * 3);
-            var lineCount = processText(printedText, INFO_WINDOW_X + 220, INFO_WINDOW_Y + LARGE_LINE_HEIGHT, INFO_WINDOW_W - 220);
+            var lineCount = processText(printedText, INFO_WINDOW_W - 220, INFO_WINDOW_X + 220, INFO_WINDOW_Y + LARGE_LINE_HEIGHT).lineCount;
 
             if ((frame - 10) * 3 >= text.length) {
                 fc.beginPath();

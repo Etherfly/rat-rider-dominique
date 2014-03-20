@@ -1,0 +1,59 @@
+Bandit/Бандит
+
+A poor man, probably, a peasant, driven to the path of karmic robbery. Slow and predictable. <br> Anticipated action pattern: defend, attack, opening. <br> <br> Hint: <br> - Since the time frame near the enemy attack provides a greater vulnerability, it makes sense to use it to deliver a finishing blow. One has to be careful, however: if the enemy still stands after such an attack or manages to strike first, one will sustain more damage.
+
+Бедняк, вероятно, крестьянин, ставший на путь кармического грабежа. Медленный и предсказуемый. <br> Ожидаемая схема действий: защита, атака, уязвимость. <br> <br> Совет: <br> - Так как временная область близ вражеской атаки предоставляет большую уязвимость, имеет смысл использовать её для нанесения последнего удара. Следует, однако, быть осторжным: если враг выстоит такую атаку или сумеет нанести удар первым, полученные повреждения будут большими.
+
+Wolf/Волк
+
+A hungry gray wolf, preying upon careless travellers. Fast, but weak. Occassionally fumbles an attack, barely scratching the opponent and leaving itself vulnerable. <br> Anticipated action pattern: attack, defend, fumbled attack.
+
+Голодный серый волк, охотящийся на беззаботных путешественников. Быстрый, но слабый. Иногда производит неудачную атаку, едва задевая противника и оставляя себя уязвимым. <br> Ожидаемая схема действий: атака, защита, неудачная атака.
+
+Giant wasp/Гигантская оса
+
+A big and dangerous insect that utilizes a weakening poison. Fast and nimble. Has a chance to evade attacks and uses evasion as means of defense. <br> Anticipated action pattern: jab x2-3, evade, vulnerability, poison sting (weakness). <br> <br> Hints: <br> - Every status attack (e.g., poison sting) has a defense threshold. If at the impact moment, target's effective defense equals to or is greater than the threshold, the status effect is resisted. Thus, in order to protect yourself against negative status effects, one simply needs to defend at the right moment. <br> - When giant wasp goes for a poison sting, not only its defense is lowered, its evasion rate is going down as well. Just as with most enemies, striking right before the enemy does is an excellent way to finish it off.
+
+Большое и опасное насекомое, использующее ослабляющий яд. Быстрое и ловкое. Имеет шанс уклониться от атак и использует уклонение как способ защиты. <br> Ожидаемая схема действий: короткий удар x2-3, уклонение, уязвимость, ядовитое жало (слабость). <br> <br> Советы: <br> - Всякая статусная атака (например, ядовитое жало) имеет определённый порог защиты. Если в момент удара, эффективная защита цели равна или превышает порог, статус будет отражён. Таким образом, для защиты от негативных статусов достаточно просто оборониться в нужный момент. <br> - Когда гигансткая оса атакует ядовитым жалом, снижается не только её защита, но и её вероятность уклонения. Как и с большинством других врагов, удар прямо перед атакой врага - отличный способ закончить бой.
+
+Brigand/Рабойник
+
+A somewhat experienced karmic robber that has obtained some skills and a good weapon. Strong, but slow. Uses power attack that slows him down near the moment of impact. <br> Anticipated action pattern: power attack, defend, [attack and fumbled attack] (random order), defense. <br> <br> Hint: <br> - While power attack provides great opportunities to deliver a few good blows to the opponent, it's also potentially deadly due to its high attack power. Since it slows down near the impact, one may use speed synchronization ('Shift' key) to make sure that it is guarded against. One should remember, however, that synchronization negates the advantage from having higher agility.
+
+В определённой степени опытный кармический грабитель, обретший некоторые навыки и хорошее оружие. Сильный, но медленный. Использует силовую атаку, которая замедляет его близ момента удара. <br> Ожидаемая схема действий: силовая атака, защита, [атака и неудачная атака] (в случайном порядке), защита. <br> <br> Совет: <br> - В то время, как силовая атака даёт великолепную возможность пронести несколько ударов, она потенциально смертельна ввиду высокой силы атаки. Так как она замедляется к моменту удара, можно использовать синхронизацию по скорости (клавиша 'Shift'), чтобы обеспечить успешную защиту. Стоит помнить, однако, что синхронизация лишает преимущества в ловкости.
+
+Poison Wasp/Ядовитая оса
+
+A lethal version of a giant wasp that uses deadly venom. As its kin, fast and nimble. Its poison deals damage over time, so defending against it is imperative. <br> Anticipated action pattern: evade, jab x2, evade, jab x2, poison sting (HP loss).
+
+Смертельный вариант гигансткой осы, использует смертельный яд. Как и её родственница, быстрая и ловкая. Её яд наносит повреждения с течением времени, поэтому оборона против него критична. <br> Ожидаемая схема действий: уклонение, короткий удар x2, уклонение, короткий удар x2, ядовитое жало (потеря ОЖ).
+
+Red Wolf/Бурый волк
+
+A dangerous red wolf with a short temper. Fast and reckless. Whenever it is hit, it becomes enraged and its speed increases. In addition to that, as red wolf's health drops, it starts defending less often. <br> Anticipated action pattern: defend x0-2, attack, [attack and opening] (random order). <br> <br> Hint: <br> - Less frequent and more powerful attacks are preferrable in battle against red wolf, so precision aiming at openings is especially important.
+
+Опасный и крайне вспыльчивый бурый волк. Быстр и безрассуден. Каждый удар злит его и увеличивает его скорость. В дополнение к этому, по мере снижения здоровья бурого волка, он обороняется всё реже. <br> Ожидаемая схема действий: защита x0-2, атака, [атака и уязвимость] (в случайном порядке). <br> <br> Совет: <br> - Менее частые и более мощные атаки предпочтительны в битве с бурым волком, поэтому точные попадания в уязвимости особенно важны.
+
+Armadillo knight/Броненосец-витязь
+
+An armored warrior of the armadillo kin. Armadillos have a penchant for exploring and experiencing different warrior ways. Tough, but slow. Has a fullguard attack, which provides a defense increase instead of a decrease. <br> Anticipated action pattern: fullguard attack, opening, attack, defense.
+
+Бронированный воин из рода броненосцев. Броненосцы имеют склонность к исследованию и испытанию различных воинских традиций. Крепкий, но медлительный. Имеет полностью защищённую атаку, дающую повышение защиты вместо понижения. <br> Ожидаемая схема действий: цельнозащитная атака, уязвимость, атака, защита.
+
+Bandit ringleader/Главарь банды
+
+Danger encounter! <br> <br> A ringleader of a local band. Terrorizes commoners, occasionally commits atrocities and is a bad person overall. Uses power attack and double strike. <br> Anticipated action pattern: defense, double strike, [jab and attack] (random order), power attack. <br> <br> Learnable skill: double strike.
+
+Опасный бой! <br> <br> Главарь местной банды. Терроризирует жителей, иногда учиняет зверства и в целом является плохим человеком. Использует силовую атаку и двойной удар. <br> Ожидаемая схема действий: защита, двойной удар, [короткий удар и атака] (в случайном порядке), силовая атака. <br> <br> Изучаемый навык: двойной удар.
+
+Armadillo vityaz/Броненосец-витязь
+
+Danger encounter! <br> <br> A mighty hero of the armadillo kin. His true cause is long lost, so he wanders the world in search of worthy opponents. Bulat plating and blades were yet to fail him in a fight. <br> Anticipated action pattern: fullguard attack, opening, defend, [counterattack and guarded strike] (random order), defend.
+
+Опасный бой! <br> <br> Могучий герой из рода броненосцев. Его истинные цели давно забыты, так что он бродит по миру в поисках достойных противников. Булатный доспех и лезвия ещё ни разу не подвели его в битве. До этого. <br> Ожидаемая схема действий: цельнозащитная атака, уязвимость, защита, [контратака и осторожный удар] (в случайном порядке), защита.
+
+Green serpent/Зелёный змей
+
+Boss! <br> <br> The legendary 'Stealer of Lives' that leaves his den once in half a year to gather supplies and hunt for sport. It has developed a taste for alcoholic beverages, so it is not uncommon for it to attend at parties as an unwanted guest and slaughter every living being in sight only to consume the spirits in their blood. For this very reason few actually organize feasts at times of year when Stealer of Lives is on the prowl.
+
+Босс! <br> <br> Легендарный 'Похититель Жизней', который покидает своё логово раз в полгода, чтобы запастись едой и поохотиться ради развлечений. Он пристрастился к алкоголю, так что нередко посещает вечеринки в качестве незванного гостя и убивает всех присутствующих исключительно ради спирта в их крови. Именно поэтому немногие рискуют организовывать пиры в то время года, когда Похититель Жизней выходит на охоту.

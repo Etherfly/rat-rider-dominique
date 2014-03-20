@@ -93,15 +93,20 @@ var MS_MENU_MESSAGE = 23;
  * Supported tags: <br>
  * Returns the line count.
  */
-function processText(text, x, y, w, font) {
+function processText(text, w, x, y, font) {
     function writeLine(line, lineCount) {
         fc.beginPath();
         fc.fillStyle = "white";
-        fc.font = font === undefined ? DEFAULT_FONT : font;
+        fc.font = font == null ? DEFAULT_FONT : font;
         fc.fillText(line, x, y + 10 + DEFAULT_LINE_HEIGHT * (lineCount + 1));
     }
 
-    var lineCount = 0;
+    var print = (x != null) && (y != null);
+
+    var processedTextData = {
+        textLines: [],
+        lineCount: 0
+    };
     var charLimitPerLine = Math.floor((w - 30) / DEFAULT_CHAR_WIDTH - 1);
     var words = (typeof text === "string") ? text.split(" ") : text[lang].split(" ");
     if ((words.length != 1) || (words[0] != "")) {
@@ -109,8 +114,11 @@ function processText(text, x, y, w, font) {
         var line = "";
         for (var i = 0; i < words.length; i++) {
             if ((line.length + words[i].length > charLimitPerLine) || (words[i] == "<br>") || (i == words.length - 1)) {
-                writeLine(line, lineCount);
-                lineCount++;
+                if (print) {
+                    writeLine(line, processedTextData.lineCount);
+                }
+                processedTextData.textLines.push(line);
+                processedTextData.lineCount++;
                 line = "";
             }
             if (words[i].indexOf("<") == -1) {
@@ -119,11 +127,11 @@ function processText(text, x, y, w, font) {
         }
     }
 
-    return lineCount;
+    return processedTextData;
 }
 
 function processInfoText(text) {
-    processText(text, INFO_WINDOW_X + 30, INFO_WINDOW_Y, INFO_WINDOW_W);
+    return processText(text, INFO_WINDOW_W, INFO_WINDOW_X + 30, INFO_WINDOW_Y);
 }
 
 /* GUI utility functions */
@@ -786,7 +794,8 @@ function procureDisplayMenuRootAction() {
                     lineCount++;
                     if ((((i == 0) && (menuState == MS_STATS))
                         || ((i == 1) && (menuState >= MS_SKILLS_BROWSE_1) && (menuState <= MS_SKILLS_EXCHANGE_3))
-                        || ((i == 2) && (menuState >= MS_ITEMS_BROWSE_1) && (menuState <= MS_ITEMS_EXCHANGE_2)))
+                        || ((i == 2) && (menuState >= MS_ITEMS_BROWSE_1) && (menuState <= MS_ITEMS_EXCHANGE_2))
+                        || ((i == 3) && (menuState >= MS_CODEX_ROOT) && (menuState <= MS_CODEX_ENTRY)))
                         && (frame % 14 > 6)) {
                         fc.beginPath();
                         fc.drawImage(CURSOR_RIGHT, HP_GAUGE_X + 20, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
@@ -1583,7 +1592,7 @@ function procureDisplayMenuCodexCategoryAction() {
     var displayCodexCategoryAction = new Action();
     displayCodexCategoryAction.entries = [];
     for (var e = 0; e < hero.codexEntries.length; e++) {
-        if (inquireCodex(hero.codexEntries[e]).category == objectChoice[0]) {
+        if (inquireCodex(hero.codexEntries[e].id).category == objectChoice[0]) {
             displayCodexCategoryAction.entries.push(hero.codexEntries[e]);
         }
     }
@@ -1636,11 +1645,20 @@ function procureDisplayMenuCodexCategoryAction() {
                 } else if ((keyPressed == KEY_ACTION) && (displayCodexCategoryAction.entries.length > 0)) {
                     playSfx(SFX_GUI_THUCK);
                     var codexEntrySequence = new Sequence();
-                    codexEntrySequence.addAction(procureDisplayMenuCodexEntryAction().authorizeMenuPlay());
+                    codexEntrySequence.addAction(procureDisplayMenuCodexEntryAction(
+                        displayCodexCategoryAction.entries[objectChoice[1]].id).authorizeMenuPlay());
                     codexEntrySequence.addAction(procureCodeFragmentAction(function () {
                         menuState = MS_CODEX_CATEGORY;
                     }).authorizeMenuPlay());
                     registerObject(GUI_EVENT, codexEntrySequence);
+                    if (!displayCodexCategoryAction.entries[objectChoice[1]].read) {
+                        displayCodexCategoryAction.entries[objectChoice[1]].read = true;
+                        for (e = 0; e < hero.codexEntries.length; e++) {
+                            if (hero.codexEntries[e].id == displayCodexCategoryAction.entries[objectChoice[1]].id) {
+                                hero.codexEntries[e].read = true;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1659,16 +1677,19 @@ function procureDisplayMenuCodexCategoryAction() {
                 }
                 for (i = scrollOffset; (i < displayCodexCategoryAction.entries.length) && (i - scrollOffset < 13); i++) {
                     lineCount++;
-                    if (displayCodexCategoryAction.entries) {
-                        writeLine(inquireCodex(displayCodexCategoryAction.entries[i]).title[lang], "white",
-                            DEFAULT_FONT, lineCount, xOffset);
+                    writeLine(inquireCodex(displayCodexCategoryAction.entries[i].id).title[lang], "white",
+                        DEFAULT_FONT, lineCount, xOffset);
+                    if (!displayCodexCategoryAction.entries[i].read) {
+                        var newMarkOffset = fc.measureText(inquireCodex(displayCodexCategoryAction.entries[i].id).title[lang]).width;
+                        fc.drawImage(getResource("imgQuestMark"), xOffset + newMarkOffset + 5,
+                            HP_GAUGE_Y + MENU_ROOT_Y_OFFSET - 6 + DEFAULT_LINE_HEIGHT * (lineCount + 1), 4, 12);
                     }
                     if (i == objectChoice[1]) {
                         fc.beginPath();
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
                         fc.drawImage(CURSOR_RIGHT, xOffset - 45 + cursorOffset,
                             HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
-                        var entryInfo = ["Info", "Инфа"];
+                        var entryInfo = ["Info", "Инфа 100%"];
                         processInfoText(entryInfo);
                     }
                 }
@@ -1680,9 +1701,7 @@ function procureDisplayMenuCodexCategoryAction() {
                 }
             } else {
                 lineCount++;
-                if (displayCodexCategoryAction.entries) {
-                    writeLine(TXT_CODEX_NO_ENTRIES_YET[lang], "white", DEFAULT_FONT, lineCount, xOffset);
-                }
+                writeLine(TXT_CODEX_NO_ENTRIES_YET[lang], "white", DEFAULT_FONT, lineCount, xOffset);
             }
 
             if ((keyPressed == KEY_ESC) && (menuState == MS_CODEX_CATEGORY)) {
@@ -1696,10 +1715,11 @@ function procureDisplayMenuCodexCategoryAction() {
     return displayCodexCategoryAction;
 }
 
-function procureDisplayMenuCodexEntryAction() {
+function procureDisplayMenuCodexEntryAction(entryId) {
     var displayMenuCodexEntryAction = new Action();
     var scrollTop = getResource("imgScrollTop");
     var scrollBottom = getResource("imgScrollBottom");
+    var entry = inquireCodex(entryId);
     displayMenuCodexEntryAction.definePlayFrame(function (frame) {
         function writeLine(line, color, font, lineCount, offset) {
             fc.beginPath();
@@ -1721,7 +1741,6 @@ function procureDisplayMenuCodexEntryAction() {
         var scrollTopHeight = scrollTop.height * INFO_WINDOW_W / scrollTop.width;
 
         if (frame < 10) {
-            fc.beginPath();
             fc.drawImage(scrollTop, INFO_WINDOW_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, INFO_WINDOW_W, scrollTopHeight);
             fc.fillStyle = "#F1ECAD";
             fc.fillRect(INFO_WINDOW_X + 1, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight,
@@ -1729,7 +1748,6 @@ function procureDisplayMenuCodexEntryAction() {
             fc.drawImage(scrollBottom, INFO_WINDOW_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight
                 + (MENU_ROOT_HEIGHT + 10 + INFO_WINDOW_H - scrollTopHeight * 2) * frame / 10, INFO_WINDOW_W, scrollTopHeight);
         } else {
-            fc.beginPath();
             fc.drawImage(scrollTop, INFO_WINDOW_X, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET, INFO_WINDOW_W, scrollTopHeight);
             fc.fillStyle = "#F1ECAD";
             fc.fillRect(INFO_WINDOW_X + 1, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight,
@@ -1739,39 +1757,59 @@ function procureDisplayMenuCodexEntryAction() {
 
             processTutorialMessages(CH00, CH00_TUTORIAL_MENU_CODEX, CH00_TUTORIAL_MENU_CODEX_TXT);
 
-            var i;
-            var lineCount = 0;
-            var cursorOffset;
-            var xOffset = MENU_SKILLS_AURA_X + 45;
-            //writeLine(TXT_CODEX_CATEGORIES[lang], "white", LARGE_FONT, lineCount, xOffset - 25);
-            lineCount++;
-            if (menuState == MS_CODEX_CATEGORY) {
+            var textLines = processText(entry.text, INFO_WINDOW_W - 60).textLines;
+            var limit = textLines.length - 15;
+            if (limit < 0) {
+                limit = 0;
+            }
+
+            if (menuState == MS_CODEX_ENTRY) {
                 if (keyPressed == KEY_UP) {
                     playSfx(SFX_GUI_TINK);
-                    if (objectChoice[1] > 0) {
-                        objectChoice[1]--;
-                    } else {
-                        objectChoice[1] = displayMenuCodexEntryAction.choices.length - 1;
-                    }
-                    if (objectChoice[1] < scrollOffset) {
-                        scrollOffset--;
-                    } else if ((scrollOffset == 0) && (objectChoice[1] > 12)) {
-                        scrollOffset = objectChoice[1] - 12;
+                    if (objectChoice[2] > 0) {
+                        objectChoice[2]--;
                     }
                 } else if (keyPressed == KEY_DOWN) {
                     playSfx(SFX_GUI_TINK);
-                    if (objectChoice[1] < displayMenuCodexEntryAction.choices.length - 1) {
-                        objectChoice[1]++;
-                    } else {
-                        objectChoice[1] = 0;
+                    if (objectChoice[2] < limit) {
+                        objectChoice[2]++;
                     }
-                    if (objectChoice[1] > 12) {
-                        scrollOffset = objectChoice[1] - 12;
-                    } else {
-                        scrollOffset = 0;
-                    }
-                } else if (keyPressed == KEY_ACTION) {
-                    playSfx(SFX_GUI_THUCK);
+                }
+            }
+
+            if (limit > 0) {
+                fc.beginPath();
+                fc.strokeStyle = "#D1CC8D";
+                fc.lineWidth = 2;
+                fc.moveTo(INFO_WINDOW_X + INFO_WINDOW_W - 45,
+                    HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight);
+                fc.lineTo(INFO_WINDOW_X + INFO_WINDOW_W - 45,
+                    HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight
+                        + MENU_ROOT_HEIGHT + 10 + INFO_WINDOW_H - scrollTopHeight * 2);
+                fc.stroke();
+                var scrollerPosition = HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight
+                    + (MENU_ROOT_HEIGHT + 10 + INFO_WINDOW_H - scrollTopHeight * 2) * objectChoice[2] / limit;
+                fc.beginPath();
+                fc.fillStyle = "#B1AC6D";
+                fc.arc(INFO_WINDOW_X + INFO_WINDOW_W - 45, scrollerPosition, 5, 0, 2 * Math.PI);
+                fc.fill();
+            }
+
+            for (var i = 1 + objectChoice[2]; i < 25 + objectChoice[2]; i++) {
+                if (i == 1) {
+                    fc.textAlign = "center";
+                    writeLine(entry.title[lang], TEXT_COLOR_INK, LARGE_FONT, i, MENU_SKILLS_AVAILABLE_X + INFO_WINDOW_W / 2);
+                    fc.textAlign = "left";
+                }
+                if ((i == 2) && (entry.image != null)) {
+                    var scale = (DEFAULT_LINE_HEIGHT * 4) / entry.image.height;
+                    //if (scale > 1) { scale = 1; }
+                    fc.drawImage(entry.image, INFO_WINDOW_X + (INFO_WINDOW_W - entry.image.width * scale) / 2,
+                        HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight + DEFAULT_LINE_HEIGHT,
+                        entry.image.width * scale, entry.image.height * scale)
+                }
+                if ((i >= 7) && (textLines[i - 7] != null)) {
+                    writeLine(textLines[i - 7], TEXT_COLOR_INK, DEFAULT_FONT, i - objectChoice[2], MENU_SKILLS_AVAILABLE_X + 30);
                 }
             }
 
