@@ -613,7 +613,79 @@ function initializeGui() {
     menuState = MS_NONE;
 }
 
-/* SKILL GAINED / ITEM OBTAINED */
+/* SKILL GAINED / ITEM OBTAINED / NEW CODEX ENTRY */
+
+function procureSkillGainedSequence(skillId) {
+    var skillGainedSequence = new Sequence();
+    skillGainedSequence.addAction(procureDisplaySkillMessageAction(skillId).authorizeMenuPlay());
+    skillGainedSequence.addAction(procureCodeFragmentAction(function () {
+        menuState = MS_NONE;
+    }).authorizeMenuPlay());
+    return skillGainedSequence;
+}
+
+function procureDisplaySkillMessageAction(skillId) {
+    var displayItemMessageAction = new Action();
+    displayItemMessageAction.definePlayFrame(function (frame) {
+        var skill = gainSkill(skillId);
+        var skillLine = TXT_SKILL_GAINED[lang] + skill.name[lang];
+        var lineLength = skillLine.length * LARGE_CHAR_WIDTH + 55;
+
+        if (frame < 10) {
+            drawTextbox((W - lineLength) / 2, H / 2 - 50,
+                lineLength * frame / 10, (12 + LARGE_LINE_HEIGHT) * frame / 10);
+        } else {
+            drawTextbox((W - lineLength) / 2, H / 2 - 50, lineLength, 12 + LARGE_LINE_HEIGHT);
+            fc.beginPath();
+            fc.drawImage(getResource("imgIconMenuSkill"), (W - lineLength ) / 2 + 15, H / 2 - 42, 30, 30);
+            fc.textAlign = "center";
+            fc.fillStyle = "white";
+            fc.font = LARGE_FONT;
+            fc.fillText(skillLine, W / 2 + 16, H / 2 - 50 + LARGE_LINE_HEIGHT - 5);
+            fc.textAlign = "left";
+
+            return (keyPressed == KEY_ACTION) || (keyPressed == KEY_ESC);
+        }
+        return false;
+    });
+    return displayItemMessageAction;
+}
+
+function procureAuraSkillGainedSequence(auraSkillId) {
+    var skillGainedSequence = new Sequence();
+    skillGainedSequence.addAction(procureDisplayAuraSkillMessageAction(auraSkillId).authorizeMenuPlay());
+    skillGainedSequence.addAction(procureCodeFragmentAction(function () {
+        menuState = MS_NONE;
+    }).authorizeMenuPlay());
+    return skillGainedSequence;
+}
+
+function procureDisplayAuraSkillMessageAction(auraSkillId) {
+    var displayItemMessageAction = new Action();
+    displayItemMessageAction.definePlayFrame(function (frame) {
+        var skill = gainSkill(auraSkillId);
+        var skillLine = TXT_AURA_SKILL_GAINED[lang] + skill.name[lang];
+        var lineLength = skillLine.length * LARGE_CHAR_WIDTH + 55;
+
+        if (frame < 10) {
+            drawTextbox((W - lineLength) / 2, H / 2 - 50,
+                lineLength * frame / 10, (12 + LARGE_LINE_HEIGHT) * frame / 10);
+        } else {
+            drawTextbox((W - lineLength) / 2, H / 2 - 50, lineLength, 12 + LARGE_LINE_HEIGHT);
+            fc.beginPath();
+            fc.drawImage(getResource("imgIconMenuAuraSkill"), (W - lineLength ) / 2 + 15, H / 2 - 42, 30, 30);
+            fc.textAlign = "center";
+            fc.fillStyle = TEXT_COLOR_GOLD;
+            fc.font = LARGE_FONT;
+            fc.fillText(skillLine, W / 2 + 16, H / 2 - 50 + LARGE_LINE_HEIGHT - 5);
+            fc.textAlign = "left";
+
+            return (keyPressed == KEY_ACTION) || (keyPressed == KEY_ESC);
+        }
+        return false;
+    });
+    return displayItemMessageAction;
+}
 
 function procureItemObtainedSequence(itemRecord) {
     var itemObtainedSequence = new Sequence();
@@ -644,7 +716,43 @@ function procureDisplayItemMessageAction(itemRecord) {
             fc.fillText(itemLine, W / 2 + 16, H / 2 - 50 + LARGE_LINE_HEIGHT - 5);
             fc.textAlign = "left";
 
-            return keyPressed == KEY_ACTION;
+            return keyPressed == (KEY_ACTION) || (keyPressed == KEY_ESC);
+        }
+        return false;
+    });
+    return displayItemMessageAction;
+}
+
+function procureNewCodexEntrySequence(entryId) {
+    var skillGainedSequence = new Sequence();
+    skillGainedSequence.addAction(procureDisplayCodexEntryMessageAction(entryId).authorizeMenuPlay());
+    skillGainedSequence.addAction(procureCodeFragmentAction(function () {
+        menuState = MS_NONE;
+    }).authorizeMenuPlay());
+    return skillGainedSequence;
+}
+
+function procureDisplayCodexEntryMessageAction(entryId) {
+    var displayItemMessageAction = new Action();
+    displayItemMessageAction.definePlayFrame(function (frame) {
+        var entry = inquireCodex(entryId);
+        var skillLine = TXT_NEW_CODEX_ENTRY[lang] + entry.title[lang];
+        var lineLength = skillLine.length * LARGE_CHAR_WIDTH + 55;
+
+        if (frame < 10) {
+            drawTextbox((W - lineLength) / 2, H / 2 - 50,
+                lineLength * frame / 10, (12 + LARGE_LINE_HEIGHT) * frame / 10);
+        } else {
+            drawTextbox((W - lineLength) / 2, H / 2 - 50, lineLength, 12 + LARGE_LINE_HEIGHT);
+            fc.beginPath();
+            fc.drawImage(getResource("imgIconMenuCodex"), (W - lineLength ) / 2 + 15, H / 2 - 42, 30, 30);
+            fc.textAlign = "center";
+            fc.fillStyle = "white";
+            fc.font = LARGE_FONT;
+            fc.fillText(skillLine, W / 2 + 16, H / 2 - 50 + LARGE_LINE_HEIGHT - 5);
+            fc.textAlign = "left";
+
+            return (keyPressed == KEY_ACTION) || (keyPressed == KEY_ESC);
         }
         return false;
     });
@@ -1563,16 +1671,20 @@ function procureDisplayMenuCodexAction() {
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
                         fc.drawImage(CURSOR_RIGHT, xOffset - 45 + cursorOffset, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
                             + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                        processInfoText(getCategoryDescById(objectChoice[0]));
                     }
                 }
             } else {
                 for (i = 0; i < displayMenuCodexAction.choices.length; i++) {
                     lineCount++;
                     writeLine(displayMenuCodexAction.choices[i][lang], "white", DEFAULT_FONT, lineCount, xOffset);
-                    if ((i == objectChoice[0]) && (frame % 14 > 6)) {
-                        fc.beginPath();
-                        fc.drawImage(CURSOR_RIGHT, xOffset - 25, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
-                            + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                    if (i == objectChoice[0]) {
+                        if (frame % 14 > 6) {
+                            fc.beginPath();
+                            fc.drawImage(CURSOR_RIGHT, xOffset - 25, HP_GAUGE_Y + MENU_ROOT_Y_OFFSET
+                                + 20 + DEFAULT_LINE_HEIGHT * lineCount);
+                        }
+                        processInfoText(getCategoryDescById(objectChoice[0]));
                     }
                 }
             }
@@ -1689,8 +1801,6 @@ function procureDisplayMenuCodexCategoryAction() {
                         cursorOffset = (frame % 20 < 10) ? 20 : 25;
                         fc.drawImage(CURSOR_RIGHT, xOffset - 45 + cursorOffset,
                             HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + 20 + DEFAULT_LINE_HEIGHT * lineCount);
-                        var entryInfo = ["Info", "Инфа 100%"];
-                        processInfoText(entryInfo);
                     }
                 }
                 if ((i < displayCodexCategoryAction.entries.length)) {
@@ -1805,7 +1915,7 @@ function procureDisplayMenuCodexEntryAction(entryId) {
                     var scale = (DEFAULT_LINE_HEIGHT * 4) / entry.image.height;
                     //if (scale > 1) { scale = 1; }
                     fc.drawImage(entry.image, INFO_WINDOW_X + (INFO_WINDOW_W - entry.image.width * scale) / 2,
-                        HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight + DEFAULT_LINE_HEIGHT,
+                        HP_GAUGE_Y + MENU_ROOT_Y_OFFSET + scrollTopHeight + (i - 1) * DEFAULT_LINE_HEIGHT,
                         entry.image.width * scale, entry.image.height * scale)
                 }
                 if ((i >= 7) && (textLines[i - 7] != null)) {

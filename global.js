@@ -139,6 +139,9 @@ attrIncrease[ATTR_DEFENSE] = 0;     // defense is increased by defending
 attrIncrease[ATTR_AGILITY] = 0;     // agility is increased by rapid actions, one after another
 attrIncrease[ATTR_REFLEXES] = 0;    // reflexes are increased by precision actions, like attacking the enemy
                                     // in a weakpoint or defending right when the enemy attacks
+
+var itemsLooted = [];
+var skillsLearned = [];
 // attribute increase bases
 var AIB_ATTACK = 0.1;
 var AIB_DEFENSE = 0.2;
@@ -771,17 +774,32 @@ function handleBattleEnd() {
     }
     if (hero.hp > 0) {
         var karmaGained = enemy.getKarma();
+        skillsLearned = skillsLearned.filter(function (skill) { return !hero.hasSkill(skill); });
+        var skillMessage = ["", ""];
+        if (skillsLearned.length > 0) {
+            var skillListEng = "";
+            var skillListRus = "";
+            for (var i = 0; i < skillsLearned.length; i++) {
+                skillListEng += gainSkill(skillsLearned[i]).name[LANG_ENG];
+                skillListRus += gainSkill(skillsLearned[i]).name[LANG_RUS];
+                if (i < skillsLearned.length - 1) {
+                    skillListEng += ", ";
+                    skillListRus += ", ";
+                }
+            }
+            skillMessage = [TXT_BATTLE_RESULTS_6[LANG_ENG] + skillListEng, TXT_BATTLE_RESULTS_6[LANG_RUS] + skillListRus];
+        }
         var battleResultsMessage = [
             TXT_BATTLE_RESULTS_1[LANG_ENG] + Math.floor(attrIncrease[ATTR_ATTACK] * 100) + "%"
                 + TXT_BATTLE_RESULTS_2[LANG_ENG] + Math.floor(attrIncrease[ATTR_DEFENSE] * 100) + "%"
                 + TXT_BATTLE_RESULTS_3[LANG_ENG] + Math.floor(attrIncrease[ATTR_AGILITY] * 100) + "%"
                 + TXT_BATTLE_RESULTS_4[LANG_ENG] + Math.floor(attrIncrease[ATTR_REFLEXES] * 100) + "%"
-                + " <br> <br> " + TXT_KARMA[LANG_ENG] + " +" + karmaGained,
+                + " <br> <br> " + TXT_KARMA[LANG_ENG] + " +" + karmaGained + skillMessage[LANG_ENG],
             TXT_BATTLE_RESULTS_1[LANG_RUS] + Math.floor(attrIncrease[ATTR_ATTACK] * 100) + "%"
                 + TXT_BATTLE_RESULTS_2[LANG_RUS] + Math.floor(attrIncrease[ATTR_DEFENSE] * 100) + "%"
                 + TXT_BATTLE_RESULTS_3[LANG_RUS] + Math.floor(attrIncrease[ATTR_AGILITY] * 100) + "%"
                 + TXT_BATTLE_RESULTS_4[LANG_RUS] + Math.floor(attrIncrease[ATTR_REFLEXES] * 100) + "%"
-                + " <br> <br> " + TXT_KARMA[LANG_RUS] + " +" + karmaGained
+                + " <br> <br> " + TXT_KARMA[LANG_RUS] + " +" + karmaGained + skillMessage[LANG_RUS]
         ];
         battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, battleResultsMessage, true));
         battleEndSequence.addAction(procureCodeFragmentAction(function () {
@@ -793,14 +811,39 @@ function handleBattleEnd() {
                 attrIncrease[i] = 0;
             }
             hero.addKarma(karmaGained);
-        }));
-        if (eventBattleEndSequence != null) {
+
+            var levelingSkillList = getLevelingSkills();
+            if (levelingSkillList.length > 0) {
+                battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, TXT_BATTLE_RESULTS_SKILLS, true));
+                for (i = 0; i < levelingSkillList.length; i++) {
+                    var levelingSkillId = levelingSkillList[i];
+                    battleEndSequence.addAction(procureCodeFragmentAction(function (skillId) {
+                        hero.gainSkill(skillId);
+                    }, levelingSkillId));
+                }
+            }
             battleEndSequence.addAction(procureCodeFragmentAction(function () {
-                registerObject(GUI_EVENT, eventBattleEndSequence);
+                if (enemy.codexEntry != null) {
+                    hero.obtainCodexEntry(enemy.codexEntry);
+                }
             }));
-        } else {
-            battleEndSequence.addAction(procureResumeAction());
+            if (eventBattleEndSequence != null) {
+                battleEndSequence.addAction(procureCodeFragmentAction(function () {
+                    registerObject(GUI_EVENT, eventBattleEndSequence);
+                }));
+            } else {
+                battleEndSequence.addAction(procureResumeAction());
+            }
+        }));
+        for (i = 0; i < skillsLearned.length; i++) {
+            var skillId = skillsLearned[i];
+            battleEndSequence.addAction(procureCodeFragmentAction(function (skillId) {
+                hero.gainSkill(skillId);
+            }, skillId));
         }
+        battleEndSequence.addAction(procureCodeFragmentAction(function () {
+            skillsLearned.length = 0;
+        }));
     } else {
         displayGui = false;
         battleEndSequence.addAction(procureDisplayCenteredMessageAction(WW_SMALL, TXT_DOMINIQUE_HAS_FALLEN, true)

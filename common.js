@@ -173,10 +173,10 @@ function procureAuraSkillSequence(character, auraImage, skillName) {
 
 /* ACTIONS */
 
-function procureCodeFragmentAction(func) {
+function procureCodeFragmentAction(func, args) {
     var fragmentAction = new Action();
     fragmentAction.definePlayFrame(function (frame) {
-        func();
+        func(args);
         return true;
     });
     return fragmentAction;
@@ -1024,7 +1024,7 @@ function acquireTriggerArtifact(triggerFunction, position, cooldown, image) {
     var triggerArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
     triggerArtifact.defineGetEffect(function (position, character) {
         if (position <= BGL_LEFT) {
-            triggerFunction();
+            triggerFunction(character);
             return true;
         } else {
             return false;

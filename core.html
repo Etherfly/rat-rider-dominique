@@ -29,6 +29,9 @@
             <img id="imgIconAttrDefense" src="resources/other/icons/attrDefense.png">
             <img id="imgIconAttrAgility" src="resources/other/icons/attrAgility.png">
             <img id="imgIconAttrReflexes" src="resources/other/icons/attrReflexes.png">
+            <img id="imgIconMenuSkill" src="resources/other/icons/menuSkill.png">
+            <img id="imgIconMenuAuraSkill" src="resources/other/icons/menuAuraSkill.png">
+            <img id="imgIconMenuCodex" src="resources/other/icons/menuCodex.png">
             <img id="imgKarma" src="resources/other/karma.png">
             <img id="imgBattleGauges" src="resources/other/battleGauges.png">
             <img id="imgFlashLabel" src="resources/other/flashLabel.png">
@@ -321,9 +324,22 @@
 
     var TXT_CODEX_CATEGORIES = ["Categories", "Категории"];
     var TXT_CODEX_LANDMARKS = ["Landmarks", "Объекты на местности"];
+    var TXT_CODEX_LANDMARKS_DESC = ["Landmarks <br> <br> This category contains information about different objects Dominique can come " +
+            "across during his travels, e.g., chests, buildings, milestones.", "Объекты на местности <br> <br> Эта категория содержит " +
+            "информацию о различных объектах, которые Доминик может встретить на своём пути, такие как сундуки, строения, мильные камни."];
     var TXT_CODEX_ENEMIES = ["Enemies", "Враги"];
+    var TXT_CODEX_ENEMIES_DESC = [
+        "Enemies <br> <br> This category contains information about Dominique's adversaries that he fought at some point.",
+        "Враги <br> <br> Эта категория содержит информацию о противниках Доминика, с которыми ему доводилось сражаться."
+    ];
     var TXT_CODEX_LORE = ["Lore", "Знания"];
+    var TXT_CODEX_LORE_DESC = ["Lore <br> <br> This category contains information about the world, Ecumos, where Dominique lives, " +
+            "including cosmology, history and culture.", "Знания <br> <br> Эта категория содержит информацию о мире под названием Экумос, в " +
+            "котором живёт Доминик. Включает в себя знания о космологии, истории и культуре."];
     var TXT_CODEX_JOURNAL = ["Journal", "Журнал"];
+    var TXT_CODEX_JOURNAL_DESC = ["Journal <br> <br> This category contains information about Dominique's adventures up to this point. " +
+            "You may view your current goals here.", "Журнал <br> <br> Эта категория содержит информацию о приключениях Доминика до этого " +
+            "момента. Здесь можно посмотреть Ваши текущие цели."];
 
     var TXT_CODEX_NO_ENTRIES_YET = ["This category is empty yet.", "Эта категория пока что пуста."];
 
@@ -395,8 +411,10 @@
     var TXT_INFLICTED = ["Status inflicted: ", "Наложен статус: "];
     var TXT_ACTIVATED = ["Status activated: ", "Активирован статус: "];
 
-    var TXT_SKILL_GAINED = ["Skill gained! ", "Получен навык: "];
-    var TXT_ITEM_OBTAINED = ["Item obtained! ", "Получен предмет: "];
+    var TXT_SKILL_GAINED = ["Skill gained: ", "Получен навык: "];
+    var TXT_AURA_SKILL_GAINED = ["Aura skill gained: ", "Получен аура-навык: "];
+    var TXT_ITEM_OBTAINED = ["Item obtained: ", "Получен предмет: "];
+    var TXT_NEW_CODEX_ENTRY = ["New codex entry: ", "Новая запись в кодексе: "];
 
     var TXT_HOTKEY = [" (Hotkey: '", " (Клавиша: '"];
     var TXT_NOCHOSENITEM = ["No item selected", "Предмет не выбран"];
@@ -411,6 +429,12 @@
     var TXT_BATTLE_RESULTS_2 = [" <br> Defense growth +", " <br> Прирост защиты +"];
     var TXT_BATTLE_RESULTS_3 = [" <br> Agility growth +", " <br> Прирост ловкости +"];
     var TXT_BATTLE_RESULTS_4 = [" <br> Reflexes growth +", " <br> Прирост реакции +"];
+    var TXT_BATTLE_RESULTS_5 = [" <br> <br> Items found: <br> ", " <br> <br> Найденные предметы: <br> "];
+    var TXT_BATTLE_RESULTS_6 = [" <br> <br> Skills learned from the enemy: <br> ",
+        " <br> <br> Навыки, которым Доминик научился у врага: <br> "];
+
+    var TXT_BATTLE_RESULTS_SKILLS = ["Dominique's skills are improving and he is learning new ones.",
+        "Навыки Доминика оттачиваются, и он учится новым."];
 
     var TXT_DOMINIQUE_HAS_FALLEN = ["Dominique has fallen in battle... <br> <br> "
             + "But who said his story is meant to end this way?.. <br> ", "Доминик пал в бою... <br> <br> "

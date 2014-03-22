@@ -393,6 +393,31 @@ function gainSkill(id) {
     }
 }
 
+/* HERO LEVELING SKILL GAINS */
+
+var levelingSkills = [
+    {id: SKL_CHARGE, attrAttack: 20, attrDefense: 15, attrAgility: 10, attrReflexes: 10},
+    {id: SKL_JAB, attrAttack: 15, attrDefense: 15, attrAgility: 12, attrReflexes: 11},
+    {id: SKL_COUNTERATTACK, attrAttack: 20, attrDefense: 20, attrAgility: 12, attrReflexes: 14},
+    {id: SKL_GUARDEDSTRIKE, attrAttack: 25, attrDefense: 28, attrAgility: 15, attrReflexes: 15},
+    {id: SKL_RATRIDERDANCE, attrAttack: 40, attrDefense: 35, attrAgility: 23, attrReflexes: 20}
+];
+
+function getLevelingSkills() {
+    var levelingSkillList = [];
+    for (var i = 0; i < levelingSkills.length; i++) {
+        if (!hero.hasSkill(levelingSkills[i].id)) {
+            if ((hero.attrAttack >= levelingSkills[i].attrAttack)
+                && (hero.attrDefense >= levelingSkills[i].attrDefense)
+                && (hero.attrAgility >= levelingSkills[i].attrAgility)
+                && (hero.attrReflexes >= levelingSkills[i].attrReflexes)) {
+                levelingSkillList.push(levelingSkills[i].id);
+            }
+        }
+    }
+    return levelingSkillList;
+}
+
 /* ENEMY SKILLS */
 
 function gainOpenerSkill(cooldown) {
@@ -504,6 +529,48 @@ function gainFullguardAttackSkill(width, armor) {
         ];
     });
     return fullguardAttackSkill;
+}
+
+function gainLearnableDoubleStrikeSkill() {
+    var doubleStrikeSkill = new CombatSkill(["Double strike", "Двойной удар"], [
+        "Double strike skill for the enemy, so the hero can learn it."], 15);
+    var hitCount = 0;
+    doubleStrikeSkill.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                80, 80, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
+            acquireTriggerArtifact(function (character) {
+                playBattleSfx(character, "sound/sfx/hit.ogg");
+                character.strike(0.7);
+                if ((hitCount < 2) && (hero.effDefense > 1)) {
+                    hitCount++;
+                } else if (hitCount < 2) {
+                    hitCount = 0;
+                }
+            }, getAbsoluteArtifactPosition(position) - 30, 10, getResource("imgBattleImpactIcon")),
+            acquireTriggerArtifact(function (character) {
+                playBattleSfx(character, "sound/sfx/hit.ogg");
+                character.strike(0.7);
+                if ((hitCount < 2) && (hero.effDefense > 1)) {
+                    hitCount++;
+                } else if (hitCount < 2) {
+                    hitCount = 0;
+                }
+                if ((hitCount == 2) && !hero.hasSkill(SKL_DOUBLESTRIKE)) {
+                    skillsLearned.push(SKL_DOUBLESTRIKE);
+                    registerObject(GUI_EVENT, procureStatusTextAction(hero, TEXT_COLOR_INK,
+                        ["Dominique learns something new!", "Доминик учится новому!"]
+                    ));
+                    hitCount++;
+                } else if (hitCount < 2) {
+                    hitCount = 0;
+                }
+            }, getAbsoluteArtifactPosition(position) + 30, 10, getResource("imgBattleImpactIcon")),
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position) - 30, getResource("imgBattleImpactIcon"), 0.7),
+            acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 30, getResource("imgBattleImpactIcon"), 0.7)
+        ];
+    });
+    return doubleStrikeSkill;
 }
 
 function gainLieInWaitSkill(width, defenseFluct, agilityFluct) {

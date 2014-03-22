@@ -335,8 +335,7 @@ function Hero() {
     this.animationFrame = 0;
 
     // TODO: temporary filled skills and items!
-    this.availableSkills = [SKL_JAB, SKL_CHARGE, SKL_COUNTERATTACK, SKL_GUARDEDSTRIKE, SKL_RATRIDERDANCE,
-        SKL_DEEPBREATH, SKL_EVADE, SKL_NETCAST, SKL_DOUBLESTRIKE];
+    this.availableSkills = [SKL_DEEPBREATH];
     this.availableAuraSkills = [SKL_ACEOFSPADES];
     this.activeSkills = [SKL_ATTACK, SKL_DEFEND];
     this.activeAuraSkills = [];
@@ -349,13 +348,7 @@ function Hero() {
 
     this.codexEntries = [{id: CDX_CH00HOUSE, read: false}, {id: CDX_CH00HOTSPRING, read: false}, {id: CDX_CH00INN, read: false},
         {id: CDX_CH00SMITHY, read: false}, {id: CDX_CH00DOJO, read: false}, {id: CDX_CH00CHRONICLER, read: false},
-        {id: CDX_CH00LIBRARY, read: false}, {id: CDX_CH00TRADINGPOST, read: false}, {id: CDX_CH00MILESTONE, read: false},
-        {id: CDX_CH00ENM_BANDIT, read: false}, {id: CDX_CH00ENM_WOLF, read: false}, {id: CDX_CH00ENM_WASP, read: false},
-        {id: CDX_CH00ENM_BRIGAND, read: false}, {id: CDX_CH00ENM_POISONWASP, read: false}, {id: CDX_CH00ENM_REDWOLF, read: false},
-        {id: CDX_CH00ENM_ARMADILLOKNIGHT, read: false}, {id: CDX_CH00ENM_BANDITRINGLEADER, read: false},
-        {id: CDX_CH00ENM_ARMADILLOVITYAZ, read: false}, {id: CDX_CH00ENM_GREENSERPENT, read: false},
-        {id: CDX_LORE001_NATURALORDER, read: false}, {id: CDX_LORE002_SOURCESOFKARMA, read: true}, {id: CDX_LORE003_ROBBERSANDDEALERS, read: false},
-        {id: CDX_LORE004_ONDEITIES, read: false}, {id: CDX_LORE005_HUMANSOCIETY, read: false}];
+        {id: CDX_CH00LIBRARY, read: false}, {id: CDX_CH00TRADINGPOST, read: false}, {id: CDX_CH00MILESTONE, read: false}];
 
     this.skillSet = [];
     this.battleGaugeArtifacts = [];
@@ -658,15 +651,24 @@ function Hero() {
         }
     };
 
+    this.hasSkill = function (skillId) {
+        return (this.availableSkills.indexOf(skillId) >= 0) || (this.availableAuraSkills.indexOf(skillId) >= 0)
+            || (this.activeSkills.indexOf(skillId) >= 0);
+    };
+
     this.gainSkill = function (skillId) {
-        if ((this.availableSkills.indexOf(skillId) >= 0) && (this.activeSkills.indexOf(skillId) >= 0)) {
+        if (!this.hasSkill(skillId)) {
             this.availableSkills.push(skillId);
+            menuState = MS_SKILL_GAINED;
+            registerObject(GUI_EVENT, procureSkillGainedSequence(skillId));
         }
     };
 
     this.gainAuraSkill = function (skillId) {
-        if ((this.availableAuraSkills.indexOf(skillId) >= 0) && (this.activeSkills.indexOf(skillId) >= 0)) {
+        if (!this.hasSkill(skillId)) {
             this.availableAuraSkills.push(skillId);
+            menuState = MS_SKILL_GAINED;
+            registerObject(GUI_EVENT, procureAuraSkillGainedSequence(skillId));
         }
     };
 
@@ -680,10 +682,22 @@ function Hero() {
         registerObject(GUI_EVENT, procureItemObtainedSequence(itemRecord));
     };
 
+    this.hasCodexEntry = function (entryId) {
+        var hasEntry = false;
+        for (var i = 0; i < this.codexEntries.length; i++) {
+            if ((this.codexEntries[i] != null) && (this.codexEntries[i].id == entryId)) {
+                hasEntry = true;
+            }
+        }
+        return hasEntry;
+    };
+
     this.obtainCodexEntry = function (entryId) {
-        this.codexEntries.push(entryId);
-        menuState = MS_NEW_CODEX_ENTRY;
-        //registerObject(GUI_EVENT, procureItemObtainedSequence(itemRecord));
+        if (!this.hasCodexEntry(entryId)) {
+            this.codexEntries.push({id: entryId, read: false});
+            menuState = MS_NEW_CODEX_ENTRY;
+            registerObject(GUI_EVENT, procureNewCodexEntrySequence(entryId));
+        }
     };
 
     this.setAnimationState = function (animationState) {
@@ -784,7 +798,7 @@ function Hero() {
     this.move = function() {};
 }
 
-function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, animationObject) {
+function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, animationObject, codexEntry) {
     this.attrAttack = attrAttack;
     this.attrDefense = attrDefense;
     this.attrAgility = attrAgility;
@@ -800,6 +814,8 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
     this.effReflect = 1;
 
     this.animationObject = animationObject;
+
+    this.codexEntry = codexEntry != undefined ? codexEntry : null;
 
     this.battleGaugeArtifacts = [];
 

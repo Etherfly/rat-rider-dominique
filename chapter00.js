@@ -321,6 +321,34 @@ var CH00_RFXDOJO_05 = [
     "Доминик берёт немного клинокрыла вместо того, чтобы тренироваться. Ну, что ж, это тоже вариант."
 ];
 
+var CH00_LIBRARY_01 = [
+    "A majestic building stands tall before Dominique and Sallinger, its spire rising to the sky. " +
+        "This is a library, a temple of learning, where all are free to dive into the world's knowledge. It's probably a great " +
+        "place to spend time and improve oneself, since new things may be learnt here, and even if they are not immediately " +
+        "useful, broadening horizons contributes to one's karmic wealth. <br> <br> Would you like to stay?",
+    "Величественное здание с уходящим в небо шпилем возвышается над Домиником и Сэллинджером. Это библиотека, храм " +
+        "познания, где все могут абсолютно свободно нырнуть в мир знаний. Это отличное место, где можно провести время " +
+        "и стать лучше, ибо здесь узнаётся много нового, и даже если оно не будет полезным сразу, расширение горизонтов " +
+        "вносит лепту в кармическое богатство. <br> <br> Желаете остановиться?"];
+
+var CH00_LIBRARY_02_1 = [
+    "Walking in the seemingly infinite bookshelf labyrinth, Dominique looks through the books and finally picks one. " +
+        "He silently sits by the table in the corner and starts delving into its contents, taking notes in his codex.",
+    "Бродя в кажущимся бесконечным лабиринте книжных полок, Доминик осматривает книги и, наконец, выбирает одну. Тихо сев " +
+        "в уголок за письменный стол, он начинает погружаться в её содержимое и попутно делать заметки в своём кодексе."];
+var CH00_LIBRARY_02_2 = [
+    "Walking in the seemingly infinite bookshelf labyrinth, Dominique looks through the books and finally picks one. " +
+        "He silently sits by the table in the corner and starts delving into its contents, enjoying beautiful classic poetry.",
+    "Бродя в кажущимся бесконечным лабиринте книжных полок, Доминик осматривает книги и, наконец, выбирает одну. Тихо сев " +
+        "в уголок за письменный стол, он начинает погружаться в её содержимое и наслаждаться прекрасными классическими стихами."];
+var CH00_LIBRARY_02_3 = [
+    "Walking in the seemingly infinite bookshelf labyrinth, Dominique looks through the books and notices one titled " +
+        "\"The Art of Not Being Hit in the First Place\". He proceeds to carefully study its contents and concludes that he should " +
+        "try practicing what he just learned",
+    "Бродя в кажущимся бесконечным лабиринте книжных полок, Доминик осматривает книги и обнаруживает одну, озаглавленную " +
+        "\"Искусство Изначально не Попадать под Удары\". Он аккуратно изучает её содержимое и заключает, что ему неплохо бы " +
+        "попрактиковаться в том, что он только что освоил."];
+
 var CH00_HOUSE_REST_01 = [
     " greets Dominique by the house and invites inside to share a meal. Being a rat rider certainly has some "
         + "advantages, especially in a land where bandits roam. <br> <br> Staying here will restore some HP or SP "
@@ -390,6 +418,13 @@ var CH00_COMMON_CHEST_02_2 = [
 var CH00_COMMON_CHEST_02_3 = [
     "As Dominique opens the chest, a cloud of dust bursts from it! He starts feeling funny.",
     "Когда Доминик открыл сундук, из него вырвалось облако пыли! Доминику становится нехорошо."
+];
+
+var CH00_COMMON_CHEST_02_4 = [
+    "Dominique opens the chest and finds a hemp net with many pages of text describing different techniques of using " +
+        "it to ensnare enemies. This certainly seems useful.",
+    "Доминик открывает сундук и находит там пеньковую сеть с многостраничным описанием различных техник поимки в неё врагов. " +
+        "Определённо полезная вещь."
 ];
 
 var CH00_DESTROYED_HOUSE = [
@@ -483,6 +518,13 @@ function createPrologueLandscape() {
         this.addLandmarkType(describeHouseWorkType(0.1));
         this.addLandmarkType(describeTradingPostType(0.1));
         this.addLandmarkType(describeCommonChestType(0.1));
+        this.addLandmarkType(describeCodexLibraryType(0.1));
+        if (!hero.hasSkill(SKL_NETCAST)) {
+            this.addLandmarkType(describeCh00SkillChestType(0.05));
+        }
+        if (!hero.hasSkill(SKL_EVADE)) {
+            this.addLandmarkType(describeSkillLibraryType(0.05));
+        }
         this.addLandmarkType(describeTrainerType(0.07));
         if (gst[CH00][CH00_PHASE] == 1) {
             this.addLandmarkType(describeBanditType(0.15));
@@ -512,7 +554,7 @@ function createPrologueLandscape() {
             this.addLandmarkType(describeRedWolfType(0.1));
             this.addLandmarkType(describePoisonWaspType(0.1));
             this.addLandmarkType(describeArmadilloKnightType(0.1));
-            this.addLandmarkType(describeBanditRingleaderType(0.05));
+            this.addLandmarkType(describeBanditRingleaderType(0.205));
             this.addLandmarkType(describeArmadilloVityazType(0.05));
             this.addLandmarkType(describeGreenSerpentType(0.1));
         }
@@ -1152,6 +1194,91 @@ function describeTradingPostType(chance) {
     return objectType;
 }
 
+// TODO: do a good implementation of the library
+function describeCodexLibraryType(chance) {
+    var libraryType = new LandmarkType(chance);
+    libraryType.defineGenerateLandmark(function (path, position) {
+        var library = new Landmark(path, position, 0, getResource("imgObjLibrary"));
+        library.defineTrigger(function () {
+            var librarySequence = new Sequence();
+            librarySequence.addAction(procureStopAction());
+            librarySequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, CH00_LIBRARY_01, true)
+                .addChoice(TXT_YES).addChoice(TXT_NO));
+            librarySequence.addAction(procureCodeFragmentAction(function () {
+                if (eventChoice == 0) {
+                    if (!hero.hasCodexEntry(CDX_LORE005_HUMANSOCIETY)) {
+                        librarySequence.addAction(
+                            procureDisplayCenteredMessageAction(WW_SMALL, CH00_LIBRARY_02_1, true));
+                        librarySequence.addAction(procureCodeFragmentAction(function () {
+                            var codexEntryGained = false;
+                            var i = 0;
+                            while (!codexEntryGained && (i < 5)) {
+                                if (!hero.hasCodexEntry(1001 + i)) {
+                                    hero.obtainCodexEntry(1001 + i);
+                                    codexEntryGained = true;
+                                }
+                                i++;
+                            }
+                        }));
+                    } else {
+                        librarySequence.addAction(
+                            procureDisplayCenteredMessageAction(WW_SMALL, CH00_LIBRARY_02_2, true));
+                    }
+                    librarySequence.addAction(procureCodeFragmentAction(function () {
+                        var karmaGained = 0;
+                        for (i = 0; i < hero.codexEntries.length; i++) {
+                            if ((hero.codexEntries[i] != null) && (hero.codexEntries[i].read)) {
+                                karmaGained++;
+                            }
+                        }
+                        karmaGained = Math.floor(karmaGained * (0.75 + 0.5 * Math.random()));
+                        hero.addKarma(karmaGained);
+                    }));
+                } else {
+                    librarySequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
+                }
+                librarySequence.addAction(procureResumeAction());
+            }));
+            registerObject(GUI_EVENT, librarySequence);
+        });
+        return library;
+    });
+    return libraryType;
+}
+
+// TODO: do a good implementation of the skill library
+function describeSkillLibraryType(chance) {
+    var libraryType = new LandmarkType(chance);
+    libraryType.singletonId = "singleton: ch00_skill_evade";
+    libraryType.defineGenerateLandmark(function (path, position) {
+        var library = new Landmark(path, position, 0, getResource("imgObjLibrary"));
+        library.defineTrigger(function () {
+            var librarySequence = new Sequence();
+            librarySequence.addAction(procureStopAction());
+            librarySequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, CH00_LIBRARY_01, true)
+                .addChoice(TXT_YES).addChoice(TXT_NO));
+            librarySequence.addAction(procureCodeFragmentAction(function () {
+                if (eventChoice == 0) {
+                    librarySequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, CH00_LIBRARY_02_3, true));
+                    librarySequence.addAction(procureCodeFragmentAction(function () {
+                        hero.gainSkill(SKL_EVADE);
+                        landscape.actualize();
+                    }));
+                } else {
+                    librarySequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
+                }
+                librarySequence.addAction(procureResumeAction());
+            }));
+            registerObject(GUI_EVENT, librarySequence);
+        });
+        return library;
+    });
+    return libraryType;
+}
+
 function describeCommonChestType(chance) {
     var objectType = new LandmarkType(chance);
     objectType.defineGenerateLandmark(function (path, position) {
@@ -1231,6 +1358,39 @@ function describeCommonChestType(chance) {
     return objectType;
 }
 
+// TODO: do a good implementation of the skill chest
+function describeCh00SkillChestType(chance) {
+    var objectType = new LandmarkType(chance);
+    objectType.singletonId = "singleton: ch00_skill_netcast";
+    objectType.defineGenerateLandmark(function (path, position) {
+        var object = new Landmark(path, position, 50, getResource("imgObjChest1"));
+        object.layerOffset = -2;
+        object.defineTrigger(function () {
+            var objectSequence = new Sequence();
+            objectSequence.addAction(procureStopAction());
+            objectSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, CH00_COMMON_CHEST_01, true)
+                .addChoice(TXT_YES).addChoice(TXT_NO));
+            objectSequence.addAction(procureCodeFragmentAction(function () {
+                if (eventChoice == 0) {
+                    objectSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, CH00_COMMON_CHEST_02_4, true));
+                    objectSequence.addAction(procureCodeFragmentAction(function () {
+                        hero.gainSkill(SKL_NETCAST);
+                        landscape.actualize();
+                    }));
+                } else {
+                    objectSequence.addAction(
+                        procureDisplayCenteredMessageAction(WW_SMALL, TXT_SUIT_YOURSELF, true));
+                }
+                objectSequence.addAction(procureResumeAction());
+            }));
+            registerObject(GUI_EVENT, objectSequence);
+        });
+        return object;
+    });
+    return objectType;
+}
+
 function describeDestroyedHouseType(chance) {
     var objectType = new LandmarkType(chance);
     objectType.singletonId = "singleton: ch00_phase01";
@@ -1275,7 +1435,7 @@ function describeMilestoneType(chance) {
                 .addChoice(TXT_YES).addChoice(TXT_NO));
             objectSequence.addAction(procureCodeFragmentAction(function () {
                 if (eventChoice == 0) {
-                    terminated = true;
+                    triggered = true;
                     gst[CH00][CH00_PHASE]++;
                     landscape.actualize();
                     objectSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, CH00_MILESTONE_02, true));
@@ -1290,7 +1450,7 @@ function describeMilestoneType(chance) {
                                 ["Hold on a second. I'm sure you've realized this by now, of course, but just in "
                                     + "case... Memento mori. If you fall in battle it's all over. So be careful and "
                                     + "talk to chroniclers often.",
-                                    "Погоди секунду. Я уверен, что ты это, конечно, уже осознал, но на всякий случай..."
+                                    "Погоди секунду. Я уверен, что ты это, конечно, уже осознал, но на всякий случай... "
                                         + "Мементо мори. Если ты падёшь в битве, всё кончено. Так что будь осторожен и "
                                         + "почаще общайся с летописцами."]));
                             dangerTutorialSequence.addAction(procureDisplaySpeechMessageAction(
@@ -1411,7 +1571,7 @@ function describeGreenSerpentType(chance) {
 /* ENEMIES */
 
 function enlistTutorialBandit(animationObject) {
-    var bandit = new Enemy(6, 15, 10, 8, 250, animationObject);
+    var bandit = new Enemy(6, 15, 10, 8, 250, animationObject, CDX_CH00ENM_BANDIT);
     var attackSkill = gainAttackSkill();
     var defendSkill = gainDefendSkill();
     var opening = gainOpeningSkill(40, 0.5);
@@ -1619,7 +1779,8 @@ function enlistTutorialBandit(animationObject) {
 
 function enlistBandit(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
-    var bandit = new Enemy(10 * strScale, 15 * strScale, 10 * strScale, 8 * strScale, 120 * strScale, animationObject);
+    var bandit = new Enemy(10 * strScale, 15 * strScale, 10 * strScale, 8 * strScale, 120 * strScale,
+        animationObject, CDX_CH00ENM_BANDIT);
     var attackSkill = gainAttackSkill();
     var defendSkill = gainDefendSkill();
     var opening = gainOpeningSkill(40, 0.5);
@@ -1651,7 +1812,8 @@ function enlistBandit(startingHeroStrength, maxHeroStrength, animationObject) {
 
 function enlistBrigand(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
-    var brigand = new Enemy(12 * strScale, 13 * strScale, 11 * strScale, 10 * strScale, 130 * strScale, animationObject);
+    var brigand = new Enemy(12 * strScale, 13 * strScale, 11 * strScale, 10 * strScale, 130 * strScale,
+        animationObject, CDX_CH00ENM_BRIGAND);
     var powerAttack = gainPowerAttackSkill(200, 0.6, 1.7);
     var defenseSkill = gainEnemyDefenseSkill(300, 1.7);
     var attackSkill = gainAttackSkill();
@@ -1696,9 +1858,10 @@ function enlistBrigand(startingHeroStrength, maxHeroStrength, animationObject) {
 
 function enlistBanditRingleader(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
-    var banditRingleader = new Enemy(14 * strScale, 17 * strScale, 11 * strScale, 9 * strScale, 400 * strScale, animationObject);
+    var banditRingleader = new Enemy(12 * strScale, 15 * strScale, 11 * strScale, 9 * strScale, 400 * strScale,
+        animationObject, CDX_CH00ENM_BANDITRINGLEADER);
     var powerAttack = gainPowerAttackSkill(200, 0.6, 1.9);
-    var doubleStrike = gainDoubleStrikeSkill();
+    var doubleStrike = gainLearnableDoubleStrikeSkill();
     var defenseSkill = gainEnemyDefenseSkill(200, 2.1);
     var attackSkill = gainAttackSkill();
     var jabSkill = gainJabSkill();
@@ -1710,29 +1873,29 @@ function enlistBanditRingleader(startingHeroStrength, maxHeroStrength, animation
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
             if (behaviorFluctuation == 1) {
                 character.useSkill(defenseSkill, getStandardEnemyOffset(defenseSkill)
-                    + 20 +  Math.floor(20 * Math.random()));
+                    + 50 +  Math.floor(20 * Math.random()));
                 behaviorFluctuation += 1;
             } else if (behaviorFluctuation == 2) {
-                position = getStandardEnemyOffset(doubleStrike) + 10 + Math.floor(40 * Math.random());
+                position = getStandardEnemyOffset(doubleStrike) + 30 + Math.floor(40 * Math.random());
                 character.useSkill(doubleStrike,  position);
                 character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
                     ["Double strike", "Двойной удар"])]);
                 behaviorFluctuation += 1 + Math.floor(Math.random() * 2);
             } else if (behaviorFluctuation == 3) {
                 character.useSkill(jabSkill,  getStandardEnemyOffset(jabSkill)
-                    + 20 + Math.floor(10 * Math.random()));
+                    + 50 + Math.floor(10 * Math.random()));
                 character.useSkill(attackSkill,  getStandardEnemyOffset(attackSkill)
-                    + 20 + Math.floor(30 * Math.random()));
+                    + 50 + Math.floor(30 * Math.random()));
                 behaviorFluctuation = 5;
             } else if (behaviorFluctuation == 4) {
                 character.useSkill(attackSkill,  getStandardEnemyOffset(attackSkill)
-                    + 20 + Math.floor(30 * Math.random()));
+                    + 50 + Math.floor(30 * Math.random()));
                 character.useSkill(jabSkill,  getStandardEnemyOffset(jabSkill)
-                    + 20 + Math.floor(10 * Math.random()));
+                    + 50 + Math.floor(10 * Math.random()));
                 behaviorFluctuation = 5;
             } else if (behaviorFluctuation == 5) {
                 character.useSkill(powerAttack,  getStandardEnemyOffset(powerAttack)
-                    + 60 + Math.floor(40 * Math.random()));
+                    + 70 + Math.floor(40 * Math.random()));
                 behaviorFluctuation = 1;
             }
         }
@@ -1742,7 +1905,8 @@ function enlistBanditRingleader(startingHeroStrength, maxHeroStrength, animation
 
 function enlistWolf(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
-    var wolf = new Enemy(7 * strScale, 14 * strScale, 12 * strScale, 9 * strScale, 90 * strScale, animationObject);
+    var wolf = new Enemy(7 * strScale, 14 * strScale, 12 * strScale, 9 * strScale, 90 * strScale,
+        animationObject, CDX_CH00ENM_WOLF);
     var attackSkill = gainAttackSkill();
     var defendSkill = gainDefendSkill();
     var fumbledAttackSkill = gainFumbledAttackSkill(40, 0.3);
@@ -1778,7 +1942,8 @@ function enlistWolf(startingHeroStrength, maxHeroStrength, animationObject) {
 
 function enlistRedWolf(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
-    var redWolf = new Enemy(9 * strScale, 12 * strScale, 12 * strScale, 10 * strScale, 150 * strScale, animationObject);
+    var redWolf = new Enemy(9 * strScale, 12 * strScale, 12 * strScale, 10 * strScale, 150 * strScale,
+        animationObject, CDX_CH00ENM_REDWOLF);
     var attackSkill = gainAttackSkill();
     var defendSkill = gainDefendSkill();
     var opening = gainOpeningSkill(40, 0.4);
@@ -1828,7 +1993,8 @@ function enlistRedWolf(startingHeroStrength, maxHeroStrength, animationObject) {
 
 function enlistWasp(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
-    var wasp = new Enemy(8 * strScale, 13 * strScale, 13 * strScale, 10 * strScale, 80 * strScale, animationObject);
+    var wasp = new Enemy(8 * strScale, 13 * strScale, 13 * strScale, 10 * strScale, 80 * strScale,
+        animationObject, CDX_CH00ENM_WASP);
     var jabSkill = gainEnemyAttackSkill(40, 0.6, 0.4);
     var evadeSkill = gainEnemyEvadeSkill(100, 0.2);
     var openingSkill = gainOpeningSkill(50, 0.8);
@@ -1877,7 +2043,7 @@ function enlistWasp(startingHeroStrength, maxHeroStrength, animationObject) {
 function enlistPoisonWasp(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
     var poisonWasp = new Enemy(9 * strScale, 13 * strScale, 13 * strScale, 10 * strScale,
-        80 * strScale, animationObject);
+        80 * strScale, animationObject, CDX_CH00ENM_POISONWASP);
     var jabSkill = gainEnemyAttackSkill(40, 0.6, 0.4);
     var evadeSkill = gainEnemyEvadeSkill(100, 0.2);
     var poisonStingSkill = gainStatusAttackSkill(140, 0.7, acquirePoisonedStatus, 1.1, 1000, 30);
@@ -1927,7 +2093,7 @@ function enlistPoisonWasp(startingHeroStrength, maxHeroStrength, animationObject
 function enlistArmadilloKnight(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
     var armadilloKnight = new Enemy(11 * strScale, 18 * strScale, 9 * strScale, 8 * strScale,
-        170 * strScale, animationObject);
+        170 * strScale, animationObject, CDX_CH00ENM_ARMADILLOKNIGHT);
     var attackSkill = gainAttackSkill();
     var defendSkill = gainDefendSkill();
     var fullguardAttack = gainFullguardAttackSkill(160, 1.7);
@@ -1969,7 +2135,7 @@ function enlistArmadilloKnight(startingHeroStrength, maxHeroStrength, animationO
 function enlistArmadilloVityaz(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
     var armadilloVityaz = new Enemy(14 * strScale, 20 * strScale, 9 * strScale, 8 * strScale,
-        370 * strScale, animationObject);
+        370 * strScale, animationObject, CDX_CH00ENM_ARMADILLOVITYAZ);
     var counterattack = gainCounterattackSkill();
     var guardedStrike = gainGuardedStrikeSkill();
     var defendSkill = gainDefendSkill();
@@ -2026,7 +2192,7 @@ function enlistArmadilloVityaz(startingHeroStrength, maxHeroStrength, animationO
 function enlistGreenSerpent(startingHeroStrength, maxHeroStrength, animationObject) {
     var strScale = getHeroStrengthScale(startingHeroStrength, maxHeroStrength);
     var greenSerpent = new Enemy(14 * strScale, 18 * strScale, 13 * strScale, 11 * strScale,
-        800, animationObject);
+        800, animationObject, CDX_CH00ENM_GREENSERPENT);
     var attackSkill = gainEnemyAttackSkill(70, 0.7, 1);
     var powerAttack = gainPowerAttackSkill(200, 0.6, 1.6);
     var jabSkill = gainJabSkill();
