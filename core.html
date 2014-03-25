@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Rat Rider Dominique v.0.87 ALPHA</title>
+    <title>Rat Rider Dominique v.0.90.0</title>
     <meta charset="utf-8">
 </head>
 <body style="background-color: black; empty-cells: show; width: 100%; height: 100%; margin: 0;" onload="resetGame(); registerObject(GUI_EVENT, procureTitleSequence());">
@@ -66,6 +66,12 @@
             <img id="imgDecGrassPatch1" src="resources/decorations/grasslands/patch1.png">
             <img id="imgDecGrassPatch2" src="resources/decorations/grasslands/patch2.png">
             <img id="imgDecGrassFlower1" src="resources/decorations/grasslands/flower1.png">
+
+            <img id="imgDecCavesBackground" src="resources/decorations/caves/bg.png">
+            <img id="imgDecCavesRock1" src="resources/decorations/caves/rock1.png">
+            <img id="imgDecCavesRock2" src="resources/decorations/caves/rock2.png">
+            <img id="imgDecCavesStalagmite1" src="resources/decorations/caves/stalagmite1.png">
+            <img id="imgDecCavesStalagmite2" src="resources/decorations/caves/stalagmite2.png">
 
             <img id="imgHeroStand" src="resources/hero/stand.png">
             <img id="imgHeroMove1" src="resources/hero/move-1.png">
@@ -162,7 +168,7 @@
             <span id="txtIntro1Eng">
                 For as long as he can remember, Dominique was a rebellious knight serving none but justice itself,
                 protecting the weak, punishing evil and giving all he had to the poor. <br> <br>
-                But most importantly, he appears to be a small boar.
+                But most importantly, he appears to be a small boar. Technically, he is a hogman.
                 And his trusty friend and steed is a phlegmatic rat by the name of Sallinger. <br>
             </span>
             <span id="txtIntro2Eng">
@@ -177,25 +183,16 @@
             </span>
             <span id="txtIntro3Eng">
                 And so Dominique wishes to choose the destiny of a hero - a typical desire for someone like him.
-                But such a path is not easily attained. And for this reason he leaves his home of Hogville and
-                sets out on a journey to perform a feat worthy of earning him the title of "hero". <br> <br>
-                As he arrives to a mysterious land, he looks around to find those in need.
-            </span>
-            <span id="txtIntro4Eng">
-                Guide Dominique on his quest for justice and karma! <br>
-                Navigate the landscape, fight enemies for experience
-                and visit different places for special effects. <br> <br>
-                W, S or arrows up and down - move farther/nearer; choose a menu item.
-                Moving between paths consumes stamina, so choose your path carefully. <br>
-                Space or Enter - confirm/action. <br> <br>
-                Press ACTION to start your joruney.
+                But such a path is not easily attained. And for this reason he sets out on a journey to perform a
+                feat worthy of earning him the title of "hero". <br> <br>
+                As he arrives to the free province of Asqiua, he looks around to find those in need.
             </span>
         </td>
         <td style="display: none;">
             <span id="txtIntro1Rus">
                 Сколько он себя помнит, Доминик был мятежным рыцарем, служащим одному лишь правосудию, защищающим
                 слабых, наказывающим зло и отдающим всё своё имущество бедным. <br> <br>
-                Но что самое главное, он - маленький кабан.
+                Но что самое главное, он - маленький кабан. Точнее - кабанолюд.
                 А его верный друг - и боевой конь - флегматичная крыса по имени Сэллинджер. <br>
             </span>
             <span id="txtIntro2Rus">
@@ -209,18 +206,9 @@
             </span>
             <span id="txtIntro3Rus">
                 И вот, Доминик желает избрать судьбу героя - типичное желание для такого, как он.
-                Но выйти на подобную стезю непросто. И как раз для этого он покидает свой дом в Хогвилле и отправляется
-                в путешествие, чтобы совершить подвиг, достойный звания "героя". <br> <br>
-                Прибыв в незнакомую загадочную страну, он оглядывается в поисках нуждающихся в его услугах. <br>
-            </span>
-            <span id="txtIntro4Rus">
-                Помогите Доминику в его поисках правосудия и кармы! <br>
-                Перемещайтесь по местности, сражайтесь с врагами, чтобы получать опыт,
-                и посещайте различные места для активации особых эффектов. <br> <br>
-                W, S или стрелки вверх и вниз - перемещение дальше/ближе; выбор пункта меню.
-                Перемещение между тропами стоит выносливости, так что осторожно выбирайте свой путь. <br>
-                Пробел или Enter - подтверждение/действие. <br> <br>
-                Нажмите ДЕЙСТВИЕ, чтобы начать путешествие.
+                Но выйти на подобную стезю непросто. И как раз для этого он отправляется в путешествие, чтобы совершить
+                подвиг, достойный звания "героя". <br> <br>
+                Прибыв в свободную провинцию Аскюа, он оглядывается в поисках нуждающихся в его услугах. <br>
             </span>
         </td>
     </tr>
@@ -256,6 +244,24 @@
         loopStart: 3.34,
         loopEnd: 83.2,
         ending: 146.6
+    };
+    var MUS_FOREBODING = {
+        src: "sound/music/04-foreboding.ogg",
+        loopStart: 0,
+        loopEnd: 57.14,
+        ending: 0
+    };
+    var MUS_BOSS_BATTLE = {
+        src: "sound/music/05-boss-battle-1.ogg",
+        loopStart: 0,
+        loopEnd: 68.16,
+        ending: 64.85
+    };
+    var MUS_RELIEF = {
+        src: "sound/music/06-relief.ogg",
+        loopStart: 0,
+        loopEnd: 56.79,
+        ending: 0
     };
 
     /* ================================ */
@@ -293,7 +299,6 @@
     var TXT_INTRO_1 = [getTextResource("txtIntro1Eng"), getTextResource("txtIntro1Rus")];
     var TXT_INTRO_2 = [getTextResource("txtIntro2Eng"), getTextResource("txtIntro2Rus")];
     var TXT_INTRO_3 = [getTextResource("txtIntro3Eng"), getTextResource("txtIntro3Rus")];
-    var TXT_INTRO_4 = [getTextResource("txtIntro4Eng"), getTextResource("txtIntro4Rus")];
 
     var TXT_YES = ["Yes", "Да"];
     var TXT_NO = ["No", "Нет"];

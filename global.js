@@ -283,6 +283,9 @@ function initializeChapterData(chapterId) {
 }
 
 function loadLandscape(id) {
+    if (landscape != null) {
+        clearObjectType("Landscape");
+    }
     landscapeId = id;
     landscape = createLandscape(landscapeId);
     setEventMusic(null);
@@ -290,6 +293,8 @@ function loadLandscape(id) {
     setLandscapeMusic();
     singletonIds.length = 0;
     landscape.actualize();
+    landscape.resetTerrain();
+    registerObject(GUI_EVENT, landscape);
 }
 
 function resetGame() {
@@ -309,9 +314,8 @@ function resetGame() {
     setControlMode(CM_EVENT);
     initializeGui();
     loadLandscape(LSC_TITLE);
-    landscape.resetTerrain();
     moving = true;
-    registerObject(GUI_EVENT, landscape);
+    maneuvering = true;
 
     setEventMusic(MUS_TITLE_THEME);
     setMusicPlayState(MPS_EVENT);
@@ -381,8 +385,6 @@ function loadGame() {
 
         var loadGameSequence = new Sequence();
         loadGameSequence.addAction(procureCodeFragmentAction(function () {
-            landscape.resetTerrain();
-            registerObject(GUI_EVENT, landscape);
             setControlMode(CM_FIELD);
         }));
         loadGameSequence.addAction(procureResumeAction());
@@ -549,6 +551,19 @@ function pathToLandscapeLayer(path) {
     }
 }
 
+function pathToObjectBackgroundLayer(path) {
+    switch (path) {
+        case FAR:
+            return OBJECTS_FAR_BG;
+        case MID:
+            return OBJECTS_MID_BG;
+        case NEAR:
+            return OBJECTS_NEAR_BG;
+        default:
+            return OBJECTS_NEAR_BG;
+    }
+}
+
 function pathToObjectLayer(path) {
     switch (path) {
         case FAR:
@@ -591,9 +606,9 @@ function pathToDecorationLayer(path) {
 function getBasisHeight(path) {
     switch (path) {
         case FAR:
-            return H - 250;
+            return H - 300;
         case MID:
-            return H - 150;
+            return H - 175;
         case NEAR:
             return H - 50;
         default:
@@ -640,7 +655,7 @@ function getOptimalHeight(path, position) {
 }
 
 function getPathScale(path) {
-    return (2 + path) / 2;
+    return (2 + path) / 3;
 }
 
 function getBattleGaugeOffset(character) {
@@ -1076,6 +1091,7 @@ function manageMusic() {
             break;
         case MPS_BATTLE_END:
             if (btlMusicElement.ended) {
+                setBattleMusic(null);
                 if (eventMusic == null) {
                     musicFade[MPS_LANDSCAPE] = 0;
                     musicPlayState = MPS_LANDSCAPE;
@@ -1169,7 +1185,7 @@ function tick() {
                         if ((object.path == hero.path) && (!object.finished)
                             && (Math.abs(object.position - hero.position) < collisionDistance)
                             && (Math.abs(getOptimalHeight(object.path, object.position) - hero.height)
-                            < collisionDistance))
+                            < collisionDistance * 2))
                         {
                             object.finished = true;
                             object.trigger();
@@ -1178,18 +1194,21 @@ function tick() {
                 }
             }
         }
-        if (i == LANDSCAPE_FAR) {
-            fc.beginPath();
-            fc.fillStyle = "#007700";
-            fc.fillRect(0, H - 250, W, H);
-        } else if (i == LANDSCAPE_MID) {
-            fc.beginPath();
-            fc.fillStyle = "#009900";
-            fc.fillRect(0, H - 150, W, H);
-        } else if (i == LANDSCAPE_NEAR) {
-            fc.beginPath();
-            fc.fillStyle = "#00AA00";
-            fc.fillRect(0, H - 50, W, H);
+
+        if (landscape != null) {
+            if (i == LANDSCAPE_FAR) {
+                fc.beginPath();
+                fc.fillStyle = landscape.terrainColorFar;
+                fc.fillRect(0, getBasisHeight(FAR), W, H);
+            } else if (i == LANDSCAPE_MID) {
+                fc.beginPath();
+                fc.fillStyle = landscape.terrainColorMid;
+                fc.fillRect(0, getBasisHeight(MID), W, H);
+            } else if (i == LANDSCAPE_NEAR) {
+                fc.beginPath();
+                fc.fillStyle = landscape.terrainColorNear;
+                fc.fillRect(0, getBasisHeight(NEAR), W, H);
+            }
         }
     }
 

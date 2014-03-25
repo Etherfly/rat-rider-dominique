@@ -7,10 +7,10 @@
 /* LANDSCAPES */
 
 var LSC_TITLE = 0;
-function createTitleLandscape() {
-    var titleLandscape = new Landscape(getResource("imgDecGrassBackground"), "#007700", "#009900", "#00AA00",
+function createGrasslandsLandscape() {
+    var grasslandsLandscape = new Landscape(getResource("imgDecGrassBackground"), "#007700", "#009900", "#00AA00",
         MUS_GRASSLANDS_THEME, MUS_BATTLE_THEME, 600);
-    titleLandscape.defineGenerateTerrain(function (path) {
+    grasslandsLandscape.defineGenerateTerrain(function (path) {
         var color = this.pathToColor(path);
         var terrain = generateSurface(path, color);
         registerObject(pathToLandscapeLayer(path), terrain);
@@ -34,7 +34,7 @@ function createTitleLandscape() {
         }
         decorateReaches(path, 0, 2, 1, 10, treeSet);
     });
-    titleLandscape.defineGenerateUpperDecoration(function () {
+    grasslandsLandscape.defineGenerateUpperDecoration(function () {
         var cloud = new Decoration(null, 1, MID, -50 + Math.random() * 100, upperReaches.position + 270 + Math.random() * 70);
         cloud.movementFactor = 0.4;
         cloud.deleteRange = -400;
@@ -55,16 +55,46 @@ function createTitleLandscape() {
         upperReaches = cloud;
         registerObject(DECORATIONS_MID, cloud);
     });
-    return titleLandscape;
+    return grasslandsLandscape;
+}
+
+function createCavesLandscape() {
+    var cavesLandscape = new Landscape(getResource("imgDecCavesBackground"), "#667766", "#889988", "#99AA99",
+        MUS_GRASSLANDS_THEME, MUS_BATTLE_THEME, 600);
+    cavesLandscape.defineGenerateTerrain(function (path) {
+        var color = this.pathToColor(path);
+        var terrain = generateSurface(path, color);
+        registerObject(pathToLandscapeLayer(path), terrain);
+
+        var rockSet = [];
+        for (var i = 1; i < 3; i++) {
+            rockSet.push(getResource("imgDecCavesRock" + i));
+        }
+        decorateReaches(path, 0, 2.5, 0.5, 90, rockSet);
+
+        var stalagmiteSet = [];
+        for (i = 1; i < 3; i++) {
+            stalagmiteSet.push(getResource("imgDecCavesStalagmite" + i));
+        }
+        decorateReaches(path, 0, 2, 1, 10, stalagmiteSet);
+    });
+    cavesLandscape.defineGenerateUpperDecoration(function () {
+        var cloud = new Decoration(null, 1, MID, -50 + Math.random() * 100, upperReaches.position + 270 + Math.random() * 70);
+        upperReaches = cloud;
+        registerObject(DECORATIONS_MID, cloud);
+    });
+    return cavesLandscape;
 }
 
 /* LANDSCAPES ID MAPPING */
 function createLandscape(id) {
     switch (id) {
         case LSC_TITLE:
-            return createTitleLandscape();
+            return createGrasslandsLandscape();
         case LSC_PROLOGUE:
             return createPrologueLandscape();
+        case LSC_SERPENT_CAVE:
+            return createSerpentCaveLandscape();
         default:
             return null;
     }
@@ -308,11 +338,12 @@ function procureDisplayMessageAction(xPos, yPos, width, height, text, displayCur
                     yPos + cursorOffset + DEFAULT_LINE_HEIGHT * lineCount);
             }
 
-            if (keyPressed == KEY_ACTION) {
+            if ((keyPressed == KEY_ACTION) || (keyPressed == KEY_ESC)) {
                 playSfx(SFX_GUI_THUCK);
             }
-            return (keyPressed == KEY_ACTION)
-                && (displayMessageAction.choices.length == 0 || displayMessageAction.choices[eventChoice].active());
+            return ((keyPressed == KEY_ACTION)
+                && (displayMessageAction.choices.length == 0 || displayMessageAction.choices[eventChoice].active()))
+                || ((keyPressed == KEY_ESC) && (menuState > MS_NONE) && (displayMessageAction.choices.length == 0));
         }
         return false;
     });
@@ -355,7 +386,9 @@ function procureDisplaySpeechMessageAction(name, portrait, text) {
         } else {
             drawInfoWindow();
             fc.beginPath();
-            fc.drawImage(portrait, INFO_WINDOW_X + 12, INFO_WINDOW_Y + 12, 196, 196);
+            if (portrait != undefined) {
+                fc.drawImage(portrait, INFO_WINDOW_X + 12, INFO_WINDOW_Y + 12, 196, 196);
+            }
             processText(name, INFO_WINDOW_W - 220, INFO_WINDOW_X + 220, INFO_WINDOW_Y, LARGE_FONT);
             var translatedText = (typeof text === "string") ? text : text[lang];
             var printedText = frame * 3 >= translatedText.length ? translatedText : translatedText.substr(0, (frame - 10) * 3);
@@ -550,6 +583,19 @@ function procureResumeAction() {
     });
 }
 
+function procureLandscapeTransitionAction(landscapeId, isEvent) {
+    var landscapeTransitionAction = procureCodeFragmentAction(function () {
+        if (isEvent) {
+            maneuvering = false;
+            hero.path = MID;
+        } else {
+            maneuvering = true;
+        }
+        loadLandscape(landscapeId);
+    });
+    return [procureMaskAction(), landscapeTransitionAction, procureResumeAction(), procureUnmaskAction()];
+}
+
 function procureDistanceTimeoutAction(movingFrameDistance) {
     var distanceTimeoutAction = new Action();
     var movingFrame = 0;
@@ -609,6 +655,12 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
                         itemChoice = i;
                     }
                 }
+
+                for (i = 0; i < attrIncrease.length; i++) {
+                    attrIncrease[i] = 0;
+                }
+                skillsLearned.length = 0;
+
                 battleFrame = 0;
                 currentSyncCoefficient = 1;
                 heroBGNicksPosition = 0;
@@ -663,7 +715,7 @@ function procureFloatingImageAction(linkedObject, floatingImage, terminationFunc
     }
     var floatingImageAction = new Action();
     floatingImageAction.definePlayFrame(function (frame) {
-        if (linkedObject != null) {
+        if ((linkedObject != null) && !linkedObject.deletable) {
             fc.beginPath();
             fc.drawImage(floatingImage, linkedObject.position - floatingImage.width / 2, getOptimalHeight(linkedObject.path,
                 linkedObject.position) + linkedObject.offset - floatingImage.height - 20 + 10 * Math.sin(frame * 2 * Math.PI / 100));
@@ -681,7 +733,7 @@ function describeCommonEncounter(chanceToAppear, enemyName, enemyImageStand, ene
                                  startingHeroStrength, maxHeroStrength, chId, varId, firstEncounterMessageAction) {
     var encounterType = new LandmarkType(chanceToAppear);
     encounterType.defineGenerateLandmark(function (path, position) {
-        var enemyObject = new Landmark(path, position, 50, enemyImageStand);
+        var enemyObject = new Landmark(path, position, enemyImageStand);
         enemyObject.setAttackImage(enemyImageAttack);
         var enemy = enlistEnemyFunction(startingHeroStrength, maxHeroStrength, enemyObject);
         enemyObject.defineTrigger(function () {
@@ -729,7 +781,7 @@ function describeDangerEncounter(chanceToAppear, enemyName, enemyImageStand, ene
     var encounterType = new LandmarkType(chanceToAppear);
     encounterType.singletonId = "singleton: " + enemyName[LANG_ENG];
     encounterType.defineGenerateLandmark(function (path, position) {
-        var enemyObject = new Landmark(path, position, 50, enemyImageStand);
+        var enemyObject = new Landmark(path, position, enemyImageStand);
         enemyObject.setAttackImage(enemyImageAttack);
         var triggered = false;
         registerObject(pathToObjectLayer(path),

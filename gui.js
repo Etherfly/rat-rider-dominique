@@ -1030,6 +1030,7 @@ function procureDisplayMenuSkillsAction() {
                 }
             }
 
+            var escSafe = false;
             var skillInfo;
             var x;
             var i = getItemSetByMenuState(menuState);
@@ -1146,7 +1147,7 @@ function procureDisplayMenuSkillsAction() {
                 playSfx(SFX_GUI_THUCK);
                 if (menuState >= MS_SKILLS_EXCHANGE_1) {
                     menuState -= 3;
-                    keyPressed = KEY_NONE;
+                    escSafe = true;
                 }
             }
 
@@ -1321,7 +1322,7 @@ function procureDisplayMenuSkillsAction() {
                 }
             }
 
-            return (keyPressed == KEY_ESC) && (menuState >= MS_SKILLS_BROWSE_1) && (menuState <= MS_SKILLS_BROWSE_3);
+            return (keyPressed == KEY_ESC) && !escSafe && (menuState >= MS_SKILLS_BROWSE_1) && (menuState <= MS_SKILLS_BROWSE_3);
         }
         return false;
     });
@@ -1384,6 +1385,7 @@ function procureDisplayMenuItemsAction() {
                 }
             }
 
+            var escSafe = false;
             var currentItem;
             var itemInfo;
             var x;
@@ -1472,7 +1474,7 @@ function procureDisplayMenuItemsAction() {
                 playSfx(SFX_GUI_THUCK);
                 if (menuState >= MS_ITEMS_EXCHANGE_1) {
                     menuState -= 3;
-                    keyPressed = KEY_NONE;
+                    escSafe = true;
                 }
             }
 
@@ -1597,7 +1599,7 @@ function procureDisplayMenuItemsAction() {
             displayEquipmentInfo(TXT_MENU_WHITE_STEEL_ARMOR, TXT_MENU_WHITE_STEEL_ARMOR_DESC, 1);
             displayEquipmentInfo(TXT_MENU_RAT_RIDER_PELERINE, TXT_MENU_RAT_RIDER_PELERINE_DESC, 2);
 
-            return (keyPressed == KEY_ESC) && (menuState >= MS_ITEMS_BROWSE_1) && (menuState <= MS_ITEMS_BROWSE_3);
+            return (keyPressed == KEY_ESC) && !escSafe && (menuState >= MS_ITEMS_BROWSE_1) && (menuState <= MS_ITEMS_BROWSE_3);
         }
         return false;
     });
@@ -1927,7 +1929,7 @@ function procureDisplayMenuCodexEntryAction(entryId) {
                 playSfx(SFX_GUI_THUCK);
             }
 
-            return (keyPressed == KEY_ESC) && (menuState == MS_CODEX_ENTRY);
+            return ((keyPressed == KEY_ACTION) || (keyPressed == KEY_ESC)) && (menuState == MS_CODEX_ENTRY);
         }
         return false;
     });

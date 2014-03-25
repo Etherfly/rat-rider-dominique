@@ -22,9 +22,9 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     this.landmarksMin = 2 * W / landmarkFrequency;  // landmarks to be present on the layer simultaneously
 
     for (var i = 0; i < 3; i++) { landmarksOnLayer[i] = 0; }
-    farthestLandmarks[FAR] = (new Landmark(FAR, 600, 0, null));
-    farthestLandmarks[MID] = (new Landmark(MID, 600, 0, null));
-    farthestLandmarks[NEAR] = (new Landmark(NEAR, 600, 0, null));
+    farthestLandmarks[FAR] = (new Landmark(FAR, 600));
+    farthestLandmarks[MID] = (new Landmark(MID, 600));
+    farthestLandmarks[NEAR] = (new Landmark(NEAR, 600));
 
     this.type = "Landscape";    // type definition
     this.deletable = false;     // universal deletability flag
@@ -48,8 +48,9 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     this.actualize = function () { };
 
     this.resetTerrain = function () {
-        clearObjectType("Terrain");
+        clearObjectType("Landmark");
         clearObjectType("Decoration");
+        clearObjectType("Terrain");
         reaches[FAR] = new Terrain(FAR, this.terrainColorFar,
             -200, Math.floor(random() * 120) + 130);
         reaches[MID] = new Terrain(MID, this.terrainColorMid,
@@ -96,10 +97,22 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     this.generateUpperDecoration = function () {};
 
     this.manifest = function () {
-        if (this.landmarkTypes.length > 0) {
+        var newLandmarkPosition;
+        var newLandmark;
+        if (this.landmarkTypes.length == 1) {
+            while (landmarksOnLayer[MID] < 1) {
+                newLandmarkPosition = farthestLandmarks[MID].position
+                    + this.landmarkFrequency * (0.5 + Math.random());
+                newLandmark = this.landmarkTypes[0].generateLandmark(MID, newLandmarkPosition);
+                newLandmark.landmarkType = this.landmarkTypes[currentLandmarkTypeId];
+                registerObject(pathToObjectBackgroundLayer(MID) + newLandmark.layerOffset, newLandmark);
+                landmarksOnLayer[MID]++;
+                farthestLandmarks[MID] = newLandmark;
+            }
+        } else if (this.landmarkTypes.length > 1) {
             for (var path = 0; path < 3; path++) {
                 while (landmarksOnLayer[path] < this.landmarksMin) {
-                    var newLandmarkPosition = farthestLandmarks[path].position
+                    newLandmarkPosition = farthestLandmarks[path].position
                         + this.landmarkFrequency * (0.5 + Math.random());
                     var probabilityScale = 0;
                     for (var i = 0; i < this.landmarkTypes.length; i++) {
@@ -113,12 +126,12 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
                         chanceArea += !this.landmarkTypes[currentLandmarkTypeId].available()
                             ? 0 : this.landmarkTypes[currentLandmarkTypeId].chanceToAppear;
                     }
-                    var newLandmark = this.landmarkTypes[currentLandmarkTypeId].generateLandmark(path, newLandmarkPosition);
+                    newLandmark = this.landmarkTypes[currentLandmarkTypeId].generateLandmark(path, newLandmarkPosition);
                     newLandmark.landmarkType = this.landmarkTypes[currentLandmarkTypeId];
                     if (this.landmarkTypes[currentLandmarkTypeId].singletonId != null) {
                         singletonIds.push(this.landmarkTypes[currentLandmarkTypeId].singletonId);
                     }
-                    registerObject(pathToObjectFrontLayer(path) + newLandmark.layerOffset, newLandmark);
+                    registerObject(pathToObjectBackgroundLayer(path) + newLandmark.layerOffset, newLandmark);
                     landmarksOnLayer[path]++;
                     farthestLandmarks[path] = newLandmark;
                 }
@@ -233,9 +246,17 @@ function Sequence() {
     this.move = function() {};
 
     this.addAction = function(action, layer) {
-        this.sequence.push({
-            action: action, layer: (layer === undefined) ? GUI_EVENT : layer
-        });
+        if (!(action instanceof Array)) {
+            this.sequence.push({
+                action: action, layer: (layer === undefined) ? GUI_EVENT : layer
+            });
+        } else {
+            for (var i = 0; i < action.length; i++) {
+                this.sequence.push({
+                    action: action[i], layer: (layer === undefined) ? GUI_EVENT : layer
+                });
+            }
+        }
     };
 }
 
@@ -717,7 +738,7 @@ function Hero() {
     this.manifest = function() {
         if (menuState == MS_NONE) {
             if (moving) {
-                var optimalHeight = getOptimalHeight(this.path, this.position) + 30;
+                var optimalHeight = getOptimalHeight(this.path, this.position) + 60;
                 var heightOffset = optimalHeight - this.height;
                 if (Math.abs(heightOffset) > 4) {
                     heightOffset = 4 * heightOffset / Math.abs(heightOffset);
@@ -1068,16 +1089,22 @@ function LandmarkType(chanceToAppear) {
     this.generateLandmark = function(path, position) {};
 }
 
-function Landmark(path, position, offset, defaultImage) {
+function Landmark(path, position, defaultImage) {
     this.defaultImage = defaultImage;   // image in a default state
     this.path = path;                   // path layer
     this.layerOffset = 0;               // layer offset
     this.position = position;           // center position
-    this.offset = offset;               // offset from the center position
     this.landmarkType = null;           // landmark type that generated this landmark
 
     this.finished = false;              // trigger finish flag
     this.scale = getPathScale(this.path);
+
+    // offset from the center position
+    if (defaultImage != undefined) {
+        this.offset = 70 - this.defaultImage.height * this.scale + this.defaultImage.width * this.scale / 5;
+    } else {
+        this.offset = 0;
+    }
 
     this.animationState = AN_STAND;
     this.animationFrame = 0;

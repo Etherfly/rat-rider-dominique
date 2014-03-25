@@ -273,14 +273,14 @@ function inquireChapter00EnemyArmadilloVityaz() {
 var CDX_CH00ENM_GREENSERPENT = 510;
 function inquireChapter00EnemyGreenSerpent() {
     return new CodexEntry(["Green serpent", "Зелёный змей"], CAT_ENEMIES, getResource("imgEnemySerpent1Stand")).defineText([
-        "Boss! <br> <br> The legendary 'Stealer of Lives' that leaves his den once in half a year to gather supplies and hunt for sport. It " +
+        "Boss! <br> <br> The legendary 'Party Crasher' that leaves his den once in half a year to gather supplies and hunt for sport. It " +
             "has developed a taste for alcoholic beverages, so it is not uncommon for it to attend at parties as an unwanted guest and " +
             "slaughter every living being in sight only to consume the spirits in their blood. For this very reason few actually organize " +
-            "feasts at times of year when Stealer of Lives is on the prowl.",
-        "Босс! <br> <br> Легендарный 'Похититель Жизней', который покидает своё логово раз в полгода, чтобы запастись едой и поохотиться ради " +
-            "развлечений. Он пристрастился к алкоголю, так что нередко посещает вечеринки в качестве незванного гостя и убивает всех " +
+            "feasts at times of year when Party Crasher is on the prowl.",
+        "Босс! <br> <br> Легендарный 'Незваный Гость', который покидает своё логово раз в полгода, чтобы запастись едой и поохотиться ради " +
+            "развлечений. Он пристрастился к алкоголю, так что нередко посещает бурные празднества и убивает всех " +
             "присутствующих исключительно ради спирта в их крови. Именно поэтому немногие рискуют организовывать пиры в то время года, когда " +
-            "Похититель Жизней выходит на охоту."
+            "Незваный Гость выходит на охоту."
     ]);
 }
 
@@ -301,7 +301,7 @@ function inquireLore001NaturalOrder() {
             "karma, whatever you offer, you give away for karma. However simple it may sound, there are countless exceptions, and yet each " +
             "one confirms the infinite complexity and perfection of Natural Order.",
         "Из \"Путеводителя по Экумосу для детей. Сокращённое взрослое издание\" Коркиса Мэнса <br> <br> " +
-            "Истина, смысл жизни, ценность каждого маленького движения в мире... Не важно в какую эпоху, житель, будь это кабан, человек или " +
+            "Истина, смысл жизни, ценность каждого маленького движения в мире... Не важно в какую эпоху, житель, будь это кабанолюд, человек или " +
             "снежный куу, всегда находится в духовном поиске. Эти вещи нужны ему, чтобы идти вперёд. И нам повезло родиться в Экумосе, где " +
             "подобные поиски небезрезультатны. <br> <br> У наших слов, действий и выбора есть вес. Этот вес даёт нам сознание и способность " +
             "влиять на мир, привносить в него изменения, творить и украшать сущее красотой наших душ. Этот вес в какой-то момент стал " +
@@ -336,7 +336,7 @@ function inquireLore002SourcesOfKarma() {
             "закрытый потенциал каждого. В любом из нас есть постоянно меняющийся лабиринт возможностей. Всё, чем мы можем быть, что мы можем " +
             "сделать или создать, закрыто в нас с рождения и открывается с течением жизни посредством \"ключей\" извне - опыта, знаний и " +
             "храбрости. Таким образом, становясь величественнее и лучше, готовясь привносить новое в мир, мы обретаем карму. Гончар копит её с " +
-            "каждой новой техникой освоенной во время ученичества и с каждым вылепленным горшком, который лучше, чем предыдущий. Учитель получает " +
+            "каждой новой техникой, освоенной во время ученичества, и с каждым вылепленным горшком, который лучше, чем предыдущий. Учитель получает " +
             "карму от знаний, которые вкладывает в умы своих учеников. Карма воина растёт с его силой и грузом на душе, увеличивающимся с каждым " +
             "павшим от его рук. <br> <br> Как Вы могли уже понять, для обретения кармы необходим рост души. Тот, кто прекращает развиваться, " +
             "теряет свой кармический доход и рискует стать бедняком. А что может быть хуже, чем потеря способности выбирать и что-то менять, чем " +
@@ -361,11 +361,9 @@ function inquireLore003RobbersAndDealers() {
             "progressive as within human society, bureaucracy and artificial economics are still present within other civilizations. Basically " +
             "dealers inflate the value of things by creating problems in the way of getting these things and providing a solution. This makes " +
             "them somewhat essential in the minds of others and earns them karma, though they barely create anything on their own. Dealers will " +
-            "gladly sell air and water to you and even charge you for the space you take in the world. <br> <br> There are also beggars, of " +
-            "course, who live by invoking pity in others. There is not much to tell about them, save for the fact that one is likely to become a " +
-            "beggar when falling into karmic poverty or living a life dependent on someone else. <br> <br> Your primary defense against these " +
-            "creatures is knowing and ignoring their deceptive schemes, adamancy and perception. They all play a dangerous game with Natural " +
-            "Order, and sooner or later they lose.",
+            "gladly sell air and water to you and even charge you for the space you take in the world. <br> <br> Your primary defense against " +
+            "these creatures is knowing and ignoring their deceptive schemes, adamancy and perception. They all play a dangerous game with " +
+            "Natural Order, and sooner or later they lose.",
         "Из \"Путеводителя по Экумосу для детей. Сокращённое взрослое издание\" Коркиса Мэнса <br> <br> " +
             "Наверное, было бы здорово жить в раю, где все исключительно честны в своём стремлении к саморазвитию и улучшению жизни окружающих. " +
             "Но даже Экумос, где работает Естественный Порядок, не таков. Есть отдельные виды существ, которых Вам следует избегать. <br> <br> " +
@@ -380,10 +378,8 @@ function inquireLore003RobbersAndDealers() {
             "экономика всё равно присутствуют во всех цивилизациях. В своей основе дельцы раздувают ценность вещей, создавая проблемы на пути их " +
             "достижения и предоставляя решение. Это делает их в определённой мере необходимыми в глазах других и приносит им карму, хотя они едва " +
             "ли что-то создают сами. Дельцы с радостью продадут Вам воздух и воду и даже возьмут с Вас за место, которое Вы занимаете в " +
-            "пространстве. <br> <br> Есть также попрошайки, которые живут, вызывая чувство жалости в других. О них многого не скажешь, кроме " +
-            "того, что впадение в кармическую бедность или иждивенческий образ жизни - верный способ стать попрошайкой. <br> <br> Ваша главная " +
-            "защита от этих существ - знание и невосприимчивость к их обманным схемам, твёрдость воли и умение видеть суть вещей. Все они " +
-            "играют с Естественным Порядком в опасную игру и в итоге рано или поздно проигрывают."
+            "пространстве. <br> <br> Ваша главная защита от этих существ - знание и невосприимчивость к их обманным схемам, твёрдость воли и " +
+            "умение видеть суть вещей. Все они играют с Естественным Порядком в опасную игру и в итоге рано или поздно проигрывают."
     ]);
 }
 
@@ -460,6 +456,42 @@ function inquireLore005HumanSociety() {
     ]);
 }
 
+var CDX_JOU001_CH00P01 = 1501;
+function inquireJournal001Ch00P01() {
+    return new CodexEntry(["Prologue: In search of trouble", "Пролог: В поисках неприятностей"], CAT_JOURNAL).defineText([
+        "Dominique and Sallinger have arrived to Asqiua, a free province inhabited mostly by hogman and wolf homesteaders who manage " +
+            "to live side by side. It has been known to be dangerous because of many bandits and wild animals in the area. But " +
+            "Dominique hopes to find something greater, worthy of a hero's feat.",
+        "Доминик и Сэллинджер прибыли в свободную провинцию Аскюа, населённую в основном поселенцами кабанолюдов и волколюдов, " +
+            "умудряющимися сосуществовать мирно. Известно, что здесь весьма опасно из-за бандитов и диких животных. Но Доминик " +
+            "надеется найти нечто большее, достойное подвига героя."
+    ]);
+}
+
+var CDX_JOU002_CH00P02 = 1502;
+function inquireJournal002Ch00P02() {
+    return new CodexEntry(["Prologue: Seer's guidance", "Пролог: Наставления провидца"], CAT_JOURNAL).defineText([
+        "The duo have found a violently destroyed house (not without victims) and an emerald scale amidst the ruins. Everything points to " +
+            "the fact that the culprit is a huge scaly beast. To find it Dominique must find the real seer who can trace the scale back to " +
+            "its owner. <br> <br> Milestones on the way: 1",
+        "Двое обнаружили разрушенный с особой жестокостью дом (не без жертв) и изумрудную чешуйку среди развалин. Всё указывает на то, " +
+            "что совершила это огромная чешуйчатая тварь. Чтобы найти её, Доминик должен найти настоящего провидца, который сможет отследить " +
+            "её по чешуйке. <br> <br> Мильных камней на пути: 1"
+    ]);
+}
+
+var CDX_JOU003_CH00P03 = 1503;
+function inquireJournal003Ch00P03() {
+    return new CodexEntry(["Prologue: Party Crasher", "Пролог: Незваный Гость"], CAT_JOURNAL).defineText([
+        "The rat rider has visited the seer only to find out that he was already on the way to his target - Party Crasher. Though the " +
+            "two are yet to find out what kind of monster is that, they will meet it soon if they continue following the snake path. " +
+            "<br> <br> Milestones on the way: 1",
+        "Крысиный всадник посетил провидца только, чтобы узнать, что он уже на пути к своей цели - Незваному Гостю. Хотя двое ещё не " +
+            "догадываются, что за чудовище их ждёт, они вскоре с ним встретятся, если продолжат путь по тропе змеи. " +
+            "<br> <br> Мильных камней на пути: 1"
+    ]);
+}
+
 /* CODEX ENTRIES ID MAPPING */
 function inquireCodex(id) {
     switch (id) {
@@ -511,6 +543,12 @@ function inquireCodex(id) {
             return inquireLore004OnDeities();
         case CDX_LORE005_HUMANSOCIETY:
             return inquireLore005HumanSociety();
+        case CDX_JOU001_CH00P01:
+            return inquireJournal001Ch00P01();
+        case CDX_JOU002_CH00P02:
+            return inquireJournal002Ch00P02();
+        case CDX_JOU003_CH00P03:
+            return inquireJournal003Ch00P03();
         default:
             return null;
     }

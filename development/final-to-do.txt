@@ -2,17 +2,19 @@
 2) DONE: Library.
 3) DONE: Gaining skills: library, chest, enemy, leveling.
 4) DONE: Corresponding dialogs.
-5) Dialogue for destroyed house.
-6) Dialogue for seer's hut.
-7) Transitioning to new area.
-8) Dialogue and complete boss battle with the serpent.
+5) DONE: Dialogue for destroyed house.
+6) DONE: Dialogue for seer's hut.
+7) DONE: Transitioning to new area.
+8) DONE: Dialogue and complete boss battle with the serpent.
 9) Aftermath.
 10) Smallfixes:
 - SP cost display.
 - denial sound effect.
-- escape should also work on menu messages.
+- DONE: escape should also work on menu messages.
 - area name view in the menu.
 - redo syncing
+- audio volume
+- DONE: codex entry closing by enter
 11) Balancing everything out.
 12) Writing a good description.
 13) Uploading everything to GitHub and propagating info.
