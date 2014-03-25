@@ -1,0 +1,9 @@
+convert tree1.png -transparent white tree1.png
+convert tree2.png -transparent white tree2.png
+convert tree3.png -transparent white tree3.png
+convert tree4.png -transparent white tree4.png
+convert shrub1.png -transparent white shrub1.png
+convert shrub2.png -transparent white shrub2.png
+convert patch1.png -transparent white patch1.png
+convert patch2.png -transparent white patch2.png
+convert flower1.png -transparent white flower1.png
