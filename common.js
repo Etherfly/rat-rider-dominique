@@ -53,7 +53,7 @@ function createGrasslandsLandscape() {
             }
         });
         upperReaches = cloud;
-        registerObject(DECORATIONS_MID, cloud);
+        registerObject(OBJECTS_MID_FRONT, cloud);
     });
     return grasslandsLandscape;
 }
@@ -81,7 +81,7 @@ function createCavesLandscape() {
     cavesLandscape.defineGenerateUpperDecoration(function () {
         var cloud = new Decoration(null, 1, MID, -50 + Math.random() * 100, upperReaches.position + 270 + Math.random() * 70);
         upperReaches = cloud;
-        registerObject(DECORATIONS_MID, cloud);
+        registerObject(OBJECTS_MID_FRONT, cloud);
     });
     return cavesLandscape;
 }
@@ -104,10 +104,26 @@ function createLandscape(id) {
 
 function procureTitleSequence() {
     var titleDisplay = new Sequence();
+    var hintText = new Action();
+    var hintTerminated = false;
+    hintText.definePlayFrame(function (frame) {
+        fc.beginPath();
+        fc.fillStyle = "white";
+        fc.font = DEFAULT_FONT;
+        fc.fillText(TXT_HINT_LANGUAGE[lang], 20, H - 50);
+        fc.fillText(TXT_HINT_VOLUME[lang], 20, H - 20);
+        fc.textAlign = "right";
+        fc.fillText("© 2014 Etherfly", W - 20, H - 20);
+        fc.textAlign = "left";
+        return hintTerminated;
+    });
     var logoAppearAction = new Action();
     var titleDisplayAction = new Action();
     var imgResLogo = getResource("imgResLogo");
     logoAppearAction.definePlayFrame(function (frame) {
+        if (frame == 1) {
+            registerObject(GUI_EVENT, hintText);
+        }
         fc.beginPath();
         fc.drawImage(imgResLogo, (W - imgResLogo.width / 2) / 2, -imgResLogo.height / 2 + frame * 4, 700, 471);
         return frame * 4 > imgResLogo.height / 2 + 10;
@@ -119,13 +135,16 @@ function procureTitleSequence() {
             fc.beginPath();
             fc.fillStyle = "white";
             fc.font = "bold 24pt Courier New";
-            fc.fillText(TXT_PRESS_START[lang], (W - 375) / 2, 110 + imgResLogo.height / 2);
+            fc.textAlign = "center";
+            fc.fillText(TXT_PRESS_START[lang], W / 2, 110 + imgResLogo.height / 2);
+            fc.textAlign = "left";
         }
         if (keyPressed == KEY_ACTION) {
             var mainMenuSequence = new Sequence();
             mainMenuSequence.addAction(procureDisplayCenteredMessageAction(300, "", false)
                 .addChoice(TXT_NEW_GAME).addChoice(TXT_LOAD_GAME).addChoice(TXT_ENDLESS_MODE, function () {return false;}));
             mainMenuSequence.addAction(procureCodeFragmentAction(function () {
+                hintTerminated = true;
                 switch (eventChoice) {
                     case 0:
                         registerObject(GUI_EVENT, procureStartPrologueSequence());
@@ -152,6 +171,7 @@ function procureAuraSkillSequence(character, auraImage, skillName) {
     var seed = Math.random() * 1000;
     auraAnimationAction.definePlayFrame(function (frame) {
         if (frame == 1) {
+            playBattleSfx(character, "sound/sfx/aura.ogg");
             registerObject(GUI_COMMON, procureGuiEffectAction(GFX_SCREEN_FLASH, "#FFFFFF", null));
         }
         var auraImageScale = (AURA_ANIMATION_H - 40) / auraImage.height;
@@ -385,19 +405,22 @@ function procureDisplaySpeechMessageAction(name, portrait, text) {
             drawTextbox(INFO_WINDOW_X, INFO_WINDOW_Y, INFO_WINDOW_W * frame / 10, INFO_WINDOW_H * frame / 10);
         } else {
             drawInfoWindow();
+            var portraitOffset = 20;
             fc.beginPath();
             if (portrait != undefined) {
                 fc.drawImage(portrait, INFO_WINDOW_X + 12, INFO_WINDOW_Y + 12, 196, 196);
+                portraitOffset = 220;
             }
-            processText(name, INFO_WINDOW_W - 220, INFO_WINDOW_X + 220, INFO_WINDOW_Y, LARGE_FONT);
+            processText(name, INFO_WINDOW_W - portraitOffset, INFO_WINDOW_X + portraitOffset, INFO_WINDOW_Y, LARGE_FONT);
             var translatedText = (typeof text === "string") ? text : text[lang];
             var printedText = frame * 3 >= translatedText.length ? translatedText : translatedText.substr(0, (frame - 10) * 3);
-            var lineCount = processText(printedText, INFO_WINDOW_W - 220, INFO_WINDOW_X + 220, INFO_WINDOW_Y + LARGE_LINE_HEIGHT).lineCount;
+            var lineCount = processText(printedText, INFO_WINDOW_W - portraitOffset, INFO_WINDOW_X + portraitOffset,
+                INFO_WINDOW_Y + LARGE_LINE_HEIGHT).lineCount;
 
             if ((frame - 10) * 3 >= text.length) {
                 fc.beginPath();
                 var cursorOffset = (frame % 20 < 10) ? 20 : 25;
-                fc.drawImage(CURSOR_DOWN, INFO_WINDOW_X + 220 + (INFO_WINDOW_W - 220) / 2 - CURSOR_DOWN.width / 2,
+                fc.drawImage(CURSOR_DOWN, INFO_WINDOW_X + portraitOffset + (INFO_WINDOW_W - portraitOffset) / 2 - CURSOR_DOWN.width / 2,
                     INFO_WINDOW_Y + cursorOffset + LARGE_LINE_HEIGHT + DEFAULT_LINE_HEIGHT * lineCount);
             }
 
@@ -437,7 +460,9 @@ function procureHeroTextAction(color, text) {
 
 function procureHpGaugeTextAction(character, color, text) {
     var y = (character == hero) ? 70 : 175;
-    return procureFloatingTextAction(60, y, DEFAULT_FONT, color, text);
+    var textToFloat = (typeof text === "string") ? text : text[lang];
+    return procureFloatingTextAction(60 + (textToFloat.length > 6 ? (textToFloat.length - 6) * DEFAULT_CHAR_WIDTH : 0),
+        y, DEFAULT_FONT, color, text);
 }
 
 function procureStatusTextAction(character, color, text) {
@@ -656,10 +681,11 @@ function procureInitiateBattleAction(newEnemy, finishedSequence) {
                     }
                 }
 
+                itemsLooted.length = 0;
+                skillsLearned.length = 0;
                 for (i = 0; i < attrIncrease.length; i++) {
                     attrIncrease[i] = 0;
                 }
-                skillsLearned.length = 0;
 
                 battleFrame = 0;
                 currentSyncCoefficient = 1;
@@ -996,12 +1022,11 @@ function acquireGradualChangeArtifact(position, leftWidth, rightWidth, weakColor
     return gradualChangeArtifact;
 }
 
-function acquireImpactArtifact(position, image, power, evadable, apGain, inflictData) {
+function acquireImpactArtifact(position, image, power, evadable, apGain, inflictData, impactAnimationData) {
     var impactArtifact = new BattleGaugeArtifact(position, 10, 10);
     impactArtifact.defineGetEffect(function (position, character) {
         if (position <= BGL_LEFT) {
-            playBattleSfx(character, "sound/sfx/hit.ogg");
-            character.strike(power, evadable, apGain, inflictData);
+            character.strike(power, evadable, apGain, inflictData, impactAnimationData);
             return true;
         } else {
             return false;
@@ -1070,6 +1095,54 @@ function acquireSelfInflictArtifact(position, cooldown, image, inflictData) {
         });
     }
     return selfInflictArtifact;
+}
+
+function acquireSlotLockArtifact(position, leftWidth, rightWidth, weakColor, strongColor, item, slot, hidden) {
+    var slotLockArtifact = new BattleGaugeArtifact(position, leftWidth, rightWidth);
+    if (hidden) {
+        slotLockArtifact.leftCooldown = 0;
+        slotLockArtifact.rightCooldown = 0;
+    }
+    slotLockArtifact.defineGetEffect(function (position, character) {
+        if (((position >= BGL_LEFT) && (leftWidth != 0) && (position - BGL_LEFT <= leftWidth))
+            || ((position <= BGL_LEFT) && (rightWidth != 0) && (BGL_LEFT - position <= rightWidth))) {
+
+            if (character == hero) {
+                if (item) {
+                    itemSlotLock[slot] = true;
+                } else {
+                    skillSlotLock[slot] = true;
+                }
+            }
+        }
+        return position + rightWidth < BGL_LEFT;
+    });
+    if (!hidden) {
+        slotLockArtifact.defineDraw(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            drawLimitedGradient(position - leftWidth, topOffset, position, topOffset + BGL_HEIGHT,
+                weakColor, strongColor
+            );
+            drawLimitedGradient(position, topOffset, position + rightWidth, topOffset + BGL_HEIGHT,
+                strongColor, weakColor
+            );
+        });
+        slotLockArtifact.defineSketch(function (position, character) {
+            var topOffset = getBattleGaugeOffset(character);
+            fc.beginPath();
+            fc.rect(position - leftWidth, topOffset - 5, rightWidth + leftWidth, BGL_HEIGHT + 10);
+            fc.lineWidth = 3;
+            fc.strokeStyle = "black";
+            fc.stroke();
+            fc.lineWidth = 1;
+            fc.moveTo(position - leftWidth, topOffset - 5);
+            fc.lineTo(position - leftWidth, topOffset + 164);
+            fc.moveTo(position + rightWidth, topOffset - 5);
+            fc.lineTo(position + rightWidth, topOffset + 164);
+            fc.stroke();
+        });
+    }
+    return slotLockArtifact;
 }
 
 function acquireTriggerArtifact(triggerFunction, position, cooldown, image) {
@@ -1172,9 +1245,9 @@ function acquireResponseArtifact(position, leftWidth, rightWidth, weakColor, str
     return responseArtifact;
 }
 
-function acquireEmptyArtifact(position, cooldown, image) {
+function acquireEmptyArtifact(position, cooldown, image, sfxSrc) {
     var emptyArtifact = new BattleGaugeArtifact(position, cooldown, cooldown);
-    if (image !== undefined) {
+    if (image != undefined) {
         emptyArtifact.defineDraw(function (position, character) {
             var topOffset = getBattleGaugeOffset(character);
             if ((position > BGL_LEFT) && (position < BGL_RIGHT)) {
@@ -1198,7 +1271,10 @@ function acquireEmptyArtifact(position, cooldown, image) {
             fc.stroke();
         });
     }
-    emptyArtifact.defineGetEffect(function (position) {
+    emptyArtifact.defineGetEffect(function (position, character) {
+        if ((position < BGL_LEFT) && (sfxSrc != undefined)) {
+            playBattleSfx(character, sfxSrc);
+        }
         return position < BGL_LEFT;
     });
     return emptyArtifact;

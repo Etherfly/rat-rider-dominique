@@ -8,7 +8,7 @@
 
 <table>
     <tr>
-        <td style="color: white;">Rat Rider Dominique v.0.87 ALPHA</td>
+        <td style="color: white;">Rat Rider Dominique v.0.90 ALPHA</td>
     </tr>
     <tr>
         <td>
@@ -48,6 +48,8 @@
             <img id="imgBattleInflictImpact2Icon" src="resources/other/battlegauge/iconInflictImpact2.png">
             <img id="imgBattleAuraImpact1Icon" src="resources/other/battlegauge/iconAuraImpact1.png">
             <img id="imgBattleAuraImpact2Icon" src="resources/other/battlegauge/iconAuraImpact2.png">
+            <img id="imgBattleDeathblowIcon" src="resources/other/battlegauge/iconDeathblow.png">
+            <img id="imgBattleNimbleIcon" src="resources/other/battlegauge/iconNimble.png">
             <img id="imgBattleItemIcon" src="resources/other/battlegauge/iconItem.png">
             <img id="imgBattleItemTrap" src="resources/other/battlegauge/iconTrap.png">
             <img id="imgAuraDominique" src="resources/other/dominique-aura.png">
@@ -89,6 +91,8 @@
             <img id="imgItemDagger1" src="resources/items/dagger1.png">
             <img id="imgItemShield1" src="resources/items/shield1.png">
             <img id="imgItemTalisman1" src="resources/items/talisman1.png">
+            <img id="imgItemElixir1" src="resources/items/elixir1.png">
+            <img id="imgItemElixir2" src="resources/items/elixir2.png">
             <img id="imgItemCube1" src="resources/items/cube1.png">
             <img id="imgItemCube2" src="resources/items/cube2.png">
             <img id="imgItemCube3" src="resources/items/cube3.png">
@@ -157,6 +161,12 @@
             <audio id="sndGuiThuck2">
                 <source src="sound/sfx/gui-thuck.ogg" type="audio/ogg">
             </audio>
+            <audio id="sndGuiBorok1">
+                <source src="sound/sfx/gui-borok.ogg" type="audio/ogg">
+            </audio>
+            <audio id="sndGuiBorok2">
+                <source src="sound/sfx/gui-borok.ogg" type="audio/ogg">
+            </audio>
             <audio id="sndHeroBattleSfx">
                 <source src="sound/sfx/hit.ogg" type="audio/ogg">
             </audio>
@@ -185,7 +195,7 @@
                 And so Dominique wishes to choose the destiny of a hero - a typical desire for someone like him.
                 But such a path is not easily attained. And for this reason he sets out on a journey to perform a
                 feat worthy of earning him the title of "hero". <br> <br>
-                As he arrives to the free province of Asqiua, he looks around to find those in need.
+                As he arrives to the free province of Asqarra, he looks around to find those in need.
             </span>
         </td>
         <td style="display: none;">
@@ -208,7 +218,7 @@
                 И вот, Доминик желает избрать судьбу героя - типичное желание для такого, как он.
                 Но выйти на подобную стезю непросто. И как раз для этого он отправляется в путешествие, чтобы совершить
                 подвиг, достойный звания "героя". <br> <br>
-                Прибыв в свободную провинцию Аскюа, он оглядывается в поисках нуждающихся в его услугах. <br>
+                Прибыв в свободную провинцию Аскарра, он оглядывается в поисках нуждающихся в его услугах. <br>
             </span>
         </td>
     </tr>
@@ -293,6 +303,9 @@
     var TXT_ENDLESS_MODE = ["Endless mode", "Бесконечный режим"];
     var TXT_RETURN_TO_TITLE = ["Return to title", "Вернуться в главное меню"];
 
+    var TXT_HINT_LANGUAGE = ["* Нажмите 'Ё', чтобы сменить язык на русский.", "* Press '~' (tilde) to change language to English."];
+    var TXT_HINT_VOLUME = ["* Press '+' and '-' to adjust the master volume.", "* Нажимайте '+' и '-', чтобы отрегулировать громкость звука."];
+
     var TXT_LOAD_GAME_NO_DATA = ["No saved game data was found in the local storage of your browser.",
         "В локальном хранилище Вашего браузера не найдено данных сохранённой игры."];
 
@@ -321,11 +334,18 @@
     var TXT_KARMA = ["Karma", "Карма"];
     var TXT_KARMA_COST = [" karma.", " ед. кармы."];
 
+    var TXT_MAXHP = ["Max HP", "Макс. ОЖ"];
+    var TXT_MAXSP = ["Max SP", "Макс. ОВ"];
+
     var TXT_MENU_STATS = ["Statistics", "Статистика"];
     var TXT_MENU_SKILLS = ["Skills", "Навыки"];
     var TXT_MENU_ITEMS = ["Items", "Предметы"];
     var TXT_MENU_CODEX = ["Codex", "Кодекс"];
     var TXT_MENU_QUIT = ["Quit", "Выйти"];
+
+    var TXT_STATS_SKILLS_LEARNED = ["Skills known", "Известно навыков"];
+    var TXT_STATS_CODEX_ENTRIES = ["Codex entries", "Записей в кодексе"];
+    var TXT_STATS_DESTINIES = ["Destinies", "Судьбы"];
 
     var TXT_CODEX_CATEGORIES = ["Categories", "Категории"];
     var TXT_CODEX_LANDMARKS = ["Landmarks", "Объекты на местности"];

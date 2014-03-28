@@ -155,7 +155,7 @@ function inquireChapter00EnemyBandit() {
             "defend, attack, opening. <br> <br> Hint: <br> - Since the time frame near the enemy attack provides a greater vulnerability, " +
             "it makes sense to use it to deliver a finishing blow. One has to be careful, however: if the enemy still stands after such an " +
             "attack or manages to strike first, one will sustain more damage.",
-        "Бедняк, вероятно, крестьянин, ставший на путь кармического грабежа. Медленный и предсказуемый. <br> Ожидаемая схема действий: защита, " +
+        "Бедняк, вероятно, крестьянин, вставший на путь кармического грабежа. Медленный и предсказуемый. <br> Ожидаемая схема действий: защита, " +
             "атака, уязвимость. <br> <br> Совет: <br> - Так как временная область близ вражеской атаки предоставляет большую уязвимость, имеет " +
             "смысл использовать её для нанесения последнего удара. Следует, однако, быть осторжным: если враг выстоит такую атаку или сумеет " +
             "нанести удар первым, полученные повреждения будут большими."
@@ -196,7 +196,7 @@ function inquireChapter00EnemyBrigand() {
     return new CodexEntry(["Brigand", "Разбойник"], CAT_ENEMIES, getResource("imgEnemyBandit2Stand")).defineText([
         "A somewhat experienced karmic robber that has obtained some skills and a good weapon. Strong, but slow. Uses power attack that slows " +
             "him down near the moment of impact. <br> Anticipated action pattern: power attack, defend, [attack and fumbled attack] (random " +
-            "order), defense. <br> <br> Hint: <br> - While power attack provides great opportunities to deliver a few good blows to the " +
+            "order), defend. <br> <br> Hint: <br> - While power attack provides great opportunities to deliver a few good blows to the " +
             "opponent, it's also potentially deadly due to its high attack power. Since it slows down near the impact, one may use speed " +
             "synchronization ('Shift' key) to make sure that it is guarded against. One should remember, however, that synchronization negates " +
             "the advantage from having higher agility.",
@@ -239,10 +239,10 @@ function inquireChapter00EnemyArmadilloKnight() {
     return new CodexEntry(["Armadillo knight", "Броненосец-рыцарь"], CAT_ENEMIES, getResource("imgEnemyArmadillo1Stand")).defineText([
         "An armored warrior of the armadillo kin. Armadillos have a penchant for exploring and experiencing different warrior ways. Tough, " +
             "but slow. Has a fullguard attack, which provides a defense increase instead of a decrease. <br> Anticipated action pattern: " +
-            "fullguard attack, opening, attack, defense.",
+            "defend, fullguard attack x0-1, opening, attack, defend.",
         "Бронированный воин из рода броненосцев. Броненосцы имеют склонность к исследованию и испытанию различных воинских традиций. Крепкий, " +
             "но медлительный. Имеет полностью защищённую атаку, дающую повышение защиты вместо понижения. <br> Ожидаемая схема действий: " +
-            "цельнозащитная атака, уязвимость, атака, защита."
+            "защита, цельнозащитная атака x0-1, уязвимость, атака, защита."
     ]);
 }
 
@@ -250,7 +250,7 @@ var CDX_CH00ENM_BANDITRINGLEADER = 508;
 function inquireChapter00EnemyBanditRingleader() {
     return new CodexEntry(["Bandit ringleader", "Главарь банды"], CAT_ENEMIES, getResource("imgEnemyBandit3Stand")).defineText([
         "Danger encounter! <br> <br> A ringleader of a local band. Terrorizes commoners, occasionally commits atrocities and is a bad person " +
-            "overall. Uses power attack and double strike. <br> Anticipated action pattern: defense, double strike, [jab and attack] (random " +
+            "overall. Uses power attack and double strike. <br> Anticipated action pattern: defend, double strike, [jab and attack] (random " +
             "order), power attack. <br> <br> Learnable skill: double strike.",
         "Опасный бой! <br> <br> Главарь местной банды. Терроризирует жителей, иногда учиняет зверства и в целом является плохим (не)человеком. " +
             "Использует силовую атаку и двойной удар. <br> Ожидаемая схема действий: защита, двойной удар, [короткий удар и атака] (в случайном " +
@@ -274,7 +274,7 @@ var CDX_CH00ENM_GREENSERPENT = 510;
 function inquireChapter00EnemyGreenSerpent() {
     return new CodexEntry(["Green serpent", "Зелёный змей"], CAT_ENEMIES, getResource("imgEnemySerpent1Stand")).defineText([
         "Boss! <br> <br> The legendary 'Party Crasher' that leaves his den once in half a year to gather supplies and hunt for sport. It " +
-            "has developed a taste for alcoholic beverages, so it is not uncommon for it to attend at parties as an unwanted guest and " +
+            "has developed a taste for alcoholic beverages, so it is not uncommon for it to attend parties as an unwanted guest and " +
             "slaughter every living being in sight only to consume the spirits in their blood. For this very reason few actually organize " +
             "feasts at times of year when Party Crasher is on the prowl.",
         "Босс! <br> <br> Легендарный 'Незваный Гость', который покидает своё логово раз в полгода, чтобы запастись едой и поохотиться ради " +
@@ -304,7 +304,7 @@ function inquireLore001NaturalOrder() {
             "Истина, смысл жизни, ценность каждого маленького движения в мире... Не важно в какую эпоху, житель, будь это кабанолюд, человек или " +
             "снежный куу, всегда находится в духовном поиске. Эти вещи нужны ему, чтобы идти вперёд. И нам повезло родиться в Экумосе, где " +
             "подобные поиски небезрезультатны. <br> <br> У наших слов, действий и выбора есть вес. Этот вес даёт нам сознание и способность " +
-            "влиять на мир, привносить в него изменения, творить и украшать сущее красотой наших душ. Этот вес в какой-то момент стал " +
+            "влиять на мир, привносить в него изменения, творить и украшать сущее изяществом наших душ. Этот вес в какой-то момент стал " +
             "называться кармой. Затейливая равновесная природная система, которая удерживает наш мир от разваливания на части, чем-то похожа " +
             "на механизм с шестерёнками и весами. В то время, как Ваше эго стоит на одной чаше весов, карма - это вес на другой. Этот " +
             "великий замысел известен как Естественный Порядок. <br> <br> Будучи частью Естественного Порядка, существа Экумоса " +
@@ -339,8 +339,8 @@ function inquireLore002SourcesOfKarma() {
             "каждой новой техникой, освоенной во время ученичества, и с каждым вылепленным горшком, который лучше, чем предыдущий. Учитель получает " +
             "карму от знаний, которые вкладывает в умы своих учеников. Карма воина растёт с его силой и грузом на душе, увеличивающимся с каждым " +
             "павшим от его рук. <br> <br> Как Вы могли уже понять, для обретения кармы необходим рост души. Тот, кто прекращает развиваться, " +
-            "теряет свой кармический доход и рискует стать бедняком. А что может быть хуже, чем потеря способности выбирать и что-то менять, чем " +
-            "становление рабом чужой воли, плывущим по течению?.."
+            "теряет свой кармический доход и становится бедняком. А что может быть хуже, чем потеря способности выбирать и что-то менять, чем " +
+            "становление рабом чужой воли, плывущим по течению?"
     ]);
 }
 
@@ -368,18 +368,17 @@ function inquireLore003RobbersAndDealers() {
             "Наверное, было бы здорово жить в раю, где все исключительно честны в своём стремлении к саморазвитию и улучшению жизни окружающих. " +
             "Но даже Экумос, где работает Естественный Порядок, не таков. Есть отдельные виды существ, которых Вам следует избегать. <br> <br> " +
             "Грабители - это те, кто желает отнять Вашу карму, даже когда Вы против этого. В то время, как нет известного способа вытащить карму " +
-            "из кого-либо против его или её воли, есть множество способов заставить её отдать посредством психологического давления. Самый " +
-            "прямой способ - угроза насилия или смерти. Когда Вас охватывает страх, Вы теряете равновесие и Ваш глубинный разум " +
-            "непроизвольно отдаёт карму в пользу агрессора. Пощада грабителя затем воспринимается как акт милосердия, и любые чувства, которые " +
-            "Вы вспоследствии испытаете из-за этого, обойдутся ещё дороже. Более сложные способы работы грабителей включают в себя использование " +
-            "чувства вины и вызов на поединок сильных противников. Отдельные категории воинов, такие как крысиные всадники, особенно интересны " +
-            "для них, так как их свод правил не позволяет им отказываться от поединка. <br> <br> Другой вид кармических паразитов - это дельцы, " +
-            "чьим основным методом работы является обман. Хотя и не настолько запущенно, как в человеческом обществе, бюрократия и искусственная " +
-            "экономика всё равно присутствуют во всех цивилизациях. В своей основе дельцы раздувают ценность вещей, создавая проблемы на пути их " +
-            "достижения и предоставляя решение. Это делает их в определённой мере необходимыми в глазах других и приносит им карму, хотя они едва " +
-            "ли что-то создают сами. Дельцы с радостью продадут Вам воздух и воду и даже возьмут с Вас за место, которое Вы занимаете в " +
-            "пространстве. <br> <br> Ваша главная защита от этих существ - знание и невосприимчивость к их обманным схемам, твёрдость воли и " +
-            "умение видеть суть вещей. Все они играют с Естественным Порядком в опасную игру и в итоге рано или поздно проигрывают."
+            "из кого-либо против его или её воли, есть множество способов заставить её отдать. Самый простой способ - угроза насилия. Когда Вас " +
+            "охватывает страх, Вы теряете равновесие и непроизвольно отдаёте карму в пользу агрессора. Пощада затем воспринимается как " +
+            "акт милосердия, и любые чувства, которые Вы вспоследствии испытаете из-за этого, обойдутся ещё дороже. Отдельные категории воинов, " +
+            "такие как крысиные всадники, особенно интересны для грабителей, так как их свод правил не позволяет им отказываться от поединка. " +
+            "<br> <br> Другой вид кармических паразитов - это дельцы, чьим основным методом работы является обман. Хотя и не настолько " +
+            "запущенно, как в человеческом обществе, бюрократия и искусственная экономика всё равно присутствуют во всех цивилизациях. В своей " +
+            "основе дельцы раздувают ценность вещей, создавая проблемы на пути их достижения и предоставляя решение. Это делает их в " +
+            "определённой мере необходимыми в глазах других и приносит им карму, хотя они едва ли что-то создают сами. Дельцы с радостью " +
+            "продадут Вам воздух и воду и даже возьмут с Вас за место, которое Вы занимаете в пространстве. <br> <br> Ваша защита от " +
+            "этих существ - знание и невосприимчивость к их обманным схемам, твёрдость воли и умение видеть суть вещей. Все они играют с " +
+            "Естественным Порядком в опасную игру и в итоге рано или поздно проигрывают."
     ]);
 }
 
@@ -459,10 +458,10 @@ function inquireLore005HumanSociety() {
 var CDX_JOU001_CH00P01 = 1501;
 function inquireJournal001Ch00P01() {
     return new CodexEntry(["Prologue: In search of trouble", "Пролог: В поисках неприятностей"], CAT_JOURNAL).defineText([
-        "Dominique and Sallinger have arrived to Asqiua, a free province inhabited mostly by hogman and wolf homesteaders who manage " +
+        "Dominique and Sallinger have arrived to Asqarra, a free province inhabited mostly by hogman and wolf homesteaders who manage " +
             "to live side by side. It has been known to be dangerous because of many bandits and wild animals in the area. But " +
             "Dominique hopes to find something greater, worthy of a hero's feat.",
-        "Доминик и Сэллинджер прибыли в свободную провинцию Аскюа, населённую в основном поселенцами кабанолюдов и волколюдов, " +
+        "Доминик и Сэллинджер прибыли в свободную провинцию Аскарра, населённую в основном поселенцами кабанолюдов и волколюдов, " +
             "умудряющимися сосуществовать мирно. Известно, что здесь весьма опасно из-за бандитов и диких животных. Но Доминик " +
             "надеется найти нечто большее, достойное подвига героя."
     ]);
@@ -474,9 +473,9 @@ function inquireJournal002Ch00P02() {
         "The duo have found a violently destroyed house (not without victims) and an emerald scale amidst the ruins. Everything points to " +
             "the fact that the culprit is a huge scaly beast. To find it Dominique must find the real seer who can trace the scale back to " +
             "its owner. <br> <br> Milestones on the way: 1",
-        "Двое обнаружили разрушенный с особой жестокостью дом (не без жертв) и изумрудную чешуйку среди развалин. Всё указывает на то, " +
+        "Двое обнаружили разрушенный дом, полусъеденные тела и изумрудную чешуйку среди развалин. Всё указывает на то, " +
             "что совершила это огромная чешуйчатая тварь. Чтобы найти её, Доминик должен найти настоящего провидца, который сможет отследить " +
-            "её по чешуйке. <br> <br> Мильных камней на пути: 1"
+            "её. <br> <br> Мильных камней на пути: 1"
     ]);
 }
 
@@ -489,6 +488,14 @@ function inquireJournal003Ch00P03() {
         "Крысиный всадник посетил провидца только, чтобы узнать, что он уже на пути к своей цели - Незваному Гостю. Хотя двое ещё не " +
             "догадываются, что за чудовище их ждёт, они вскоре с ним встретятся, если продолжат путь по тропе змеи. " +
             "<br> <br> Мильных камней на пути: 1"
+    ]);
+}
+
+var CDX_JOU004_CH00P04 = 1504;
+function inquireJournal004Ch00P04() {
+    return new CodexEntry(["Prologue: The end?", "Пролог: Конец?"], CAT_JOURNAL).defineText([
+        "The game is finished (for now), but not Dominique's story. What will rat rider find when he returns to what was once his home?..",
+        "Игра на этом окончена (пока), но не история Доминика. Что же найдёт крысиный всадник по возвращении в свой бывший дом?.."
     ]);
 }
 
@@ -549,6 +556,8 @@ function inquireCodex(id) {
             return inquireJournal002Ch00P02();
         case CDX_JOU003_CH00P03:
             return inquireJournal003Ch00P03();
+        case CDX_JOU004_CH00P04:
+            return inquireJournal004Ch00P04();
         default:
             return null;
     }

@@ -13,6 +13,8 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
     this.terrainColorMid = terrainColorMid;
     this.terrainColorNear = terrainColorNear;
 
+    this.name = ["Unknown", "Неизвестно"];
+
     this.mainTheme = mainTheme;
     this.battleTheme = battleTheme;
 
@@ -105,7 +107,7 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
                     + this.landmarkFrequency * (0.5 + Math.random());
                 newLandmark = this.landmarkTypes[0].generateLandmark(MID, newLandmarkPosition);
                 newLandmark.landmarkType = this.landmarkTypes[currentLandmarkTypeId];
-                registerObject(pathToObjectBackgroundLayer(MID) + newLandmark.layerOffset, newLandmark);
+                registerObject(pathToObjectLayer(MID) + newLandmark.layerOffset, newLandmark);
                 landmarksOnLayer[MID]++;
                 farthestLandmarks[MID] = newLandmark;
             }
@@ -131,7 +133,7 @@ function Landscape(background, terrainColorFar, terrainColorMid, terrainColorNea
                     if (this.landmarkTypes[currentLandmarkTypeId].singletonId != null) {
                         singletonIds.push(this.landmarkTypes[currentLandmarkTypeId].singletonId);
                     }
-                    registerObject(pathToObjectBackgroundLayer(path) + newLandmark.layerOffset, newLandmark);
+                    registerObject(pathToObjectLayer(path) + newLandmark.layerOffset, newLandmark);
                     landmarksOnLayer[path]++;
                     farthestLandmarks[path] = newLandmark;
                 }
@@ -357,7 +359,7 @@ function Hero() {
 
     // TODO: temporary filled skills and items!
     this.availableSkills = [SKL_DEEPBREATH];
-    this.availableAuraSkills = [SKL_ACEOFSPADES];
+    this.availableAuraSkills = [];
     this.activeSkills = [SKL_ATTACK, SKL_DEFEND];
     this.activeAuraSkills = [];
 
@@ -447,8 +449,10 @@ function Hero() {
 
     this.useSkill = function (skill, position) {
         if (this.getRightmostCooldown() >= skill.getLeftCooldown(position)) {
+            playSfx(SFX_GUI_BOROK);
             registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH, "#FF6060", null));
         } else if (this.sp < skill.spCost) {
+            playSfx(SFX_GUI_BOROK);
             registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_SPGAUGE_FLASH, "#FF6060", null));
         } else {
 
@@ -470,10 +474,13 @@ function Hero() {
 
     this.useAuraSkill = function (skill, position) {
         if (this.getRightmostCooldown() >= skill.getLeftCooldown(position)) {
+            playSfx(SFX_GUI_BOROK);
             registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH, "#FF6060", null));
         } else if (this.sp < skill.spCost) {
+            playSfx(SFX_GUI_BOROK);
             registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_SPGAUGE_FLASH, "#FF6060", null));
         } else if (this.ap < 1) {
+            playSfx(SFX_GUI_BOROK);
             registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_APGAUGE_FLASH, "#FF6060", null));
         } else {
             /* ATTRIBUTE INCREASE FOR AGILITY */
@@ -499,8 +506,10 @@ function Hero() {
         if (this.activeItems[itemChoice] != null) {
             var item = obtainItem(this.activeItems[itemChoice].id);
             if (this.getRightmostCooldown() >= item.getLeftCooldown(position)) {
+                playSfx(SFX_GUI_BOROK);
                 registerObject(GUI_COMMON, procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH, "#FF6060", null));
             } else {
+
                 /* ATTRIBUTE INCREASE FOR AGILITY */
                 var enemyAgilityModifier = enemy.attrAgility / hero.attrAgility;
                 var agilityIncreaseMultiplier = 100 / (item.getLeftCooldown(position) - this.getRightmostCooldown() + 50);
@@ -511,12 +520,15 @@ function Hero() {
                     this.activeItems[itemChoice] = null;
                 }
                 var artifactData = item.getArtifacts(position);
-                for (var i = 0; i < artifactData.length; i++) {
-                    // Fuck you, Javascript!
-                    this.battleGaugeArtifacts.push(artifactData[i]);
+                if (artifactData != null) {
+                    for (var i = 0; i < artifactData.length; i++) {
+                        this.battleGaugeArtifacts.push(artifactData[i]);
+                    }
+                    registerObject(GUI_COMMON,
+                        procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH_FILL, "#FFFFFF", null));
+                } else {
+                    playSfx(SFX_GUI_BOROK);
                 }
-                registerObject(GUI_COMMON,
-                    procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH_FILL, "#FFFFFF", null));
             }
         }
     };
@@ -561,8 +573,8 @@ function Hero() {
         }
     };
 
-    this.strike = function (power, evadable, apGain, inflictData) {
-        registerImpact(hero, enemy, power, evadable, apGain, inflictData);
+    this.strike = function (power, evadable, apGain, inflictData, impactAnimationData) {
+        registerImpact(hero, enemy, power, evadable, apGain, inflictData, impactAnimationData);
         registerObject(GUI_COMMON,
             procureGuiEffectAction(GFX_HERO_BATTLEGAUGE_FLASH_FILL, "#FF4040", null));
         this.setAnimationState(AN_ATTACK);
@@ -634,13 +646,13 @@ function Hero() {
     this.getAttribute = function (attribute) {
         switch (attribute) {
             case ATTR_ATTACK:
-                return hero.attrAttack;
+                return this.attrAttack;
             case ATTR_DEFENSE:
-                return hero.attrDefense;
+                return this.attrDefense;
             case ATTR_AGILITY:
-                return hero.attrAgility;
+                return this.attrAgility;
             case ATTR_REFLEXES:
-                return hero.attrReflexes;
+                return this.attrReflexes;
             default:
                 return null;
         }
@@ -651,25 +663,37 @@ function Hero() {
         switch (attribute) {
             case ATTR_ATTACK:
                 intGain = Math.floor(hero.attrAttack + increment) - Math.floor(hero.attrAttack);
-                hero.attrAttack += increment;
+                this.attrAttack += increment;
                 break;
             case ATTR_DEFENSE:
                 intGain = Math.floor(hero.attrDefense + increment) - Math.floor(hero.attrDefense);
-                hero.attrDefense += increment;
+                this.attrDefense += increment;
                 break;
             case ATTR_AGILITY:
                 intGain = Math.floor(hero.attrAgility + increment) - Math.floor(hero.attrAgility);
-                hero.attrAgility += increment;
+                this.attrAgility += increment;
                 break;
             case ATTR_REFLEXES:
                 intGain = Math.floor(hero.attrReflexes + increment) - Math.floor(hero.attrReflexes);
-                hero.attrReflexes += increment;
+                this.attrReflexes += increment;
                 break;
         }
         if (intGain > 0) {
             registerObject(GUI_COMMON,
                 procureAttributeTextAction(attribute, "#30E030", "+" + intGain).authorizeMenuPlay());
         }
+    };
+
+    this.increaseMaxHp = function (increment) {
+        this.attrMaxHp += increment;
+        registerObject(GUI_COMMON, procureHpGaugeTextAction(hero, "#30E030",
+            [TXT_MAXHP[LANG_ENG] + " +" + Math.floor(increment), TXT_MAXHP[LANG_RUS] + " +" + Math.floor(increment)]).authorizeMenuPlay());
+    };
+
+    this.increaseMaxSp = function (increment) {
+        this.attrMaxSp += increment;
+        registerObject(GUI_COMMON, procureHpGaugeTextAction(hero, "#30E030",
+            [TXT_MAXSP[LANG_ENG] + " +" + Math.floor(increment), TXT_MAXSP[LANG_RUS] + " +" + Math.floor(increment)]).authorizeMenuPlay());
     };
 
     this.hasSkill = function (skillId) {
@@ -738,7 +762,7 @@ function Hero() {
     this.manifest = function() {
         if (menuState == MS_NONE) {
             if (moving) {
-                var optimalHeight = getOptimalHeight(this.path, this.position) + 60;
+                var optimalHeight = getOptimalHeight(this.path, this.position) + 70;
                 var heightOffset = optimalHeight - this.height;
                 if (Math.abs(heightOffset) > 4) {
                     heightOffset = 4 * heightOffset / Math.abs(heightOffset);
@@ -895,12 +919,8 @@ function Enemy(attrAttack, attrDefense, attrAgility, attrReflexes, attrMaxHp, an
 
     this.useSkill = function (skill, position) {
         var artifactData = skill.getArtifacts(position);
-        if (this.getRightmostCooldown() >= skill.getLeftCooldown(position)) {
-            // Maybe some special behavior will go here
-        } else {
-            for (var i = 0; i < artifactData.length; i++) {
-                this.battleGaugeArtifacts.push(artifactData[i]);
-            }
+        for (var i = 0; i < artifactData.length; i++) {
+            this.battleGaugeArtifacts.push(artifactData[i]);
         }
     };
 
@@ -1101,7 +1121,7 @@ function Landmark(path, position, defaultImage) {
 
     // offset from the center position
     if (defaultImage != undefined) {
-        this.offset = 70 - this.defaultImage.height * this.scale + this.defaultImage.width * this.scale / 5;
+        this.offset = 80 - this.defaultImage.height * this.scale + this.defaultImage.width * this.scale / 5;
     } else {
         this.offset = 0;
     }

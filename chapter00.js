@@ -43,6 +43,7 @@ var CH00_TUTORIAL_MENU_ITEMS = 14;      // tutorial message: escape menu - items
 var CH00_TUTORIAL_MENU_CODEX = 15;      // tutorial message: escape menu - codex
 var CH00_CONVERSATION_CAVE = 16;        // conversation: serpent cave
 var CH00_BANDIT_RINGLEADER_QUEST = 17;  // bandit ringleader quest flag
+var CH00_ARMADILLO_VITYAZ_QUEST = 18;   // armadillo vityaz quest flag
 
 /* TEXT DATA */
 
@@ -50,16 +51,14 @@ var CH00_TITLE = ["Prologue: Hero's Karma <br> ", "Пролог: Карма Ге
 
 var CH00_TUTORIAL_MENU_ROOT_TXT = [
     "This is the pause menu. Here you can manage Dominique's skills and items, view statistics data "
-        + "and codex entries. <br> <br> You can access the pause menu anytime outside of battle.",
+        + "and codex entries. <br> <br> You can access the pause menu almost anytime outside of battle.",
     "Это меню паузы. Здесь Вы можете настраивать навыки и предметы Доминика, просматривать статистику и "
-        + "записи в кодексе. <br> <br> Вы можете заходить в меню паузы в любой момент вне боя."
+        + "записи в кодексе. <br> <br> Вы можете заходить в меню паузы почти в любой момент вне боя."
 ];
 
 var CH00_TUTORIAL_MENU_STATS_TXT = [
-    "On this screem you can view your character stats and game statistics and browse through your "
-        + "destinies. Not that there is ANYTHING on the screen now...",
-    "На этом экране Вы можете увидеть информацию о персонаже и игровую статистику, а также просмотреть "
-        + "Ваши судьбы. Не то, что бы сейчас на экране ВООБЩЕ что-либо отображалось..."
+    "On this screem you can view your character stats and game statistics and browse through your destinies.",
+    "На этом экране Вы можете увидеть информацию о персонаже и игровую статистику, а также просмотреть Ваши судьбы."
 ];
 
 var CH00_TUTORIAL_MENU_SKILLS_TXT = [
@@ -346,7 +345,7 @@ var CH00_LIBRARY_02_3 = [
         "\"The Art of Not Being Hit in the First Place\". He proceeds to carefully study its contents and concludes that he should " +
         "try practicing what he just learned",
     "Бродя в кажущимся бесконечным лабиринте книжных полок, Доминик осматривает книги и обнаруживает одну, озаглавленную " +
-        "\"Искусство Изначально не Попадать под Удары\". Он аккуратно изучает её содержимое и заключает, что ему неплохо бы " +
+        "\"Искусство не Попадать под Удары\". Он аккуратно изучает её содержимое и заключает, что ему неплохо бы " +
         "попрактиковаться в том, что он только что освоил."];
 
 var CH00_HOUSE_REST_01 = [
@@ -509,6 +508,7 @@ var CH00_TUTORIAL_ARMADILLO_TXT = [
 var LSC_PROLOGUE = 1;
 function createPrologueLandscape() {
     var prologueLandscape = createGrasslandsLandscape();
+    prologueLandscape.name = ["Asqarra", "Аскарра"];
     prologueLandscape.defineActualize(function () {
         this.clearLandmarkTypes();
         this.addLandmarkType(describeChroniclersPavilionType(0.1));
@@ -567,6 +567,7 @@ function createPrologueLandscape() {
 var LSC_SERPENT_CAVE = 2;
 function createSerpentCaveLandscape() {
     var serpentCaveLandscape = createCavesLandscape();
+    serpentCaveLandscape.name = ["Asqarra - Serpent cave", "Аскарра - Пещера змея"];
     serpentCaveLandscape.mainTheme = MUS_FOREBODING;
     serpentCaveLandscape.defineActualize(function () {
         this.clearLandmarkTypes();
@@ -619,7 +620,7 @@ function procureStartPrologueSequence() {
         // creating hero, enabling GUI
         clearObjectType("Hero");
         hero = new Hero();
-        registerObject(OBJECTS_MID, hero);
+        registerObject(OBJECTS_MID_HERO, hero);
 
         gst[CH00][CH00_PHASE] = 1;
 
@@ -685,11 +686,11 @@ function procureStartPrologueSequence() {
                         + "тропами, условно называемыми дальней, средней и ближней."]));
             afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
                 ["To travel towards the farther path, press the 'W' key or the 'Up' key. To travel towards the nearer "
-                    + "path, press the 'S' key or the 'Down' key. But be cautious: such movement expends your stamina, "
-                    + "so too much of it and you will get tired very quickly.",
+                    + "path, press the 'S' key or the 'Down' key. But be cautious: such movement expends stamina, "
+                    + "so too much of it and I will get tired very quickly.",
                     "Чтобы путешествовать дальше, следует нажать 'W' или 'Вверх'. Чтобы путешествовать ближе, следует "
                         + "нажать 'S' или 'Вниз'. Но будь осторожен: такие перемещения тратят твою выносливость, так "
-                        + "что если будешь много петлять, быстро устанешь."]));
+                        + "что если будешь много петлять, я быстро устану."]));
             afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
                 ["Let's have a look around and see if someone has a task for a hero like you. "
                     + "Keep an eye out for an exclamation mark over a landmark - such marks denote places of "
@@ -1418,13 +1419,11 @@ function describeDestroyedHouseType(chance) {
             objectSequence.addAction(procureStopAction());
             objectSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM, [
                 "Dominique and Sallinger discover a house that was practically brought apart by something large and vicious. White tablecloth " +
-                    "is stained crimson with either wine or blood, or maybe even a mix of both. Half-eaten victims are lying on the floor, " +
-                    "motionless and lifeless. Even though they are all commoners, they are dressed better than what one would expect. It seems " +
-                    "that a party was held here.",
+                    "is stained crimson with either wine or blood, or maybe even a mix of both. Half-eaten victims are lying on the floor. " +
+                    "Even though they are all commoners, they are dressed better than what one would expect. It seems that a party was held here.",
                 "Доминик и Сэллинджер обнаруживают дом, который был практически разобран на куски чем-то большим и жестоким. Белая скатерть " +
-                    "покрыта пятнами чего-то красного, вина или крови или даже смеси того и другого. Наполовину съеденные жертвы лежат на " +
-                    "полу без движения и признаков жизни. Хотя все они незнатного происхождения, одеты они лучше, чем следовало бы ожидать. " +
-                    "Видно, здесь проходило празднество."
+                    "покрыта пятнами чего-то красного, вина или крови или даже смеси того и другого. На полу лежат наполовину съеденные жертвы. " +
+                    "Хотя все они незнатного происхождения, одеты они лучше, чем следовало бы ожидать. Видно, здесь проходило празднество."
             ], true));
             objectSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
                 ["This is... terrible. Who could have done that?", "Это... ужасно. Кто мог такое сотворить?"]));
@@ -1486,9 +1485,9 @@ function describeDestroyedHouseType(chance) {
                     "Есть ПРАВИЛА, Доминик. Я могу использовать его только для продвижения к нашей цели или чтобы спасти нас от " +
                         "неминуемой гибели. Так заведено у крысиных всадников и их товарищей."]));
             objectSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
-                ["Ah, right, right... I lead the way and make decisions. And so I say: it is time for Dominique and " +
+                ["Ah, right, right... I lead the way and make decisions. Well, then, it is time for Dominique and " +
                     "Sallinger to enter the scene! Let us make haste to find the seer.",
-                    "Да, верно, верно... Я веду и принимаю решения. Итак, я решил: пришло время Доминику и Сэллинджеру " +
+                    "Да, верно, верно... Я веду и принимаю решения. Ну, что ж, пришло время Доминику и Сэллинджеру " +
                         "появиться на сцене! Поспешим же найти провидца."]));
             objectSequence.addAction(procureCodeFragmentAction(function () {
                 triggered = true;
@@ -1530,8 +1529,8 @@ function describeSeersHutType(chance) {
             objectSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
                 ["*quietly to Sallinger* Is this the real deal?", "*тихо обращаясь к Сэллинджеру* Он настоящий?"]));
             objectSequence.addAction(procureDisplaySpeechMessageAction(seersName, null,
-                ["Oh please. Your distrust stinks all across Asqiua. And yet what you seek you could have received " +
-                    "from any peasant along the road.", "Ох, пожалуйста, давайте без этого. Твоё недоверие воняет на всю Аскюа. " +
+                ["Oh please. Your distrust stinks all across Asqarra. And yet what you seek you could have received " +
+                    "from any peasant along the road.", "Ох, пожалуйста, давайте без этого. Твоё недоверие воняет на всю Аскарру. " +
                     "И тем не менее, то, что ты ищешь, ты мог узнать у любого крестьянина по дороге."]));
             objectSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
                 ["What does that mean? Do you imply to know why we are here?", "Что это ещё значит? Намекаете, что знаете, зачем мы здесь?"]));
@@ -1555,7 +1554,7 @@ function describeSeersHutType(chance) {
                     "Да, да... Ты определённо не будешь разочарован, когда встретишь его. Иди же и делай то, зачем пришёл."]));
             objectSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
                 ["*sarcastically* Would you be so kind as to tell us directions? That was why we sought you out in the first place, you know.",
-                    "*язвительно* Не будете ли так добры, подсказать дорогу? Мы вроде как за этим и пришли."]));
+                    "*язвительно* Не будете ли так добры подсказать дорогу? Мы вроде как за этим и пришли."]));
             objectSequence.addAction(procureDisplaySpeechMessageAction(seersName, null,
                 ["Oh, right. But as I said, you could have asked pretty much anyone - just follow the snake path that brought you to me.",
                     "А, точно. Но как я сказал, вы могли спросить это у кого угодно - просто идите по тропе змеи, которая привела вас ко мне."]));
@@ -1633,7 +1632,7 @@ function describeSerpentCaveType(chance) {
                 if (eventChoice == 0) {
                     triggered = true;
                     gst[CH00][CH00_PHASE]++;
-                    objectSequence.addAction(procureLandscapeTransitionAction(LSC_SERPENT_CAVE, true), DECORATIONS_NEAR);
+                    objectSequence.addAction(procureLandscapeTransitionAction(LSC_SERPENT_CAVE, true), OBJECTS_NEAR_FRONT);
                 } else {
                     objectSequence.addAction(procureResumeAction());
                 }
@@ -1753,14 +1752,132 @@ function describeGreenSerpentType(chance) {
             encounterSequence.addAction(procureDisplaySpeechMessageAction(["Party Crasher", "Незваный Гость"], null,
                 ["Mmmm, yesss. Thosse who ssay ssuch wordsss tend to be... ssspicy!",
                     "Мммм, превосссходно. Те, кто говорят такие ссслова обычно... оссстренькие!"]));
-            encounterSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+            encounterSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
                 ["Get ready, Sallinger! Here it comes!", "Готовься, Сэллинджер! Он нападает!"]));
+            encounterSequence.addAction(procureCodeFragmentAction(function () {
+                setEventMusic(MUS_RELIEF);
+            }));
 
             var afterbattleSequence = new Sequence();
+            afterbattleSequence.addAction(procureCodeFragmentAction(function () {
+                hero.gainAuraSkill(SKL_ACEOFSPADES);
+            }));
             afterbattleSequence.addAction(procureDisplayCenteredMessageAction(WW_MEDIUM,
                 ["The serpent is lying on cold stones of the cavern. Everything has suddenly gone quiet.",
                     "Змей лежит на холодных камнях пещеры. Всё внезапно затихло."], true));
-            afterbattleSequence.addAction(procureLandscapeTransitionAction(LSC_PROLOGUE), DECORATIONS_NEAR);
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Dominique, do you realize what you just did?", "Доминик, ты понимаешь, что ты сейчас сделал?"]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["My muscles would not move, but... I made my body deliver the finishing blow anyway! It - was - marvellous!",
+                    "Мои мышцы не двигались, но... я всё равно заставил своё тело нанести последний удар! Вос-хи-ти-тель-но!"]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["It was aura. The material manifestation of a spirit. When you reached your limit, your spirit gained power " +
+                    "over the laws of physics.", "Это была аура. Материальное проявление духа. Когда ты находился на грани, " +
+                    "твой дух возымел власть над законами физики."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["They say everyone has the potential to unleash aura, but ones who actually do it are very few. " +
+                    "Even among experienced rat riders it's a rarity to come by, not to mention a newcomer like you.",
+                    "Говорят, что у каждого есть потенциал высвобождения ауры, но на практике это могут сделать единицы. " +
+                        "Даже среди опытных крысиных всадников это редкость, не говоря уже о новичке, вроде тебя."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["A newcomer?.. What do you mean?", "Новичке?.. Что ты имеешь ввиду?"]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Heck. Did I say it out loud?", "Чёрт. Я сказал это вслух?.."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["I am... Wait. When did I become a rat rider? Who was I before? Why can't I--",
+                    "Я же... Постой. Как давно я стал крысиным всадником? Кем я был до этого? Почему я не могу--"]));
+            afterbattleSequence.addAction(procureGuiEffectAction(GFX_SCREEN_FLASH, "white", null));
+            afterbattleSequence.addAction(procureCodeFragmentAction(function () {
+                hero.expendKarma(273);
+            }));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Dominique... Stop, don't try to remember. It will be a violation of the contract, and we'll have to pay with karma.",
+                    "Доминик... Остановись, не пытайся вспоминать. Это будет нарушением сделки, и нам придётся заплатить за это кармой."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["You wanted to become a hero, and this is your chance. Just forget and live your new life.",
+                    "Ты хотел стать героем, и сейчас у тебя есть такая возможность. Просто забудь и живи своей новой жизнью."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["No, Sallinger! There is strange emptiness inside me, and I have finally perceived it! I... I don't remember where I am from, " +
+                    "where is my home... Tell me, what's going on?", "Нет, Сэллинджер! Внутри меня какая-то неведомая пустота, и я только " +
+                    "сейчас её ощутил! Я... я не помню, откуда я, и где мой дом... Объясни мне: что происходит?"]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["*sighs* It seems, victory over Party Crasher netted us enough karma to allow your thoughts into the forbidden zone. Well, " +
+                    "then. If I continue, hero's destiny will elude you.", "*вздыхает* Видимо, победа над Незваным Гостем принесла нам " +
+                    "достаточно кармы, чтобы твоя мысль вошла в запретную зону. Ну, что ж. Если я продолжу, судьба героя ускользнёт от тебя."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["... So be it. I'd rather be whole Dominique, than a hollow hero. Speak.",
+                    "... Ну, и пусть. Я не хочу быть пустым героем. Лучше я буду просто Домиником, но целым. Говори."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Suit yourself, Dominique. You struck a deal with the Peddler of Destinies. You gave up your past, its potential and memory " +
+                    "of it to become a warrior capable of carrying a weapon.", "Твоя воля, Доминик. Ты заключил сделку с Торговцем Судьбами. " +
+                    "Ты отдал своё прошлое, весь его потенциал и память о нём, чтобы стать воином, способным держать оружие."]));
+            afterbattleSequence.addAction(procureGuiEffectAction(GFX_SCREEN_FLASH, "white", null));
+            afterbattleSequence.addAction(procureCodeFragmentAction(function () {
+                hero.expendKarma(428);
+            }));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["My past...", "Моё прошлое..."]));
+            afterbattleSequence.addAction(procureCodeFragmentAction(function () {
+                displayGui = false;
+            }));
+            afterbattleSequence.addAction(procureMaskAction());
+            afterbattleSequence.addAction(procureDisplayFreeTextAction(400, 200, W - 900,
+                ["Hogville. Three years ago.", "Хогвилль. Три года назад."], true));
+            afterbattleSequence.addAction(procureDisplayFreeTextAction(200, 200, W - 400, [
+                "Dominique was a son of a Hogland noble, born to rule Hogville someday. He grew up reading tales of brave knights and for all " +
+                    "of his life he dreamed about heroic exploits. <br> <br> His younger brother, Vink, was a savant that studied cosmology " +
+                    "and ancient arts of mysticism and alchemy. <br> <br> While dreaming of valor and fame, Dominique nonetheless prepared " +
+                    "to inherit the power and studied organizational and city management basics, speechcraft and politics.",
+                "Доминик был сыном Хогледнского дворянина, будущим правителем Хогвилля. Он вырос на рыцарских сказаниях и всю сознательную " +
+                    "жизнь мечтал о подвигах. <br> <br> Его младший брат, Винк, был учёным и посвящал своё время изучению космологии и " +
+                    "древних искусств мистицизма и алхимии. <br> <br> Доминик, мечтая о доблести и славе, в то же время готовился принять " +
+                    "власть от отца и постигал основы организации и градоправления, ораторское искусство и политику."
+            ], true));
+            afterbattleSequence.addAction(procureDisplayFreeTextAction(200, 200, W - 400, [
+                "That is until Vink told him about a mysterious Peddler of Destinies, who can trade various fragments of dwellers' lives for " +
+                    "karma and karma for whatever life they wish for. \"Nothing is impossible!\" - Vink said. <br> <br> And so Dominique " +
+                    "became obsessed with exchanging the loathed destiny of a noble for incredible adventures. Especially since his " +
+                    "responsibility before the citizens grew with each passing day, and his father was about to retire.",
+                "Но так было до тех пор, пока Винк не рассказал ему, что существует некий Торговец Судьбами, способный обменивать самые разные " +
+                    "фрагменты жизни жителей на карму, а карму на такую жизнь, какую они пожелают. \"Нет ничего невозможного!\" - говорил Винк. " +
+                    "<br> <br> И Доминик стал грезить день и ночь о том, чтобы сменить претившую ему судьбу дворянина на невероятные " +
+                    "приключения. Ведь его ответственность перед горожанами росла с каждым днём, а отец готовился сложить свои полномочия."
+            ], true));
+            afterbattleSequence.addAction(procureDisplayFreeTextAction(200, 200, W - 400, [
+                "His naive wish turned frighteningly real, when he actually met this Peddler during one of his fruitless weapon training " +
+                    "sessions on the outskirts of a forest near Hogville... <br> <br> When dinner time came, not a single dweller in Hogville " +
+                    "remembered that there once lived a hogman by the name of Dominique who should have become a governor. Only Vink felt that " +
+                    "he lost something important and precious, but he could not understand what it was...",
+                "Наивное желание обернулось пугающей реальностью, когда в очередной раз безрезультатно тренируясь с оружием на опушке леса близ " +
+                    "Хогвилля, он встретил того самого Торговца... <br> <br> К обеду никто уже не помнил, что жил в Хогвилле когда-то кабанолюд " +
+                    "по имени Доминик, который должен был стать правителем. Лишь только Винк ощущал, будто он потерял что-то очень важное и " +
+                    "ценное, но никак не мог понять, что..."
+            ], true));
+            afterbattleSequence.addAction(procureUnmaskAction());
+            afterbattleSequence.addAction(procureGuiEffectAction(GFX_SCREEN_FLASH, "white", null));
+            afterbattleSequence.addAction(procureCodeFragmentAction(function () {
+                displayGui = true;
+                hero.expendKarma(1199);
+            }));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["... Hogville. So that's it. But how do you know of my contract with the Peddler of Destinies?",
+                    "... Хогвилль. Вот, значит, как оно. Но откуда ты знаешь о моей сделке с Торговцем Судьбами?"]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["Let's say I made my own deal with him. But I did not give away my memory. I'm sorry, Dominique, but I cannot say more.",
+                    "Скажем так, я тоже заключил с ним сделку. Но я не отдавал ему свою память. " +
+                        "Извини, Доминик, но я не могу пока сказать больше."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["That is not important anyway. Sallinger. We... I am coming home.", "Да и неважно. Сэллинджер. Мы... Я отправляюсь домой."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                ["We, Dominique. We just broke your contract with the Peddler, but we have paid for it already. You are still a rat rider, and " +
+                    "I am your friend. Wherever you go, I go with you.", "Мы, Доминик. Мы только что нарушили твою сделку с Торговцем, но мы " +
+                    "уже заплатили за это. Ты по-прежнему крысиный всадник, а я твой друг. Куда ты, туда и я."]));
+            afterbattleSequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                ["*slightly smiling* Excellent. Then let us go.", "*слегка улыбаясь* Отлично. Тогда идём."]));
+            afterbattleSequence.addAction(procureLandscapeTransitionAction(LSC_PROLOGUE), OBJECTS_NEAR_FRONT);
+            afterbattleSequence.addAction(procureCodeFragmentAction(function () {
+                hero.obtainCodexEntry(CDX_JOU004_CH00P04)
+            }));
 
             setBattleMusic(MUS_BOSS_BATTLE);
             encounterSequence.addAction(procureInitiateBattleAction(enemy, afterbattleSequence));
@@ -2132,6 +2249,10 @@ function enlistBanditRingleader(startingHeroStrength, maxHeroStrength, animation
     banditRingleader.defineBehave(function (character, battleFrame) {
         var position;
         if (battleFrame == 0) {
+            if (gst[CH00][CH00_BANDIT_RINGLEADER_QUEST] < 1) {
+                gst[CH00][CH00_BANDIT_RINGLEADER_QUEST] = 1;
+                itemsLooted.push({id: ITM_MAXHPUP1, charges: 1});
+            }
             character.useSkill(gainOpenerSkill(10), 0);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
@@ -2408,6 +2529,10 @@ function enlistArmadilloVityaz(startingHeroStrength, maxHeroStrength, animationO
     armadilloVityaz.defineBehave(function (character, battleFrame) {
         var position;
         if (battleFrame == 0) {
+            if (gst[CH00][CH00_ARMADILLO_VITYAZ_QUEST] < 1) {
+                gst[CH00][CH00_ARMADILLO_VITYAZ_QUEST] = 1;
+                itemsLooted.push({id: ITM_MAXSPUP1, charges: 1});
+            }
             character.useSkill(gainOpenerSkill(10), 0);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
@@ -2464,6 +2589,7 @@ function enlistGreenSerpent(startingHeroStrength, maxHeroStrength, animationObje
     var evadeSkill = gainEnemyEvadeSkill(100, 0.1);
     var poisonFangSkill = gainStatusAttackSkill(140, 0.9, acquirePoisonedStatus, 1.1, 2000, 40);
     var lieInWait = gainLieInWaitSkill(200, 0.5, 0.8);
+    var deathblow = gainDeathblowSkill(300, 0.5);
     greenSerpent.defineBehave(function (character, battleFrame) {
         if (battleFrame == 0) {
             character.inflict([acquireResponseArtifact(BGL_LEFT, 1, 1, BGL_COLOR, BGL_COLOR, function (dmg) {
@@ -2478,25 +2604,67 @@ function enlistGreenSerpent(startingHeroStrength, maxHeroStrength, animationObje
                     registerObject(GUI_EVENT, battlePhase2Sequence);
                     return character.hp - dmg <= character.attrMaxHp * 0.5 ? character.hp - character.attrMaxHp * 0.5 : dmg;
                 } else if ((character.hp > character.attrMaxHp * 0.1) && (character.hp - dmg <= character.attrMaxHp * 0.1)) {
+                    behaviorFluctuation = 1;
                     var battlePhase3Sequence = new Sequence();
                     battlePhase3Sequence.addAction(procureStopAction());
                     battlePhase3Sequence.addAction(procureCodeFragmentAction(function () {
                         hero.battleGaugeArtifacts.length = 0;
                         enemy.battleGaugeArtifacts.length = 0;
-                        hero.skillSet[7] = gainSkill(SKL_ACEOFSPADES);
-                        hero.ap = 1;
+                        var lockdown = [];
+                        for (var i = 0; i < 7; i++) {
+                            lockdown.push(
+                                acquireSlotLockArtifact(BGL_LEFT, 1, 1, BGL_COLOR, BGL_COLOR, false, i, true).perpetuate());
+                            if (i < 5) {
+                                lockdown.push(
+                                    acquireSlotLockArtifact(BGL_LEFT, 1, 1, BGL_COLOR, BGL_COLOR, true, i, true).perpetuate());
+                            }
+                        }
+                        hero.inflict(lockdown);
                     }));
+                    battlePhase3Sequence.addAction(procureDisplaySpeechMessageAction(["Party Crasher", "Незваный Гость"], null,
+                        ["*hisses angrily* Enough of it!", "*зло шипит* Доссстаточно!"]));
+                    battlePhase3Sequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                        ["*writhes in pain* I... can't move!", "*корчится от боли* Я... не могу сдвинуться с места!"]));
                     battlePhase3Sequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
-                        ["Heck. It was just playing with us. The real thing starts now!",
-                            "Чёрт. Он просто играл с нами. Сейчас начнётся самое оно!"]));
+                        ["No way! Could it be poison?", "Быть не может! Неужели яд?"]));
+                    battlePhase3Sequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                        ["Must be... But I won't let it end this way!", "Должно быть... Но я не позволю этому так закончиться!"]));
+                    battlePhase3Sequence.addAction(procureDisplaySpeechMessageAction(["Party Crasher", "Незваный Гость"], null,
+                        ["Now begone with your vermin!", "Сссгинь ссо своими грызунами!"]));
+                    battlePhase3Sequence.addAction(procureDisplaySpeechMessageAction(CHR_DOMINIQUE.name, CHR_DOMINIQUE.portrait,
+                        ["Not so fast, you drunken monster...", "Не так быстро, пьяное чудовище..."]));
+                    battlePhase3Sequence.addAction(procureDisplaySpeechMessageAction(CHR_SALLINGER.name, CHR_SALLINGER.portrait,
+                        ["Dominique?..", "Доминик?.."]));
                     battlePhase3Sequence.addAction(procureResumeAction());
+                    battlePhase3Sequence.addAction(procureCodeFragmentAction(function () {
+                        character.inflict([acquireResponseArtifact(BGL_LEFT, 1, 1,BGL_COLOR, BGL_COLOR, function () {
+                            hero.battleGaugeArtifacts.length = 0;
+                            return dmg < character.hp ? character.hp : dmg;
+                        }, true)]);
+                        hero.inflict([acquireGradualChangeArtifact(BGL_LEFT, 1, 500, BGL_COLOR, BGL_COLOR, ATTR_SP, 0, 100, 0, true)]);
+                        hero.inflict([acquireGradualChangeArtifact(BGL_LEFT, 1, 500, BGL_COLOR, BGL_COLOR, ATTR_AP, 0, 2.5, 0, true)]);
+                        hero.skillSet[7] = gainSkill(SKL_ACEOFSPADES);
+                        skillChoice = 7;
+                        var auraEffect = new Action();
+                        auraEffect.definePlayFrame(function (frame) {
+                            fc.beginPath();
+                            fc.arc(hero.position, hero.height, (frame * 20) % 500, 0, 2 * Math.PI);
+                            fc.lineWidth = frame % 25;
+                            fc.strokeStyle = "white";
+                            fc.stroke();
+                            return frame >= 150;
+                        });
+                        registerObject(OBJECTS_NEAR_FRONT, auraEffect);
+                    }));
                     registerObject(GUI_EVENT, battlePhase3Sequence);
+                    return character.hp - dmg <= character.attrMaxHp * 0.05 ? character.hp - character.attrMaxHp * 0.05 : dmg;
                 }
                 return dmg;
             }, true).perpetuate()]);
             character.useSkill(gainOpenerSkill(10), 0);
             behaviorFluctuation = 1;
         } else if (character.getRightmostCooldown() < getAbsoluteArtifactPosition(200)) {
+            var position;
             if (character.hp > character.attrMaxHp * 0.7) {
                 if (behaviorFluctuation == 1) {
                     character.useSkill(evadeSkill, getStandardEnemyOffset(evadeSkill)
@@ -2565,14 +2733,26 @@ function enlistGreenSerpent(startingHeroStrength, maxHeroStrength, animationObje
                         + 20 + Math.floor(20 * Math.random()));
                     behaviorFluctuation = 9;
                 } else if (behaviorFluctuation == 9) {
-                    character.useSkill(lieInWait, getStandardEnemyOffset(lieInWait)
-                        + 30 + Math.floor(40 * Math.random()));
+                    position = getStandardEnemyOffset(lieInWait) + 30 + Math.floor(40 * Math.random());
+                    character.useSkill(lieInWait, position);
+                    character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                        ["Lie in wait", "Затаиться"])]);
                     behaviorFluctuation = 1;
                 }
             } else {
-
+                if (behaviorFluctuation == 1) {
+                    position = getStandardEnemyOffset(deathblow);
+                    character.useSkill(deathblow, position);
+                    character.inflict([acquireLabelArtifact(getAbsoluteArtifactPosition(position),
+                        ["Deathblow", "Смертельный удар"])]);
+                    behaviorFluctuation += 1;
+                }
             }
         }
+    });
+    var baseKarma = greenSerpent.getKarma();
+    greenSerpent.defineGetKarma(function () {
+        return baseKarma + 2000;
     });
     return greenSerpent;
 }

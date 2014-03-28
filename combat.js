@@ -115,6 +115,16 @@ function acquirePerpetualAttributeModifierArtifact(attribute, power) {
 
 /* OBTAINABLE SKILLS */
 
+function wrapImpactAnimationData(animationImageArray, sfxSrc, framesPerImage, width, height) {
+    return {
+        animation: animationImageArray,
+        sfxSrc: sfxSrc,
+        framesPerImage: framesPerImage,
+        width: width,
+        height: height
+    };
+}
+
 var SKL_ATTACK = 1;
 function gainAttackSkill() {
     var attackSkill = new CombatSkill(["Attack", "Атаковать"],
@@ -242,7 +252,7 @@ function gainAceOfSpadesSkill() {
     var aceOfSpadesSkill = new CombatSkill(["Ace of Spades", "Пиковый Туз"], [
         "An powerful technique for the Queen of Spades that utilizes aura for added strike force. 500% attack power "
             + "impact in the right side of a huge guard down period.",
-        "Мощная техника для Пиковой Дамы, используюзая ауру для увеличения силы удара. Воздействие 500% силы атаки "
+        "Мощная техника для Пиковой Дамы, использующая ауру для увеличения силы удара. Воздействие 500% силы атаки "
             + "в правой части огромной зоны пониженной защиты."], 40);
     aceOfSpadesSkill.defineGetArtifacts(function (position) {
         return [
@@ -250,7 +260,9 @@ function gainAceOfSpadesSkill() {
                 100, 100, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.5, 0, false),
             acquireImpactArtifact(getAbsoluteArtifactPosition(position) + 60,
                 [getResource("imgBattleAuraImpact1Icon"), getResource("imgBattleAuraImpact2Icon")],
-                5, false, false)
+                5, false, false, null, wrapImpactAnimationData(
+                    [getResource("imgEffectHit1-1"), getResource("imgEffectHit1-2"), getResource("imgEffectHit1-3")],
+                    "sound/sfx/hit-01.ogg", 4, 45, 45))
         ];
     });
     return aceOfSpadesSkill;
@@ -540,7 +552,6 @@ function gainLearnableDoubleStrikeSkill() {
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 80, 80, BGL_COLOR, "#FF3C3C", ATTR_DEFENSE, 1, 0.3, 0, false),
             acquireTriggerArtifact(function (character) {
-                playBattleSfx(character, "sound/sfx/hit.ogg");
                 character.strike(0.7);
                 if ((hitCount < 2) && (hero.effDefense > 1)) {
                     hitCount++;
@@ -549,7 +560,6 @@ function gainLearnableDoubleStrikeSkill() {
                 }
             }, getAbsoluteArtifactPosition(position) - 30, 10, getResource("imgBattleImpactIcon")),
             acquireTriggerArtifact(function (character) {
-                playBattleSfx(character, "sound/sfx/hit.ogg");
                 character.strike(0.7);
                 if ((hitCount < 2) && (hero.effDefense > 1)) {
                     hitCount++;
@@ -585,10 +595,29 @@ function gainLieInWaitSkill(width, defenseFluct, agilityFluct) {
                 0, width, BGL_COLOR, "#FF4C4C", ATTR_DEFENSE, 1, defenseFluct, 0, false),
             acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
                 0, width * 2, BGL_COLOR, BGL_COLOR, ATTR_AGILITY, 1, 1 + agilityFluct, 0, true),
-            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getResource("imgBattleImpactIcon"))
+            acquireEmptyArtifact(getAbsoluteArtifactPosition(position), 0, getResource("imgBattleNimbleIcon"))
         ];
     });
     return lieInWaitSkill;
+}
+
+function gainDeathblowSkill(width, vulnerability) {
+    var fumbledAttackSkill = new CombatSkill("Deathblow", "A sure-kill strike.", 40);
+    fumbledAttackSkill.defineGetArtifacts(function (position) {
+        return [
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, "#FF5C5C", ATTR_DEFENSE, 1, vulnerability, 0, false),
+            acquireAttributeAdjustmentArtifact(getAbsoluteArtifactPosition(position),
+                width, width, BGL_COLOR, BGL_COLOR, ATTR_AGILITY, 1, 0.1, 0, true),
+            acquireTriggerArtifact(function (character) {
+                heroResponseHandlers.push(function (dmg) {
+                    return dmg >= hero.hp ? dmg : hero.hp;
+                });
+                character.strike(3, false);
+            }, getAbsoluteArtifactPosition(position), 1000, getResource("imgBattleDeathblowIcon"))
+        ];
+    });
+    return fumbledAttackSkill;
 }
 
 /* ITEMS */
@@ -801,6 +830,32 @@ function obtainLuckyCharmItem() {
     return luckyCharmItem;
 }
 
+var ITM_MAXHPUP1 = 10;
+function obtainGarnetElixirItem() {
+    var elixirItem = new UsableItem(["Garnet Elixir", "Гранатовый эликсир"],
+        ["A highly treasured dark-red elixir known to bestow longevity upon those who drink it. Increases max HP by 10.",
+            "Очень ценный тёмно-красный эликсир, одаривающий долголетием того, кто его пьёт. Увеличивает максимальные ОЖ на 10."],
+        getResource("imgItemElixir1"), 5000, 1, true);
+    elixirItem.defineGetFieldEffect(function () {
+        hero.increaseMaxHp(10);
+        return true;
+    });
+    return elixirItem;
+}
+
+var ITM_MAXSPUP1 = 11;
+function obtainCitrineElixirItem() {
+    var elixirItem = new UsableItem(["Citrine Elixir", "Цитриновый эликсир"],
+        ["A highly treasured golden elixir known to bestow endurance upon those who drink it. Increases max SP by 10.",
+            "Очень ценный золотой эликсир, одаривающий выносливостью того, кто его пьёт. Увеличивает максимальные ОВ на 10."],
+        getResource("imgItemElixir2"), 5000, 1, true);
+    elixirItem.defineGetFieldEffect(function () {
+        hero.increaseMaxSp(10);
+        return true;
+    });
+    return elixirItem;
+}
+
 var ITM_DEBUG_HP = 1001;
 function obtainDebugCube1Item() {
     var cubeItem = new UsableItem(["Mystic Cube: HP", "Мистический Куб: ОЖ"],
@@ -884,6 +939,10 @@ function obtainItem(id) {
             return obtainBucklerItem();
         case ITM_TALISMAN1:
             return obtainLuckyCharmItem();
+        case ITM_MAXHPUP1:
+            return obtainGarnetElixirItem();
+        case ITM_MAXSPUP1:
+            return obtainCitrineElixirItem();
         case ITM_DEBUG_HP:
             return obtainDebugCube1Item();
         case ITM_DEBUG_SPAP:
