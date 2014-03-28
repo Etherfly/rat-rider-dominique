@@ -357,21 +357,18 @@ function Hero() {
     this.animationState = AN_STAND;
     this.animationFrame = 0;
 
-    // TODO: temporary filled skills and items!
     this.availableSkills = [SKL_DEEPBREATH];
     this.availableAuraSkills = [];
     this.activeSkills = [SKL_ATTACK, SKL_DEFEND];
     this.activeAuraSkills = [];
 
-    this.availableItems = [{id: ITM_DEBUG_HP, charges: 50}, {id: ITM_DEBUG_SPAP, charges: 50},
-        {id: ITM_DEBUG_KARMA, charges: 50}, {id: ITM_SPRES1, charges: 3}, {id: ITM_ATKUP1, charges: 3},
-        {id: ITM_DEFUP1, charges: 3}, {id: ITM_AGIUP1, charges: 3}, {id: ITM_RFXUP1, charges: 3},
-        {id: ITM_DMG1, charges: 3}, {id: ITM_GUARD1, charges: 5}, {id: ITM_TALISMAN1, charges: 1}];
+    this.availableItems = [{id: ITM_HPRES1, charges: 3}, {id: ITM_SPRES1, charges: 3}];
     this.activeItems = [];
 
-    this.codexEntries = [{id: CDX_CH00HOUSE, read: false}, {id: CDX_CH00HOTSPRING, read: false}, {id: CDX_CH00INN, read: false},
-        {id: CDX_CH00SMITHY, read: false}, {id: CDX_CH00DOJO, read: false}, {id: CDX_CH00CHRONICLER, read: false},
-        {id: CDX_CH00LIBRARY, read: false}, {id: CDX_CH00TRADINGPOST, read: false}, {id: CDX_CH00MILESTONE, read: false}];
+    this.codexEntries = [{id: CDX_CH00HOUSE, read: false}, {id: CDX_CH00HOTSPRING, read: false},
+        {id: CDX_CH00INN, read: false}, {id: CDX_CH00SMITHY, read: false}, {id: CDX_CH00DOJO, read: false},
+        {id: CDX_CH00CHRONICLER, read: false}, {id: CDX_CH00LIBRARY, read: false},
+        {id: CDX_CH00TRADINGPOST, read: false}, {id: CDX_CH00MILESTONE, read: false}];
 
     this.skillSet = [];
     this.battleGaugeArtifacts = [];
